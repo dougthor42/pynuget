@@ -6,34 +6,37 @@ from flask import Flask
 
 from pynuget import app
 
+@app.route('/', methods=['GET'])
+def root():
+    raise NotImplementedError
 
-@app.route('/')
+@app.route('/index', methods=['GET', 'PUT', 'DELETE'])
 def index():
     raise NotImplementedError
 
 def push():
     raise NotImplementedError
 
-@app.route('/count')
+@app.route('/count', methods=['GET'])
 def count():
     raise NotImplementedError
 
-@app.route('/delete')
+@app.route('/delete', methods=['DELETE'])
 def delete():
     raise NotImplementedError
 
-@app.route('/download')
+@app.route('/download', methods=['GET'])
 def download():
     raise NotImplementedError
 
-@app.route('find_by_id')
+@app.route('find_by_id', methods=['GET'])
 def find_by_id:
     raise NotImplementedError
 
-@app.route('/search')
+@app.route('/search', methods=['GET'])
 def search():
     raise NotImplementedError
 
-@app.route('/updates')
+@app.route('/updates', methods=['GET'])
 def updates():
     raise NotImplementedError
