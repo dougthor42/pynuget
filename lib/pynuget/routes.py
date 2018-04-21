@@ -3,7 +3,8 @@
 """
 
 from flask import Flask
-app = Flask(__name__)
+
+from pynuget import app
 
 
 @app.route('/')
