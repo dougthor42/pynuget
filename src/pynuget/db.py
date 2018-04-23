@@ -123,8 +123,9 @@ def insert_or_update_package():
 
 def insert_version(session, **kwargs):
     """Insert a new version of an existing package."""
-    kwargs['created'] = dt.datetime.utc_now()
-    kwargs['dependencies'] = json.dumps(kwargs['dependencies'])
+    kwargs['created'] = dt.datetime.utcnow()
+    if 'dependencies' in kwargs:
+        kwargs['dependencies'] = json.dumps(kwargs['dependencies'])
     if 'is_prerelease' not in kwargs:
         kwargs['is_prerelease'] = 0
     if 'require_license_acceptance' not in kwargs:
