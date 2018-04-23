@@ -11,6 +11,7 @@ from sqlalchemy import ForeignKey
 from sqlalchemy import exists
 from sqlalchemy import func
 from sqlalchemy import desc
+from sqlalchemy import or_
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -72,8 +73,37 @@ def count_packages(session):
     return session.query(func.count(Package.package_id)).scalar()
 
 
-def search_packages():
-    raise NotImplementedError
+def search_packages(session,
+                    include_prerelease=False,
+                    order_by=desc(Version.version_download_count),
+                    filter_=None,
+                    search_query=None):
+
+    query = session.query(Version).join(Package)
+
+    if search_query is not None:
+        search_query = "%" + search_query + "%"
+        query = query.filter(
+            or_(Package.title.like(search_query),
+                Package.package_id.like(search_query)
+                )
+        )
+
+    if not include_prerelease:
+        query = query.filter(Version.is_prerelease.isnot(True))
+
+    known_filters = ('is_absolute_latest_version', 'is_latest_version')
+    if filter_ is None:
+        pass
+    elif filter_ in known_filters:
+        query = query.filter(Version.version == Package.latest_version)
+    else:
+        raise ValueError("Unknown filter '{}'".format(filter_))
+
+    if order_by is not None:
+        query = query.order_by(order_by)
+
+    return query.all()
 
 
 def package_updates():
