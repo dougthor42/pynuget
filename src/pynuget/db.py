@@ -8,6 +8,7 @@ import json
 import sqlalchemy as sa
 from sqlalchemy import Column, Integer, String, Text, Boolean
 from sqlalchemy import ForeignKey
+from sqlalchemy import exists
 from sqlalchemy import func
 from sqlalchemy import desc
 from sqlalchemy.ext.declarative import declarative_base
@@ -27,6 +28,9 @@ class Package(Base):
     title = Column(String(256), index=True)
     download_count = Column(Integer, index=True, nullable=False, default=0)
     latest_version = Column(Text())
+
+    def __repr__(self):
+        return "<Package({}, {})>".format(self.package_it, self.title)
 
 
 class Version(Base):
@@ -57,7 +61,7 @@ class Version(Base):
     copyright_ = Column(Text())
     is_prerelease = Column(Boolean())
 
-    package = relationship("Package", back_populates="versions")
+    package = relationship("Package", backref="versions")
 
     def __repr__(self):
         return "<Version({}, {})>".format(self.package.title, self.version)
@@ -65,7 +69,7 @@ class Version(Base):
 
 def count_packages(session):
     """Count the number of packages on the server."""
-    return session.query(func.count(Package.package_id))
+    return session.query(func.count(Package.package_id)).scalar()
 
 
 def search_packages():
@@ -78,9 +82,9 @@ def package_updates():
 
 def find_by_id(session, package_id, version=None):
     """Find a package by ID and version. If no version given, return all."""
-    query = session.query(Package).filter(Package.package_id == package_id)
+    query = session.query(Version).filter(Version.package_id == package_id)
     if version:
-        query.filter(Package.version == version)
+        query.filter(Version.version == version)
     query.order_by(desc(Version.version))
 
     return query.all()
@@ -95,20 +99,22 @@ def do_search():
 
 
 def validate_id_and_version(session, package_id, version):
-    query = (session.query(func.count(Version))
+    """Not exactly sure what this is supposed to do, but I *think* it simply
+    makes sure that the given pacakge_id and version exist... So that's
+    what I've decided to make it do."""
+    query = (session.query(Version)
              .filter(Version.package_id == package_id)
              .filter(Version.version == version)
              )
-    query.all()
-    # TODO: Where count(version) == 1
+    return session.query(query.exists()).scalar()
 
 
 def increment_download_count(session, package_id, version):
     """Increment the download count for a given package version."""
     obj = (session.query(Version)
            .filter(Version.package_id == package_id)
-           .filder(Version.version == version)
-           )
+           .filter(Version.version == version)
+           ).one()
     obj.version_download_count += 1
     obj.package.download_count += 1
     session.commit()
@@ -120,8 +126,9 @@ def insert_or_update_package():
 
 def insert_version(session, **kwargs):
     """Insert a new version of an existing package."""
-    kwargs['created'] = dt.datetime.utc_now()
-    kwargs['dependencies'] = json.dumps(kwargs['dependencies'])
+    kwargs['created'] = dt.datetime.utcnow()
+    if 'dependencies' in kwargs:
+        kwargs['dependencies'] = json.dumps(kwargs['dependencies'])
     if 'is_prerelease' not in kwargs:
         kwargs['is_prerelease'] = 0
     if 'require_license_acceptance' not in kwargs:
