@@ -76,8 +76,30 @@ def test_search_packages(session):
 
 
 def test_package_updates(session):
-    with pytest.raises(NotImplementedError) as e_info:
-        db.package_updates()
+    # Add more more dummy data
+    pkg = db.Package(title="test_proj", latest_version="0.1.4")
+    session.add(pkg)
+    session.commit()
+
+    session.add(db.Version(package_id=pkg.package_id, version="0.1.3"))
+    session.add(db.Version(package_id=pkg.package_id, version="0.1.4"))
+    session.commit()
+
+    data = {1: '0.0.2', 2: '0.1.3'}
+
+    result = db.package_updates(session, data)
+    assert len(result) == 2
+    assert type(result[0]) == db.Version
+    assert result[0].package.title == "dummy"
+    assert result[0].version == "0.0.3"
+    assert result[1].package.title == "test_proj"
+    assert result[1].version == "0.1.4"
+
+    # if we currently have the latest version, return nothing. Do not return
+    # packages that we don't have installed.
+    data = {1: '0.0.3'}
+    result = db.package_updates(session, data)
+    assert len(result) == 0
 
 
 def test_find_by_id(session):
