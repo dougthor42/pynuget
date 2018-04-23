@@ -169,8 +169,25 @@ def insert_version(session, **kwargs):
     session.commit()
 
 
-def delete_version():
-    raise NotImplementedError
+def delete_version(session, package_id, version):
+    sql = (session.query(Version)
+            .filter(Version.package_id == package_id)
+            .filter(Version.version == version)
+            )
+    package = sql.first().package
+
+    session.delete(sql.one())
+    session.commit()
+
+    # update the Package.latest_version value, or delete the Package
+    versions = (session.query(Version)
+                .filter(Version.package_id == package_id)
+                ).all()
+    if len(versions) > 0:
+        package.latest_version = max(v.version for v in versions)
+    else:
+        session.delete(package)
+    session.commit()
 
 
 # XXX: I don't think this is actually needed, since SQLAlchemy does it.
