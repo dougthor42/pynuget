@@ -141,8 +141,25 @@ def test_insert_version(session):
 
 
 def test_delete_version(session):
-    with pytest.raises(NotImplementedError) as e_info:
-        db.delete_version()
+    # get our initial counts
+    version_count = session.query(sa.func.count(db.Version.version_id))
+    package_count = session.query(sa.func.count(db.Package.package_id))
+    initial_version_count = version_count.scalar()
+    initial_package_count = package_count.scalar()
+
+    # Delete a version
+    pkg_id = 1
+    db.delete_version(session, pkg_id, '0.0.2')
+
+    assert initial_version_count - 1 == version_count.scalar()
+    assert initial_package_count == package_count.scalar()
+    assert '0.0.2' not in session.query(db.Version.version).all()
+
+    # twice more, the 2nd of which should delete the package
+    db.delete_version(session, 1, '0.0.3')
+    db.delete_version(session, 1, '0.0.1')
+    assert version_count.scalar() == 0
+    assert package_count.scalar() == 0
 
 
 def test_build_in_clause(session):
