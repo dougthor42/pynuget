@@ -147,8 +147,29 @@ def test_increment_download_count(session):
 
 
 def test_insert_or_update_package(session):
-    with pytest.raises(NotImplementedError) as e_info:
-        db.insert_or_update_package()
+    pkg_id = 2
+    title = "NewPackage"
+    latest_version = "0.0.1"
+
+    # Test Insert
+    db.insert_or_update_package(session, pkg_id, title, latest_version)
+
+    sql = (session.query(db.Package)
+           .filter(db.Package.package_id == pkg_id)
+           )
+
+    result = sql.scalar()
+    assert isinstance(result, db.Package)
+    assert result.title == title
+    assert result.latest_version == latest_version
+    assert result.download_count == 0
+
+    # Test update
+    db.insert_or_update_package(session, pkg_id, "NewTitle", "0.0.2")
+    result = sql.scalar()
+    assert result.title == "NewTitle"
+    assert result.latest_version == '0.0.2'
+    assert result.download_count == 0
 
 
 def test_insert_version(session):
