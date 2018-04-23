@@ -86,8 +86,13 @@ def do_search():
     raise NotImplementedError
 
 
-def validate_id_and_version():
-    raise NotImplementedError
+def validate_id_and_version(session, package_id, version):
+    query = (session.query(func.count(Version))
+             .filter(Version.package_id == package_id)
+             .filter(Version.version == version)
+             )
+    query.all()
+    # TODO: Where count(version) == 1
 
 
 def insert_or_update_package():
