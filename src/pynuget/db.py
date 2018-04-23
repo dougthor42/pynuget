@@ -8,6 +8,7 @@ import json
 import sqlalchemy as sa
 from sqlalchemy import Column, Integer, String, Text, Boolean
 from sqlalchemy import ForeignKey
+from sqlalchemy import exists
 from sqlalchemy import func
 from sqlalchemy import desc
 from sqlalchemy.ext.declarative import declarative_base
@@ -98,12 +99,14 @@ def do_search():
 
 
 def validate_id_and_version(session, package_id, version):
-    query = (session.query(func.count(Version))
+    """Not exactly sure what this is supposed to do, but I *think* it simply
+    makes sure that the given pacakge_id and version exist... So that's
+    what I've decided to make it do."""
+    query = (session.query(Version)
              .filter(Version.package_id == package_id)
              .filter(Version.version == version)
              )
-    query.all()
-    # TODO: Where count(version) == 1
+    return session.query(query.exists()).scalar()
 
 
 def increment_download_count(session, package_id, version):
