@@ -72,8 +72,14 @@ class TestDb(object):
         session.add(vers)
         session.commit()
 
-        assert db.validate_id_and_version(session, vers.package_id, vers.version) == True
-        assert db.validate_id_and_version(session, vers.package_id, "9.9.9") == False
+        result_1 = db.validate_id_and_version(session,
+                                              vers.package_id,
+                                              vers.version)
+        assert result_1 is True
+        result_2 = db.validate_id_and_version(session,
+                                              vers.package_id,
+                                              "9.9.9")
+        assert result_2 is False
 
     def test_increment_download_count(self, session):
         # insert some dummy data
