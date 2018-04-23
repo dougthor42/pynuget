@@ -65,6 +65,7 @@ class Version(Base):
 
 
 def count_packages(session):
+    """Count the number of packages on the server."""
     return session.query(func.count(Package.package_id))
 
 
@@ -77,6 +78,7 @@ def package_updates():
 
 
 def find_by_id(session, package_id, version=None):
+    """Find a package by ID and version. If no version given, return all."""
     query = session.query(Package).filter(Package.package_id == package_id)
     if version:
         query.filter(Package.version == version)
@@ -111,6 +113,7 @@ def insert_or_update_package():
 
 
 def insert_version(session, **kwargs):
+    """Insert a new version of an existing package."""
     kwargs['created'] = dt.datetime.utc_now()
     kwargs['dependencies'] = json.dumps(kwargs['dependencies'])
     if 'is_prerelease' not in kwargs:
@@ -127,5 +130,6 @@ def delete_version():
     raise NotImplementedError
 
 
+# XXX: I don't think this is actually needed, since SQLAlchemy does it.
 def build_in_clause():
     raise NotImplementedError
