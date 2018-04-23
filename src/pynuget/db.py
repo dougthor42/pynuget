@@ -77,7 +77,6 @@ class Version(Base):
         return cast(cls.package_id, String) + "~~" + cast(cls.version, String)
 
 
-
 def count_packages(session):
     """Count the number of packages on the server."""
     return session.query(func.count(Package.package_id)).scalar()
@@ -184,8 +183,16 @@ def increment_download_count(session, package_id, version):
     session.commit()
 
 
-def insert_or_update_package():
-    raise NotImplementedError
+def insert_or_update_package(session, package_id, title, latest_version):
+    sql = session.query(Package).filter(Package.package_id == package_id)
+    obj = sql.one_or_none()
+    if obj is None:
+        pkg = Package(title=title, latest_version=latest_version)
+        session.add(pkg)
+    else:
+        sql.update({Package.title: title,
+                    Package.latest_version: latest_version})
+    session.commit()
 
 
 def insert_version(session, **kwargs):
