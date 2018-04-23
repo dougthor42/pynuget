@@ -25,8 +25,7 @@ class Package(Base):
 
     package_id = Column(Integer, primary_key=True)
     title = Column(String(256), index=True)
-    download_count = Column(Integer, index=True,
-                            nullable=False, default=0)
+    download_count = Column(Integer, index=True, nullable=False, default=0)
     latest_version = Column(Text())
 
 
