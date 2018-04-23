@@ -6,6 +6,7 @@ import sqlalchemy as sa
 from sqlalchemy import Column, Integer, String, Text, Boolean
 from sqlalchemy import ForeignKey
 from sqlalchemy import func
+from sqlalchemy import desc
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -72,8 +73,13 @@ def package_updates():
     raise NotImplementedError
 
 
-def find_by_id():
-    raise NotImplementedError
+def find_by_id(session, package_id, version=None):
+    query = session.query(Package).filter(Package.package_id == package_id)
+    if version:
+        query.filter(Package.version == version)
+    query.order_by(desc(Version.version))
+
+    return query.all()
 
 
 def do_search():
