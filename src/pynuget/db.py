@@ -5,6 +5,7 @@
 import sqlalchemy as sa
 from sqlalchemy import Column, Integer, String, Text, Boolean
 from sqlalchemy import ForeignKey
+from sqlalchemy import func
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -59,8 +60,8 @@ class Version(Base):
         return "<Version({}, {})>".format(self.package.title, self.version)
 
 
-def count_packages():
-    raise NotImplementedError
+def count_packages(session):
+    return session.query(func.count(Package.package_id))
 
 
 def search_packages():
