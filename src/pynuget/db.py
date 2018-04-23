@@ -28,6 +28,9 @@ class Package(Base):
     download_count = Column(Integer, index=True, nullable=False, default=0)
     latest_version = Column(Text())
 
+    def __repr__(self):
+        return "<Package({}, {})>".format(self.package_it, self.title)
+
 
 class Version(Base):
     """
