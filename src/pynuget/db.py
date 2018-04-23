@@ -81,9 +81,9 @@ def package_updates():
 
 def find_by_id(session, package_id, version=None):
     """Find a package by ID and version. If no version given, return all."""
-    query = session.query(Package).filter(Package.package_id == package_id)
+    query = session.query(Version).filter(Version.package_id == package_id)
     if version:
-        query.filter(Package.version == version)
+        query.filter(Version.version == version)
     query.order_by(desc(Version.version))
 
     return query.all()
