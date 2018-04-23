@@ -21,7 +21,7 @@ class Package(Base):
     package_id = Column(Integer, primary_key=True)
     title = Column(String(256) index=True)
     download_count = Column(Integer, index=True,
-        nullable=False, default=0)
+                            nullable=False, default=0)
     latest_version = Column(Text())
 
 
@@ -31,7 +31,7 @@ class Version(Base):
 
     __tablename__ = "version"
 
-    version_id =  Column(Integer, primary_key=True)
+    version_id = Column(Integer, primary_key=True)
     package_id = Column(Integer, ForeignKey="package.package_id")
     title = Column(Text())
     description = Column(Text())
@@ -62,29 +62,38 @@ class Version(Base):
 def count_packages():
     raise NotImplementedError
 
+
 def search_packages():
     raise NotImplementedError
+
 
 def package_updates():
     raise NotImplementedError
 
+
 def find_by_id():
     raise NotImplementedError
+
 
 def do_search():
     raise NotImplementedError
 
+
 def validate_id_and_version():
     raise NotImplementedError
+
 
 def insert_or_update_package():
     raise NotImplementedError
 
+
 def insert_version():
     raise NotImplementedError
 
+
 def delete_version():
     raise NotImplementedError
+
 
 def build_in_clause():
     raise NotImplementedError
