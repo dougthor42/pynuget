@@ -67,8 +67,29 @@ class TestDb(object):
             db.validate_id_and_version()
 
     def test_increment_download_count(self, session):
-        with pytest.raises(NotImplementedError) as e_info:
-            db.increment_download_count()
+        # insert some dummy data
+        pkg = db.Package(title="dummy", latest_version="1.0.0")
+        session.add(pkg)
+        session.commit()
+
+        vers = db.Version(package_id=pkg.package_id, version="0.0.1")
+        session.add(vers)
+        session.commit()
+
+        # Get the previous values
+        version_sql = (session.query(db.Version.version_download_count)
+                       .filter(db.Version.version_id == vers.version_id))
+        package_sql = (session.query(db.Package.download_count)
+                       .filter(db.Package.package_id == vers.package_id))
+        prev_version_count = version_sql.scalar()
+        prev_package_count = package_sql.scalar()
+
+        # Run the function
+        db.increment_download_count(session, pkg.package_id, vers.version)
+
+        # Make our asserations
+        assert prev_version_count + 1 == version_sql.scalar()
+        assert prev_package_count + 1 == package_sql.scalar()
 
     def test_insert_or_update_package(self, session):
         with pytest.raises(NotImplementedError) as e_info:
