@@ -96,8 +96,19 @@ class TestDb(object):
             db.insert_or_update_package()
 
     def test_insert_version(self, session):
-        with pytest.raises(NotImplementedError) as e_info:
-            db.insert_version()
+        # insert some dummy data
+        pkg = db.Package(title="dummy", latest_version="1.0.0")
+        session.add(pkg)
+        session.commit()
+
+        sql = session.query(sa.func.count(db.Version.version_id))
+        version_count = sql.scalar()
+
+        db.insert_version(session, package_id=pkg.package_id,
+                          version="0.0.1")
+
+        # Make sure it was added
+        assert version_count + 1 == sql.scalar()
 
     def test_delete_version(self, session):
         with pytest.raises(NotImplementedError) as e_info:
