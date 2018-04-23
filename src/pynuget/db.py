@@ -104,8 +104,15 @@ def validate_id_and_version(session, package_id, version):
     # TODO: Where count(version) == 1
 
 
-def increment_download_count():
-    raise NotImplementedError
+def increment_download_count(session, package_id, version):
+    """Increment the download count for a given package version."""
+    obj = (session.query(Version)
+           .filter(Version.package_id == package_id)
+           .filder(Version.version == version)
+           )
+    obj.version_download_count += 1
+    obj.package.download_count += 1
+    session.commit()
 
 
 def insert_or_update_package():
