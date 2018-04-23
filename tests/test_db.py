@@ -17,21 +17,8 @@ class TestDb(object):
         db.Base.metadata.create_all(engine)
 
         session = sa.orm.Session(bind=engine)
-        return session
 
-    def test_create_schema(self, session):
-        pass
-
-    def test_count_packages(self, session):
-        # insert some dummy data
-        pkg = db.Package(title="dummy", latest_version="1.0.0")
-        session.add(pkg)
-        session.commit()
-
-        assert db.count_packages(session) == 1
-
-    def test_search_packages(self, session):
-        # insert some dummy data
+        # Add some dummy data
         pkg = db.Package(title="dummy", latest_version="0.0.3")
         session.add(pkg)
         session.commit()
@@ -41,6 +28,17 @@ class TestDb(object):
         session.add(db.Version(package_id=pkg.package_id, version="0.0.3"))
         session.commit()
 
+        return session
+
+    def test_create_schema(self, session):
+        pass
+
+    def test_count_packages(self, session):
+        session.add(db.Package(title="pkg_2", latest_version="0.0.1"))
+        session.commit()
+        assert db.count_packages(session) == 2
+
+    def test_search_packages(self, session):
         # Test with no args
         result = db.search_packages(session)
         assert len(result) == 3
@@ -80,24 +78,11 @@ class TestDb(object):
             db.package_updates()
 
     def test_find_by_id(self, session):
-        # insert some dummy data
-        pkg = db.Package(title="dummy", latest_version="1.0.0")
-        session.add(pkg)
-        session.commit()
-
-        vers = db.Version(package_id=pkg.package_id, version="0.0.1")
-        session.add(vers)
-        session.commit()
-
-        vers = db.Version(package_id=pkg.package_id, version="0.0.2")
-        session.add(vers)
-        session.commit()
-
-        result_1 = db.find_by_id(session, vers.package_id)
+        result_1 = db.find_by_id(session, 1)
         assert type(result_1) == list
-        assert len(result_1) == 2
+        assert len(result_1) == 3
         assert type(result_1[0]) == db.Version
-        result_2 = db.find_by_id(session, vers.package_id, "0.0.1")
+        result_2 = db.find_by_id(session, 1, "0.0.1")
         assert len(result_2) == 1
         assert result_2[0].version == "0.0.1"
 
@@ -110,44 +95,22 @@ class TestDb(object):
             db.do_search()
 
     def test_validate_id_and_version(self, session):
-        # insert some dummy data
-        pkg = db.Package(title="dummy", latest_version="1.0.0")
-        session.add(pkg)
-        session.commit()
-
-        vers = db.Version(package_id=pkg.package_id, version="0.0.1")
-        session.add(vers)
-        session.commit()
-
-        result_1 = db.validate_id_and_version(session,
-                                              vers.package_id,
-                                              vers.version)
+        result_1 = db.validate_id_and_version(session, 1, "0.0.1")
         assert result_1 is True
-        result_2 = db.validate_id_and_version(session,
-                                              vers.package_id,
-                                              "9.9.9")
+        result_2 = db.validate_id_and_version(session, 1, "9.9.9")
         assert result_2 is False
 
     def test_increment_download_count(self, session):
-        # insert some dummy data
-        pkg = db.Package(title="dummy", latest_version="1.0.0")
-        session.add(pkg)
-        session.commit()
-
-        vers = db.Version(package_id=pkg.package_id, version="0.0.1")
-        session.add(vers)
-        session.commit()
-
         # Get the previous values
         version_sql = (session.query(db.Version.version_download_count)
-                       .filter(db.Version.version_id == vers.version_id))
+                       .filter(db.Version.version_id == 1))
         package_sql = (session.query(db.Package.download_count)
-                       .filter(db.Package.package_id == vers.package_id))
+                       .filter(db.Package.package_id == 1))
         prev_version_count = version_sql.scalar()
         prev_package_count = package_sql.scalar()
 
         # Run the function
-        db.increment_download_count(session, pkg.package_id, vers.version)
+        db.increment_download_count(session, 1, '0.0.1')
 
         # Make our asserations
         assert prev_version_count + 1 == version_sql.scalar()
@@ -158,15 +121,10 @@ class TestDb(object):
             db.insert_or_update_package()
 
     def test_insert_version(self, session):
-        # insert some dummy data
-        pkg = db.Package(title="dummy", latest_version="1.0.0")
-        session.add(pkg)
-        session.commit()
-
         sql = session.query(sa.func.count(db.Version.version_id))
         version_count = sql.scalar()
 
-        db.insert_version(session, package_id=pkg.package_id,
+        db.insert_version(session, package_id=1,
                           version="0.0.1")
 
         # Make sure it was added
