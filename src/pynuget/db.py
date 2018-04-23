@@ -110,8 +110,8 @@ def increment_download_count(session, package_id, version):
     """Increment the download count for a given package version."""
     obj = (session.query(Version)
            .filter(Version.package_id == package_id)
-           .filder(Version.version == version)
-           )
+           .filter(Version.version == version)
+           ).one()
     obj.version_download_count += 1
     obj.package.download_count += 1
     session.commit()
