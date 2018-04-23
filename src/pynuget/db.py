@@ -57,7 +57,7 @@ class Version(Base):
     copyright_ = Column(Text())
     is_prerelease = Column(Boolean())
 
-    package = relationship("Package", back_populates="versions")
+    package = relationship("Package", backref="versions")
 
     def __repr__(self):
         return "<Version({}, {})>".format(self.package.title, self.version)
@@ -65,7 +65,7 @@ class Version(Base):
 
 def count_packages(session):
     """Count the number of packages on the server."""
-    return session.query(func.count(Package.package_id))
+    return session.query(func.count(Package.package_id)).scalar()
 
 
 def search_packages():
