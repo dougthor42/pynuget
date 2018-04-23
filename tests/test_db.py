@@ -31,8 +31,49 @@ class TestDb(object):
         assert db.count_packages(session) == 1
 
     def test_search_packages(self, session):
-        with pytest.raises(NotImplementedError) as e_info:
-            db.search_packages()
+        # insert some dummy data
+        pkg = db.Package(title="dummy", latest_version="0.0.3")
+        session.add(pkg)
+        session.commit()
+
+        session.add(db.Version(package_id=pkg.package_id, version="0.0.1"))
+        session.add(db.Version(package_id=pkg.package_id, version="0.0.2"))
+        session.add(db.Version(package_id=pkg.package_id, version="0.0.3"))
+        session.commit()
+
+        # Test with no args
+        result = db.search_packages(session)
+        assert len(result) == 3
+        assert type(result[0]) == db.Version
+        assert result[0].package.latest_version == "0.0.3"
+
+        # add a little more dummy data
+        pkg = db.Package(title="test_proj", latest_version="0.1.3")
+        session.add(pkg)
+        session.commit()
+
+        session.add(db.Version(package_id=pkg.package_id, version="0.1.3"))
+        session.commit()
+
+        # Test with a search query. Note that the wildcards are added by
+        # the function, and so they're not needed.
+        result = db.search_packages(session, search_query='test')
+        assert len(result) == 1
+        assert result[0].package.title == "test_proj"
+
+        # Test with a filter.
+        result = db.search_packages(session,
+                                    filter_='is_latest_version',
+                                    search_query='%dummy%')
+        assert len(result) == 1
+        assert result[0].version == "0.0.3"
+
+        # Test with a different order_by
+        result = db.search_packages(session,
+                                    order_by=sa.desc(db.Version.version))
+        assert len(result) == 4
+        assert result[0].version == '0.1.3'
+        assert result[-1].version == '0.0.1'
 
     def test_package_updates(self, session):
         with pytest.raises(NotImplementedError) as e_info:
