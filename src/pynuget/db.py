@@ -82,6 +82,10 @@ def find_by_id(session, package_id, version=None):
     return query.all()
 
 
+def parse_order_by():
+    raise NotImplementedError
+
+
 def do_search():
     raise NotImplementedError
 
@@ -93,6 +97,10 @@ def validate_id_and_version(session, package_id, version):
              )
     query.all()
     # TODO: Where count(version) == 1
+
+
+def increment_download_count():
+    raise NotImplementedError
 
 
 def insert_or_update_package():
