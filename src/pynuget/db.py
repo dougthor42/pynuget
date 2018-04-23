@@ -8,11 +8,12 @@ import json
 import sqlalchemy as sa
 from sqlalchemy import Column, Integer, String, Text, Boolean
 from sqlalchemy import ForeignKey
-from sqlalchemy import exists
 from sqlalchemy import func
 from sqlalchemy import desc
 from sqlalchemy import or_
+from sqlalchemy import cast
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
 
 Base = declarative_base()
@@ -67,6 +68,15 @@ class Version(Base):
     def __repr__(self):
         return "<Version({}, {})>".format(self.package.title, self.version)
 
+    @hybrid_property
+    def thing(self):
+        return "{}~~{}".format(self.package_id, self.version)
+
+    @thing.expression
+    def thing(cls):
+        return cast(cls.package_id, String) + "~~" + cast(cls.version, String)
+
+
 
 def count_packages(session):
     """Count the number of packages on the server."""
@@ -106,8 +116,32 @@ def search_packages(session,
     return query.all()
 
 
-def package_updates():
-    raise NotImplementedError
+def package_updates(session, packages_dict, include_prerelease=False):
+    """
+    I *think* this returns a list of packages that need updating...
+
+    Seems like the route for this fuction expects args from a url that look
+    like:
+        /updates?packageids='pkg1'|'pkg2'&versions='vers1'|'vers2'
+    where "|" might be encoded as %7C
+
+    Parameters
+    ----------
+    packages_dict : dict
+        Dict of {package_id, version}.
+    """
+    package_versions = ["{}~~{}".format(pkg, vers)
+                        for pkg, vers
+                        in packages_dict.items()]
+    print(package_versions)
+
+    query = (session.query(Version)
+             .filter(Version.version == Package.latest_version)
+             .filter(Version.package_id.in_(packages_dict.keys()))
+             .filter(~Version.thing.in_(package_versions))
+             )
+
+    return query.order_by(Version.package_id).all()
 
 
 def find_by_id(session, package_id, version=None):
