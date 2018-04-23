@@ -31,7 +31,7 @@ class Package(Base):
     latest_version = Column(Text())
 
     def __repr__(self):
-        return "<Package({}, {})>".format(self.package_it, self.title)
+        return "<Package({}, {})>".format(self.package_id, self.title)
 
 
 class Version(Base):
