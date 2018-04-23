@@ -39,8 +39,20 @@ class TestDb(object):
             db.package_updates()
 
     def test_find_by_id(self, session):
-        with pytest.raises(NotImplementedError) as e_info:
-            db.find_by_id()
+        # insert some dummy data
+        pkg = db.Package(title="dummy", latest_version="1.0.0")
+        session.add(pkg)
+        session.commit()
+
+        vers = db.Version(package_id=pkg.package_id, version="0.0.1")
+        session.add(vers)
+        session.commit()
+
+        result_1 = db.find_by_id(session, vers.package_id)
+        assert type(result_1) == list
+        assert type(result_1[0]) == db.Version
+        result_2 = db.find_by_id(session, vers.package_id, vers.version)
+        assert len(result_2) == 1
 
     def test_parse_order_by(self, session):
         with pytest.raises(NotImplementedError) as e_info:
