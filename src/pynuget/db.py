@@ -2,6 +2,9 @@
 """
 """
 
+import datetime as dt
+import json
+
 import sqlalchemy as sa
 from sqlalchemy import Column, Integer, String, Text, Boolean
 from sqlalchemy import ForeignKey
@@ -52,7 +55,7 @@ class Version(Base):
     authors = Column(Text())
     owners = Column(Text())
     require_license_acceptance = Column(Boolean())
-    copyright = Column(Text())
+    copyright_ = Column(Text())
     is_prerelease = Column(Boolean())
 
     package = relationship("Package", back_populates="versions")
@@ -107,8 +110,17 @@ def insert_or_update_package():
     raise NotImplementedError
 
 
-def insert_version():
-    raise NotImplementedError
+def insert_version(session, **kwargs):
+    kwargs['created'] = dt.datetime.utc_now()
+    kwargs['dependencies'] = json.dumps(kwargs['dependencies'])
+    if 'is_prerelease' not in kwargs:
+        kwargs['is_prerelease'] = 0
+    if 'require_license_acceptance' not in kwargs:
+        kwargs['require_license_acceptance'] = 0
+
+    version = Version(**kwargs)
+    session.add(version)
+    session.commit()
 
 
 def delete_version():
