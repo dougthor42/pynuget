@@ -20,7 +20,7 @@ class Package(Base):
     __tablename__ = "package"
 
     package_id = Column(Integer, primary_key=True)
-    title = Column(String(256) index=True)
+    title = Column(String(256), index=True)
     download_count = Column(Integer, index=True,
                             nullable=False, default=0)
     latest_version = Column(Text())
@@ -33,7 +33,7 @@ class Version(Base):
     __tablename__ = "version"
 
     version_id = Column(Integer, primary_key=True)
-    package_id = Column(Integer, ForeignKey="package.package_id")
+    package_id = Column(Integer, ForeignKey("package.package_id"))
     title = Column(Text())
     description = Column(Text())
     created = Column(Integer)
