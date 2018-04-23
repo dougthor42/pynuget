@@ -48,11 +48,17 @@ class TestDb(object):
         session.add(vers)
         session.commit()
 
+        vers = db.Version(package_id=pkg.package_id, version="0.0.2")
+        session.add(vers)
+        session.commit()
+
         result_1 = db.find_by_id(session, vers.package_id)
         assert type(result_1) == list
+        assert len(result_1) == 2
         assert type(result_1[0]) == db.Version
-        result_2 = db.find_by_id(session, vers.package_id, vers.version)
+        result_2 = db.find_by_id(session, vers.package_id, "0.0.1")
         assert len(result_2) == 1
+        assert result_2[0].version == "0.0.1"
 
     def test_parse_order_by(self, session):
         with pytest.raises(NotImplementedError) as e_info:
