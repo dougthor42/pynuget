@@ -140,7 +140,7 @@ class FeedWriter(object):
             'Created': self.render_meta_date(row.created),
             'Dependencies': self.render_dependencies(row.dependencies),
             'Description': row.description,  # TODO: htmlspecialchars
-            'DownloadCount': {'value': str(row.package.download_count), 'type': 'int'},
+            'DownloadCount': {'value': str(row.package.download_count), 'type': 'Edm.Int32'},
             'GalleryDetailsUrl': gallery_details_url,
             'IconUrl': row.icon_url,  #TODO: htmlspecialchars
             'IsLatestVersion': self.render_meta_boolean(row.package.latest_version == row.version),
@@ -150,7 +150,7 @@ class FeedWriter(object):
             'Published': self.render_meta_date(row.created),
             'PackageHash': row.package_hash,
             'PackageHashAlgorithm': row.package_hash_algorithm,
-            'PackageSize': {'value': str(row.package_size), 'type': 'int'},
+            'PackageSize': {'value': str(row.package_size), 'type': 'Edm.Int64'},
             'ProjectUrl': row.project_url,
             'ReportAbuseUrl': '',
             'ReleaseNotes': row.release_notes,  # TODO: htmlspecialchars
@@ -158,9 +158,9 @@ class FeedWriter(object):
             'Summary': None,
             'Tags': row.tags,
             'Title': row.title,
-            'VersionDownloadCount': {'value': str(row.version_download_count), 'type': 'int'},
+            'VersionDownloadCount': {'value': str(row.version_download_count), 'type': 'Edm.Int32'},
             'MinClientVersion': '',
-            'LastEdited': {'value': None, 'type': 'dt.datetime'},
+            'LastEdited': {'value': None, 'type': 'Edm.DateTime'},
             'LicenseUrl': row.license_url,
             'LicenseNames': '',
             'LicenseReportUrl': '',
@@ -177,10 +177,10 @@ class FeedWriter(object):
             self.add_meta(properties, name, value, type_)
 
     def render_meta_date(self, date):
-        return {'value': self.format_date(date) + "Z", 'type': dt.datetime}
+        return {'value': self.format_date(date) + "Z", 'type': 'Edm.DateTime'}
 
     def render_meta_boolean(self, value):
-        return {'value': value, 'type': bool}
+        return {'value': str(value), 'type': 'Edm.Boolean'}
 
     def format_date(self, value):
         #  return value.isoformat(timespec='seconds')      # Py3.6+

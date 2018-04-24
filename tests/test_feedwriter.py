@@ -87,14 +87,14 @@ def test_add_entry_meta(feedwriter, version_row):
 def test_render_meta_date(feedwriter):
     date = dt.datetime(1970, 1, 1, 0, 0, 0, 0)
     result = feedwriter.render_meta_date(date)
-    assert result == {'value': "1970-01-01T00:00:00Z", 'type': dt.datetime}
+    assert result == {'value': "1970-01-01T00:00:00Z", 'type': "Edm.DateTime"}
 
 
 def test_render_meta_boolean(feedwriter):
     result = feedwriter.render_meta_boolean(False)
-    assert result == {'value': False, 'type': bool}
+    assert result == {'value': 'False', 'type': 'Edm.Boolean'}
     result = feedwriter.render_meta_boolean(True)
-    assert result == {'value': True, 'type': bool}
+    assert result == {'value': 'True', 'type': 'Edm.Boolean'}
 
 
 def test_render_dependencies(feedwriter):
@@ -138,10 +138,10 @@ def test_add_meta(feedwriter):
     node = et.Element('root')
     name = "SomeName"
     value = "SomeValue"
-    type_ = 'int'
+    type_ = 'Edm.Int32'
 
     # I think this is what we're expecting...
-    expected_1 = b'<root><SomeName m:type="int">SomeValue</SomeName></root>'
+    expected_1 = b'<root><SomeName m:type="Edm.Int32">SomeValue</SomeName></root>'
 
     # add_meta doesn't return anything, but modifies `node`.
     feedwriter.add_meta(node, name, value, type_)
@@ -150,6 +150,6 @@ def test_add_meta(feedwriter):
     # Create a new node
     node = et.Element('root')
     value = None
-    expected_2 = b'<root><SomeName m:null="true" m:type="int" /></root>'
+    expected_2 = b'<root><SomeName m:null="true" m:type="Edm.Int32" /></root>'
     feedwriter.add_meta(node, name, value, type_)
     assert et.tostring(node) == expected_2
