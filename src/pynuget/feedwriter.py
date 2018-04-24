@@ -126,26 +126,31 @@ class FeedWriter(object):
         row :
             SQLAlchemy result set object
         """
-        properties = entry.append('properties', None, ADO_METADATA_URL)
+        properties = et.Element('properties')
+        entry.append(properties)
+
+        gallery_details_url = "{}details/{}/{}".format(self.base_url,
+                                                       row.package_id,
+                                                       row.version)
 
         meta = {
             'version': row.version,
             'NormalizedVersion': row.version,
-            'Copyright': row.copyright,
+            'Copyright': row.copyright_,
             'Created': self.render_meta_date(row.created),
             'Dependencies': self.render_dependencies(row.dependencies),
             'Description': row.description,  # TODO: htmlspecialchars
-            'DownloadCount': {'value': row.download_count, 'type': int},
-            'GalleryDetailsUrl': self.base_url + 'details/' + row.package_id + '/' + row.version,
+            'DownloadCount': {'value': str(row.package.download_count), 'type': 'int'},
+            'GalleryDetailsUrl': gallery_details_url,
             'IconUrl': row.icon_url,  #TODO: htmlspecialchars
-            'IsLatestVersion': self.render_meta_boolean(row.latest_version == row.version),
-            'IsAbsoluteLatestVersion': self.render_meta_boolean(row.latest_version == row.version),
+            'IsLatestVersion': self.render_meta_boolean(row.package.latest_version == row.version),
+            'IsAbsoluteLatestVersion': self.render_meta_boolean(row.package.latest_version == row.version),
             'IsPrerelease': self.render_meta_boolean(row.is_prerelease),
             'Language': None,
             'Published': self.render_meta_date(row.created),
             'PackageHash': row.package_hash,
             'PackageHashAlgorithm': row.package_hash_algorithm,
-            'PackageSize': {'value': row.package_size, 'type': int},
+            'PackageSize': {'value': str(row.package_size), 'type': 'int'},
             'ProjectUrl': row.project_url,
             'ReportAbuseUrl': '',
             'ReleaseNotes': row.release_notes,  # TODO: htmlspecialchars
@@ -153,9 +158,9 @@ class FeedWriter(object):
             'Summary': None,
             'Tags': row.tags,
             'Title': row.title,
-            'VersionDownloadCount': {'value': row.version_download_count, 'type': int},
+            'VersionDownloadCount': {'value': str(row.version_download_count), 'type': 'int'},
             'MinClientVersion': '',
-            'LastEdited': {'value': None, 'type': dt.DateTime},
+            'LastEdited': {'value': None, 'type': 'dt.datetime'},
             'LicenseUrl': row.license_url,
             'LicenseNames': '',
             'LicenseReportUrl': '',
