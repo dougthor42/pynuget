@@ -35,7 +35,7 @@ class FeedWriter(object):
 
     def begin_feed(self):
         self.feed = et.fromstring(BASE)
-        self.feed.append('id', self.base_url + self.feed_id)
+        self.feed.append(et.Element('id', text=(self.base_url + str(self.feed_id))))
         self.add_with_attributes(self.feed, 'title', self.feed_id,
                 {'type': 'text'})
         self.feed.append('updated', cls.format_date(dt.utcnow()))
@@ -187,7 +187,8 @@ class FeedWriter(object):
         attributes :
             Dict, I think.
         """
-        node = entry.append(name, value)
+        node = et.Element(name, text=value)
+        entry.append(node)
         for attr_name, attr_value in attributes.items():
             node.add_attribute(attr_name, attr_value)
 
