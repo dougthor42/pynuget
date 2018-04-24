@@ -19,9 +19,12 @@ def request_method():
     """Get the HTTP method used for the current request."""
     raise NotImplementedError
 
-def get_package_path():
+
+def get_package_path(package_id, version):
     """Get the file path for the specified pkg version."""
-    raise NotImplementedError
+    #TODO: custom package path
+    return './packagefiles/' + str(package_id) + '/' + version + '.nupkg'
+
 
 # XXX: Not needed?
 def url_scheme():
