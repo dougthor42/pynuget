@@ -26,6 +26,9 @@ class FeedWriter(object):
     def add_entry_meta(self):
         raise NotImplementedError
 
+    def render_meta_date(self, date)
+        return {'value': cls.format_date(date), 'type': dt.datetime}
+
     def render_meta_boolean(self, value):
         return {'value': value, type: bool}
 
