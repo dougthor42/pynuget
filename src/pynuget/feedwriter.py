@@ -87,7 +87,7 @@ class FeedWriter(object):
 
         # Yes, this "title" is actually the package ID. Actual title is in
         # the metadata.
-        self.add_with_attributes(entry, 'title', row.package_id,
+        self.add_with_attributes(entry, 'title', str(row.package_id),
                                  {'type': 'text'})
         self.add_with_attributes(entry, 'summary', None, {'type': 'text'})
         node = et.Element('updated')
@@ -229,7 +229,7 @@ class FeedWriter(object):
             Dict, I think.
         """
         child = et.Element(name)
-        child.text = value
+        child.text = str(value)
         entry.append(child)
         for attr_name, attr_value in sorted(attributes.items()):
             child.set(attr_name, str(attr_value))
