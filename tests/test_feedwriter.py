@@ -4,6 +4,7 @@
 
 import datetime as dt
 import json
+import xml.etree.ElementTree as et
 
 import pytest
 
@@ -88,6 +89,22 @@ def test_add_with_attributes(feedwriter):
     pass
 
 
-@pytest.mark.skip("Not Implemented")
 def test_add_meta(feedwriter):
-    pass
+    node = et.Element('root')
+    name = "SomeName"
+    value = "SomeValue"
+    type_ = 'int'
+
+    # I think this is what we're expecting...
+    expected_1 = b'<root m:type="int"><SomeName>SomeValue</SomeName></root>'
+
+    # add_meta doesn't return anything, but modifies `node`.
+    feedwriter.add_meta(node, name, value, type_)
+    assert et.tostring(node) == expected_1
+
+    # Create a new node
+    node = et.Element('root')
+    value = None
+    expected_2 = b'<root m:null="true" m:type="int"><SomeName /></root>'
+    feedwriter.add_meta(node, name, value, type_)
+    assert et.tostring(node) == expected_2
