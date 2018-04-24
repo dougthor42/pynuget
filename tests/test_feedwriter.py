@@ -51,6 +51,50 @@ def version_row():
     return row
 
 
+@pytest.fixture
+def version_row_xml():
+    """The values in here are intimately linked to those in version_row."""
+    # I think it's supposed to look like this...
+    # Note implicit string concatenation.
+    expected = (
+        '<root><properties><MinClientVersion />'
+        '<Dependencies>1:0.2.3:</Dependencies>'
+        '<VersionDownloadCount m:type="int">9</VersionDownloadCount>'
+        '<ReleaseNotes>No release notes. Sorry!</ReleaseNotes>'
+        '<version>0.0.1</version>'
+        '<LicenseUrl>"'
+        'https://github.com/dougthor42/pynuget/blob/master/LICENSE"'
+        '</LicenseUrl>'
+        '<Tags>no tags</Tags><Language m:null="true" />'
+        '<ProjectUrl>https://github.com/dougthor42/pynuget/</ProjectUrl>'
+        '<IconUrl>no url</IconUrl>'
+        '<PackageHashAlgorithm>Michael Jackson</PackageHashAlgorithm>'
+        '<PackageHash>abc123</PackageHash>'
+        '<Title>DummyPackage</Title>'
+        '<PackageSize m:type="int">1024</PackageSize>'
+        '<DownloadCount m:type="int">12</DownloadCount>'
+        '<NormalizedVersion>0.0.1</NormalizedVersion>'
+        '<Created m:type="dt.datetime">1970-01-01T00:00:00Z</Created>'
+        '<Description>Some description</Description>'
+        '<LicenseNames /><Summary m:null="true" />'
+        '<LastEdited m:null="true" m:type="dt.datetime" />'
+        '<IsPrerelease m:type="bool">False</IsPrerelease>'
+        '<RequireLicenseAcceptance m:type="bool">False'
+        '</RequireLicenseAcceptance>'
+        '<Copyright>No copyright</Copyright>'
+        '<ReportAbuseUrl />'
+        '<IsAbsoluteLatestVersion m:type="bool">True'
+        '</IsAbsoluteLatestVersion>'
+        '<IsLatestVersion m:type="bool">True</IsLatestVersion>'
+        '<Published m:type="dt.datetime">1970-01-01T00:00:00Z</Published>'
+        '<GalleryDetailsUrl>TBDdetails/1/0.0.1</GalleryDetailsUrl'
+        '><LicenseReportUrl />'
+        '</properties>'
+        '</root>'
+    )
+    return expected
+
+
 @pytest.mark.skip("Not Implemented")
 def test_feedwriter_write(feedwriter):
     result = feedwriter.write()
