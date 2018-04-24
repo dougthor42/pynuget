@@ -79,8 +79,58 @@ class FeedWriter(object):
              })
         this.add_entry_meta(entry, row)
 
-    def add_entry_meta(self):
-        raise NotImplementedError
+    def add_entry_meta(self, row):
+        """
+        Parameters
+        ----------
+        row :
+            SQLAlchemy result set object
+        """
+        properties = entry.append('properties', None,
+                'http://schemas.microsoft.com/ado/2007/08/dataservices/metadata')
+
+        meta = {
+            'version': row.version,
+            'NormalizedVersion': row.version,
+            'Copyright': row.copyright,
+            'Created': cls.render_meta_date(row.created),
+            'Dependencies': self.render_dependencies(row.dependencies),
+            'Description': row.description,  # TODO: htmlspecialchars
+            'DownloadCount': {'value': row.download_count, 'type': int},
+            'GalleryDetailsUrl': self.base_url + 'details/' + row.package_id + '/' + row.version,
+            'IconUrl': row.icon_url,  #TODO: htmlspecialchars
+            'IsLatestVersion': cls.render_meta_boolean(row.latest_version == row.version),
+            'IsAbsoluteLatestVersion': cls.render_meta_boolean(row.latest_version == row.version),
+            'IsPrerelease': cls.render_meta_boolean(row.is_prerelease),
+            'Language': None,
+            'Published': cls.render_meta_date(row.created),
+            'PackageHash': row.package_hash,
+            'PackageHashAlgorithm': row.package_hash_algorithm,
+            'PackageSize': {'value': row.package_size, 'type': int},
+            'ProjectUrl': row.project_url,
+            'ReportAbuseUrl': '',
+            'ReleaseNotes': row.release_notes,  # TODO: htmlspecialchars
+            'RequireLicenseAcceptance': cls.render_meta_boolean(row.require_license_acceptance),
+            'Summary': None,
+            'Tags': row.tags,
+            'Title': row.title,
+            'VersionDownloadCount': {'value': row.version_download_count, 'type': int},
+            'MinClientVersion': '',
+            'LastEdited': {'value': None, 'type': dt.DateTime},
+            'LicenseUrl': row.license_url,
+            'LicenseNames': '',
+            'LicenseReportUrl': '',
+        }
+
+        for name, data in meta.items():
+            if isinstance(data, dict):
+                value = data['value']
+                type_ = data['type']
+            else
+                value = data
+                type = None
+
+            self.add_meta(properties, name, value, type_)
 
     def render_meta_date(self, date)
         return {'value': cls.format_date(date), 'type': dt.datetime}
