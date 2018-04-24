@@ -84,9 +84,15 @@ def test_format_target_framework(feedwriter):
     assert feedwriter.format_target_framework('DNX4.5.1') == 'dnx451'
 
 
-@pytest.mark.skip("Not Implemented")
 def test_add_with_attributes(feedwriter):
-    pass
+    node = et.Element('root')
+    name = "SomeName"
+    value = "SomeValue"
+    attributes = {'a': 5, 'b': "foo"}
+
+    expected = b'<root><SomeName a="5" b="foo">SomeValue</SomeName></root>'
+    feedwriter.add_with_attributes(node, name, value, attributes)
+    assert et.tostring(node) == expected
 
 
 def test_add_meta(feedwriter):
