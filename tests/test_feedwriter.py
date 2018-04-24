@@ -3,6 +3,7 @@
 """
 
 import datetime as dt
+import json
 
 import pytest
 
@@ -54,7 +55,25 @@ def test_render_meta_boolean(feedwriter):
 
 
 def test_render_dependencies(feedwriter):
-    raise NotImplementedError
+    raw = """
+        [
+            {"id": 1, "version": "0.2.3"},
+            {"id": 2, "version": "1.2.3"},
+            {"id": 3, "version": "2.5.0", "framework": "DNX4.5.1"}
+        ]
+        """
+
+    # Test when raw is empty or None
+    assert feedwriter.render_dependencies('') == ''
+    assert feedwriter.render_dependencies(None) == ''
+
+    # Test for invalid JSON
+    assert feedwriter.render_dependencies('invalid json}') == ''
+
+    # Test the good stuff
+    result = feedwriter.render_dependencies(raw)
+    assert isinstance(result, str)
+    assert result == "1:0.2.3:|2:1.2.3:|3:2.5.0:dnx451"
 
 
 def test_format_target_framework(feedwriter):
