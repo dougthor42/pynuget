@@ -142,7 +142,7 @@ class FeedWriter(object):
         return {'value': self.format_date(date), 'type': dt.datetime}
 
     def render_meta_boolean(self, value):
-        return {'value': value, type: bool}
+        return {'value': value, 'type': bool}
 
     def format_date(self, value):
         #  return value.isoformat(timespec='seconds')      # Py3.6+
