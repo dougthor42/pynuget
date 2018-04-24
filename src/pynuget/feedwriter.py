@@ -38,7 +38,7 @@ class FeedWriter(object):
         self.feed.append(et.Element('id', text=(self.base_url + str(self.feed_id))))
         self.add_with_attributes(self.feed, 'title', self.feed_id,
                 {'type': 'text'})
-        self.feed.append('updated', cls.format_date(dt.utcnow()))
+        self.feed.append('updated', self.format_date(dt.utcnow()))
         self.add_with_attributes(self.feed, 'link', None,
                 {'rel': 'self',
                  'title': self.feed_id,
@@ -69,7 +69,7 @@ class FeedWriter(object):
         # the metadata.
         self.add_with_attributes(entry, 'title', row.package_id, {'type': 'text'})
         self.add_with_attributes(entry, 'summary', None, {'type': 'text'})
-        entry.append('updated', cls.format_date(row.created))
+        entry.append('updated', self.format_date(row.created))
 
         authors = entry.append('author')
         authors.append('name', row.authors)
@@ -99,24 +99,24 @@ class FeedWriter(object):
             'version': row.version,
             'NormalizedVersion': row.version,
             'Copyright': row.copyright,
-            'Created': cls.render_meta_date(row.created),
+            'Created': self.render_meta_date(row.created),
             'Dependencies': self.render_dependencies(row.dependencies),
             'Description': row.description,  # TODO: htmlspecialchars
             'DownloadCount': {'value': row.download_count, 'type': int},
             'GalleryDetailsUrl': self.base_url + 'details/' + row.package_id + '/' + row.version,
             'IconUrl': row.icon_url,  #TODO: htmlspecialchars
-            'IsLatestVersion': cls.render_meta_boolean(row.latest_version == row.version),
-            'IsAbsoluteLatestVersion': cls.render_meta_boolean(row.latest_version == row.version),
-            'IsPrerelease': cls.render_meta_boolean(row.is_prerelease),
+            'IsLatestVersion': self.render_meta_boolean(row.latest_version == row.version),
+            'IsAbsoluteLatestVersion': self.render_meta_boolean(row.latest_version == row.version),
+            'IsPrerelease': self.render_meta_boolean(row.is_prerelease),
             'Language': None,
-            'Published': cls.render_meta_date(row.created),
+            'Published': self.render_meta_date(row.created),
             'PackageHash': row.package_hash,
             'PackageHashAlgorithm': row.package_hash_algorithm,
             'PackageSize': {'value': row.package_size, 'type': int},
             'ProjectUrl': row.project_url,
             'ReportAbuseUrl': '',
             'ReleaseNotes': row.release_notes,  # TODO: htmlspecialchars
-            'RequireLicenseAcceptance': cls.render_meta_boolean(row.require_license_acceptance),
+            'RequireLicenseAcceptance': self.render_meta_boolean(row.require_license_acceptance),
             'Summary': None,
             'Tags': row.tags,
             'Title': row.title,
@@ -139,7 +139,7 @@ class FeedWriter(object):
             self.add_meta(properties, name, value, type_)
 
     def render_meta_date(self, date):
-        return {'value': cls.format_date(date), 'type': dt.datetime}
+        return {'value': self.format_date(date), 'type': dt.datetime}
 
     def render_meta_boolean(self, value):
         return {'value': value, type: bool}
