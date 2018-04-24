@@ -220,23 +220,12 @@ class FeedWriter(object):
             node.set(attr_name, attr_value)
 
     def add_meta(self, entry, name, value, type_=None):
-        ado_url = 'http://schemas.microsoft.com/ado/2007/08/dataservices',
-        node = entry.append(
-            name,
-            value,
-            ado_url,
-        )
+        child = et.Element(name)
+        child.text = value
+        entry.append(child)
 
         if type_:
-            node.add_attribute(
-                'm:type',
-                type_,
-                ado_url,
-            )
+            entry.set('m:type', type_)
 
         if value is None:
-            node.add_attribute(
-                'm:null',
-                'true',
-                ado_url,
-            )
+            entry.set('m:null', 'true')
