@@ -114,11 +114,13 @@ def test_begin_feed(feedwriter):
         pytest.fail("Unexpected Error: {}".format(ex))
 
 
-def test_add_entry(feedwriter, version_row):
+def test_add_entry(feedwriter, version_row, version_row_xml):
     feedwriter.begin_feed()
     feedwriter.add_entry(version_row)
-#    print(et.tostring(feedwriter.feed))
-#    pytest.fail()
+
+    expected = version_row_xml
+    result = et.tostring(feedwriter.feed)
+    assert result == expected
 
 
 def test_add_entry_meta(feedwriter, version_row):
