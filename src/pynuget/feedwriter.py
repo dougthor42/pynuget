@@ -26,8 +26,8 @@ class FeedWriter(object):
     def add_entry_meta(self):
         raise NotImplementedError
 
-    def render_meta_boolean(self):
-        raise NotImplementedError
+    def render_meta_boolean(self, value):
+        return {'value': value, type: bool}
 
     def format_date(self):
         raise NotImplementedError
