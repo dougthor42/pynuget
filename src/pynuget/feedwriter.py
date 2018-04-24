@@ -3,6 +3,7 @@
 """
 
 import datetime as dt
+import json
 
 class FeedWriter(object):
 
@@ -38,8 +39,24 @@ class FeedWriter(object):
         #  return dt.isoformat(timespec='seconds')      # Py3.6+
         return dt.isoformat()
 
-    def render_dependencies(self):
-        raise NotImplementedError
+    def render_dependencies(self, raw):
+        if not raw:
+            return ''
+
+        data = json.loads(raw)
+        if not data:
+            return ''
+
+        output = []
+
+        for dependency in data:
+            formatted_dependency = dependency.id + dependency.version
+            if dependency.framework:
+                formatted_dependency += self.format_target_framework(dependency.framework)
+            output.append(formatted_dependency)
+
+        return "|".join(output)
+
 
     def format_target_framework(self):
         raise NotImplementedError
