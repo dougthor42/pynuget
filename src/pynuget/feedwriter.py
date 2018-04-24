@@ -139,7 +139,7 @@ class FeedWriter(object):
             self.add_meta(properties, name, value, type_)
 
     def render_meta_date(self, date):
-        return {'value': self.format_date(date), 'type': dt.datetime}
+        return {'value': self.format_date(date) + "Z", 'type': dt.datetime}
 
     def render_meta_boolean(self, value):
         return {'value': value, 'type': bool}
