@@ -77,9 +77,11 @@ def test_add_entry(feedwriter, version_row):
 #    pytest.fail()
 
 
-@pytest.mark.skip("Not Implemented")
-def test_add_entry_meta(feedwriter):
-    pass
+def test_add_entry_meta(feedwriter, version_row):
+    node = et.Element('root')
+    feedwriter.add_entry_meta(node, version_row)
+    print(et.tostring(node))
+    assert False
 
 
 def test_render_meta_date(feedwriter):
