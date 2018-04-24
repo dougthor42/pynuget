@@ -14,7 +14,7 @@ class FeedWriter(object):
             self.add_entry(result)
         return self.feed.as_xml()
 
-    def write_to_output(self):
+    def write_to_output(self, results):
         raise NotImplementedError
 
     def begin_feed(self):
