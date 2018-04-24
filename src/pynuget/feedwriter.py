@@ -144,9 +144,9 @@ class FeedWriter(object):
     def render_meta_boolean(self, value):
         return {'value': value, type: bool}
 
-    def format_date(self):
-        #  return dt.isoformat(timespec='seconds')      # Py3.6+
-        return dt.isoformat()
+    def format_date(self, value):
+        #  return value.isoformat(timespec='seconds')      # Py3.6+
+        return value.isoformat()
 
     def render_dependencies(self, raw):
         if not raw:
