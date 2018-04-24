@@ -38,7 +38,7 @@ class FeedWriter(object):
         self.feed.append(et.Element('id', text=(self.base_url + str(self.feed_id))))
         self.add_with_attributes(self.feed, 'title', self.feed_id,
                 {'type': 'text'})
-        self.feed.append('updated', self.format_date(dt.utcnow()))
+        self.feed.append('updated', self.format_date(dt.datetime.utcnow()))
         self.add_with_attributes(self.feed, 'link', None,
                 {'rel': 'self',
                  'title': self.feed_id,
