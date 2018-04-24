@@ -19,7 +19,8 @@ class FeedWriter(object):
         return self.feed.as_xml()
 
     def write_to_output(self, results):
-        raise NotImplementedError
+        # TODO: header line
+        this.write(results)
 
     def begin_feed(self):
         raise NotImplementedError
