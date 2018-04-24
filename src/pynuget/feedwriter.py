@@ -23,7 +23,7 @@ class FeedWriter(object):
         self.feed_id = id_
         self.base_url = 'TBD'
 
-    def write(self):
+    def write(self, results):
         self.begin_feed()
         for result in results:
             self.add_entry(result)
