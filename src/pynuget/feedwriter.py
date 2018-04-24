@@ -4,8 +4,9 @@
 
 class FeedWriter(object):
 
-    def __init__(self):
-        pass
+    def __init__(self, id_):
+        self.feed_id = id_
+        self.base_url = 'TBD'
 
     def write(self):
         raise NotImplementedError
