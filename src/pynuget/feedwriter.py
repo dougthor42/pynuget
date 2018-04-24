@@ -45,8 +45,39 @@ class FeedWriter(object):
                  'href': self.feed_id,
                  })
 
-    def add_entry(self):
-        raise NotImplementedError
+    def add_entry(self, row):
+        entry_id = 'Packages(Id="' + row['package_id'] + '",Version="' + row['version'] + '")'
+        entry = self.feed.append('entry')
+        entry.append('id', 'https://www.nuget.org/api/v2/' + entry_id)
+        self.add_with_attributes(entry, 'category', None,
+                {'term': 'NuGetGallery.V2FeedPackage',
+                 'scheme': 'http://schemas.microsoft.com/ado/2007/08/dataservices/scheme',
+                 })
+        self.add_with_attributes(entry, 'link', None,
+            {'rel': 'edit',
+             'title': 'V2FeedPackage',
+             'href': entry_id,
+             })
+
+        # Yes, this "title" is actually the package ID. Actual title is in
+        # the metadata.
+        self.add_with_attributes(entry, 'title', row['package_id'], {'type': 'text'})
+        self.add_with_attributes(entry, 'summary', None, {'type': 'text'})
+        entry.append('updated', cls.format_date(row['created']))
+
+        authors = entry.append('author')
+        authors.append('name', row['authors'])
+
+        this.add_with_attributes(entry, 'link', None,
+            {'rel': 'edit-media',
+             'title': 'V2FeedPackage',
+             'href': entry_id + '/$value',
+             })
+        this.add_with_attributes(entry, 'content', None,
+            {'type': 'application/zip',
+             'src': this.base_url + 'download/' + row['package_id'] + '/' + row['version'],
+             })
+        this.add_entry_meta(entry, row)
 
     def add_entry_meta(self):
         raise NotImplementedError
