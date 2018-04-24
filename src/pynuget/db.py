@@ -50,7 +50,7 @@ class Version(Base):
     package_hash = Column(Text())
     package_hash_algorithm = Column(Text())
     dependencies = Column(Text())
-    pacakge_size = Column(Integer)
+    package_size = Column(Integer)
     release_notes = Column(Text())
     version_download_count = Column(Integer, nullable=False, default=0)
     tags = Column(Text())
