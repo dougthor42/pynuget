@@ -31,7 +31,7 @@ class FeedWriter(object):
         self.begin_feed()
         for result in results:
             self.add_entry(result)
-        return self.feed.as_xml()
+        return et.tostring(self.feed)
 
     def write_to_output(self, results):
         # TODO: header line
