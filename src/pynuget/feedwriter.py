@@ -187,13 +187,13 @@ class FeedWriter(object):
         attributes :
             Dict, I think.
         """
-        node = entry.add_child(name, value)
+        node = entry.append(name, value)
         for attr_name, attr_value in attributes.items():
             node.add_attribute(attr_name, attr_value)
 
     def add_meta(self, entry, name, value, type_=None):
         ado_url = 'http://schemas.microsoft.com/ado/2007/08/dataservices',
-        node = entry.add_child(
+        node = entry.append(
             name,
             value,
             ado_url,
