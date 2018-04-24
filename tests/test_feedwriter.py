@@ -9,11 +9,46 @@ import xml.etree.ElementTree as et
 import pytest
 
 from pynuget import feedwriter as fw
+from pynuget import db
 
 
 @pytest.fixture
 def feedwriter():
     return fw.FeedWriter(1)
+
+
+@pytest.fixture
+def version_row():
+    row = db.Version(
+        version_id=1,
+        package_id=1,
+        version="0.0.1",
+        copyright_="No copyright",
+        created=dt.datetime(1970, 1, 1, 0, 0, 0, 0),
+        dependencies='[{"id": 1, "version": "0.2.3"}]',
+        description="Some description",
+        icon_url="no url",
+        is_prerelease=False,
+        package_hash="abc123",
+        package_hash_algorithm="Michael Jackson",
+        package_size=1024,
+        project_url="https://github.com/dougthor42/pynuget/",
+        release_notes="No release notes. Sorry!",
+        require_license_acceptance=False,
+        tags="no tags",
+        title="DummyPackage",
+        version_download_count=9,
+        license_url="https://github.com/dougthor42/pynuget/blob/master/LICENSE",
+    )
+
+    pkg = db.Package(package_id=1,
+                     title="DummyPackage",
+                     download_count=12,
+                     latest_version="0.0.1")
+
+    row.package = pkg
+
+    return row
 
 
 @pytest.mark.skip("Not Implemented")
