@@ -166,7 +166,7 @@ class FeedWriter(object):
             'LicenseReportUrl': '',
         }
 
-        for name, data in meta.items():
+        for name, data in sorted(meta.items()):
             if isinstance(data, dict):
                 value = data['value']
                 type_ = data['type']
@@ -231,7 +231,7 @@ class FeedWriter(object):
         child = et.Element(name)
         child.text = value
         entry.append(child)
-        for attr_name, attr_value in attributes.items():
+        for attr_name, attr_value in sorted(attributes.items()):
             child.set(attr_name, str(attr_value))
 
     def add_meta(self, entry, name, value, type_=None):
