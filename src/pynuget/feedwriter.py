@@ -7,14 +7,14 @@ import json
 import re
 import xml.etree.ElementTree as et
 
-BASE = """
-<?xml version="1.0" encoding="utf-8" ?>
+BASE = """<?xml version="1.0" encoding="utf-8" ?>
 <feed
   xml:base="https://www.nuget.org/api/v2/"
   xmlns="http://www.w3.org/2005/Atom"
   xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices"
   xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata"
 >
+</feed>
 """
 
 class FeedWriter(object):
@@ -34,7 +34,7 @@ class FeedWriter(object):
         this.write(results)
 
     def begin_feed(self):
-        self.feed = et.parse(BASE)
+        self.feed = et.fromstring(BASE)
         self.feed.append('id', self.base_url + self.feed_id)
         self.add_with_attributes(self.feed, 'title', self.feed_id,
                 {'type': 'text'})
