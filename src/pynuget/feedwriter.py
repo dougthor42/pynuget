@@ -39,7 +39,8 @@ class FeedWriter(object):
 
     def begin_feed(self):
         self.feed = et.fromstring(BASE)
-        node = et.Element('id', text=(self.base_url + str(self.feed_id)))
+        node = et.Element('id')
+        node.text = self.base_url + str(self.feed_id)
         self.feed.append(node)
         self.add_with_attributes(
             self.feed,
@@ -47,8 +48,8 @@ class FeedWriter(object):
             self.feed_id,
             {'type': 'text'},
         )
-        node = et.Element('updated',
-                          text=self.format_date(dt.datetime.utcnow()))
+        node = et.Element('updated')
+        node.text = self.format_date(dt.datetime.utcnow())
         self.feed.append(node)
         self.add_with_attributes(
             self.feed,
