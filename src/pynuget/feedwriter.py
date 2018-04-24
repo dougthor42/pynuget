@@ -83,5 +83,24 @@ class FeedWriter(object):
         for attr_name, attr_value in attributes.items():
             node.add_attributes(attr_name, attr_value)
 
-    def add_meta(self):
-        raise NotImplementedError
+    def add_meta(self, entry, name, value, type_=None):
+        ado_url = 'http://schemas.microsoft.com/ado/2007/08/dataservices',
+        node = entry.add_child(
+            name,
+            value,
+            ado_url,
+        )
+
+        if type_:
+            node.add_attribute(
+                'm:type',
+                type_,
+                ado_url,
+            )
+
+        if value is None:
+            node.add_attribute(
+                'm:null',
+                'true',
+                ado_url,
+            )
