@@ -46,7 +46,13 @@ class FeedWriter(object):
                  })
 
     def add_entry(self, row):
-        entry_id = 'Packages(Id="' + row['package_id'] + '",Version="' + row['version'] + '")'
+        """
+        Parameters
+        ----------
+        row :
+            SQLAlchemy result set object
+        """
+        entry_id = 'Packages(Id="' + row.package_id + '",Version="' + row.version + '")'
         entry = self.feed.append('entry')
         entry.append('id', 'https://www.nuget.org/api/v2/' + entry_id)
         self.add_with_attributes(entry, 'category', None,
@@ -61,12 +67,12 @@ class FeedWriter(object):
 
         # Yes, this "title" is actually the package ID. Actual title is in
         # the metadata.
-        self.add_with_attributes(entry, 'title', row['package_id'], {'type': 'text'})
+        self.add_with_attributes(entry, 'title', row.package_id, {'type': 'text'})
         self.add_with_attributes(entry, 'summary', None, {'type': 'text'})
-        entry.append('updated', cls.format_date(row['created']))
+        entry.append('updated', cls.format_date(row.created))
 
         authors = entry.append('author')
-        authors.append('name', row['authors'])
+        authors.append('name', row.authors)
 
         this.add_with_attributes(entry, 'link', None,
             {'rel': 'edit-media',
@@ -75,7 +81,7 @@ class FeedWriter(object):
              })
         this.add_with_attributes(entry, 'content', None,
             {'type': 'application/zip',
-             'src': this.base_url + 'download/' + row['package_id'] + '/' + row['version'],
+             'src': this.base_url + 'download/' + row.package_id + '/' + row.version,
              })
         this.add_entry_meta(entry, row)
 
