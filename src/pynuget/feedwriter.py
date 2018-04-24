@@ -67,8 +67,11 @@ class FeedWriter(object):
         """
         entry_id = 'Packages(Id="{}",Version="{}")'.format(row.package_id,
                                                            row.version)
-        entry = self.feed.append('entry')
-        entry.append('id', 'https://www.nuget.org/api/v2/' + entry_id)
+        entry = et.Element('entry')
+        self.feed.append(entry)
+        node = et.Element('id')
+        node.text = 'https://www.nuget.org/api/v2/' + entry_id
+        entry.append(node)
         self.add_with_attributes(
             entry,
             'category',
@@ -87,10 +90,15 @@ class FeedWriter(object):
         self.add_with_attributes(entry, 'title', row.package_id,
                                  {'type': 'text'})
         self.add_with_attributes(entry, 'summary', None, {'type': 'text'})
-        entry.append('updated', self.format_date(row.created))
+        node = et.Element('updated')
+        node.text = self.format_date(row.created)
+        entry.append(node)
 
-        authors = entry.append('author')
-        authors.append('name', row.authors)
+        authors_node = et.Element('author')
+        entry.append(authors_node)
+        node = et.Element('name')
+        node.text = row.authors
+        authors_node.append(node)
 
         self.add_with_attributes(
             entry,
