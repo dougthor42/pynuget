@@ -69,8 +69,19 @@ class FeedWriter(object):
         """
         return re.sub('[^A-Z0-9]', '', framework).lower()
 
-    def add_with_attributes(self):
-        raise NotImplementedError
+    def add_with_attributes(self, entry, name, value, attributes):
+        """
+
+        Parameters
+        ----------
+        entry :
+            Looks to be a SimpleXMLElement node object
+        attributes :
+            Dict, I think.
+        """
+        node = entry.add_child(name, value)
+        for attr_name, attr_value in attributes.items():
+            node.add_attributes(attr_name, attr_value)
 
     def add_meta(self):
         raise NotImplementedError
