@@ -9,7 +9,10 @@ class FeedWriter(object):
         self.base_url = 'TBD'
 
     def write(self):
-        raise NotImplementedError
+        self.begin_feed()
+        for result in results:
+            self.add_entry(result)
+        return self.feed.as_xml()
 
     def write_to_output(self):
         raise NotImplementedError
