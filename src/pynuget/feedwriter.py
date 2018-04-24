@@ -16,7 +16,9 @@ BASE = """<?xml version="1.0" encoding="utf-8" ?>
 >
 </feed>
 """
-SCHEMA_URL = "http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"
+ADO_BASE_URL = "http://schemas.microsoft.com/ado/2007/08/dataservices"
+SCHEMA_URL = ADO_BASE_URL + "/scheme"
+METADATA_URL = ADO_BASE_URL + "/metadata"
 
 
 class FeedWriter(object):
@@ -108,15 +110,14 @@ class FeedWriter(object):
         )
         self.add_entry_meta(entry, row)
 
-    def add_entry_meta(self, row):
+    def add_entry_meta(self, entry, row):
         """
         Parameters
         ----------
         row :
             SQLAlchemy result set object
         """
-        properties = entry.append('properties', None,
-                'http://schemas.microsoft.com/ado/2007/08/dataservices/metadata')
+        properties = entry.append('properties', None, METADATA_URL)
 
         meta = {
             'version': row.version,
@@ -157,7 +158,7 @@ class FeedWriter(object):
                 type_ = data['type']
             else:
                 value = data
-                type = None
+                type_ = None
 
             self.add_meta(properties, name, value, type_)
 
@@ -188,7 +189,6 @@ class FeedWriter(object):
             output.append(formatted_dependency)
 
         return "|".join(output)
-
 
     def format_target_framework(self, framework):
         """Format a raw target framework from a NuSpec into the format
