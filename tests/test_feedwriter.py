@@ -15,15 +15,16 @@ def feedwriter():
     return fw.FeedWriter(1)
 
 
+@pytest.mark.skip("Not Implemented")
 def test_feedwriter_write(feedwriter):
-    raise NotImplementedError
     result = feedwriter.write()
 
     assert isinstance(result, str)
 
 
+@pytest.mark.skip("Not Implemented")
 def test_write_to_output(feedwriter):
-    raise NotImplementedError
+    pass
 
 
 def test_begin_feed(feedwriter):
@@ -33,12 +34,14 @@ def test_begin_feed(feedwriter):
         pytest.fail("Unexpected Error: {}".format(ex))
 
 
+@pytest.mark.skip("Not Implemented")
 def test_add_entry(feedwriter):
-    raise NotImplementedError
+    pass
 
 
+@pytest.mark.skip("Not Implemented")
 def test_add_entry_meta(feedwriter):
-    raise NotImplementedError
+    pass
 
 
 def test_render_meta_date(feedwriter):
@@ -80,9 +83,11 @@ def test_format_target_framework(feedwriter):
     assert feedwriter.format_target_framework('DNX4.5.1') == 'dnx451'
 
 
+@pytest.mark.skip("Not Implemented")
 def test_add_with_attributes(feedwriter):
-    raise NotImplementedError
+    pass
 
 
+@pytest.mark.skip("Not Implemented")
 def test_add_meta(feedwriter):
-    raise NotImplementedError
+    pass
