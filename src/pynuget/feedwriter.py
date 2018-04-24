@@ -31,7 +31,7 @@ class FeedWriter(object):
 
     def write_to_output(self, results):
         # TODO: header line
-        this.write(results)
+        self.write(results)
 
     def begin_feed(self):
         self.feed = et.fromstring(BASE)
@@ -74,16 +74,16 @@ class FeedWriter(object):
         authors = entry.append('author')
         authors.append('name', row.authors)
 
-        this.add_with_attributes(entry, 'link', None,
+        self.add_with_attributes(entry, 'link', None,
             {'rel': 'edit-media',
              'title': 'V2FeedPackage',
              'href': entry_id + '/$value',
              })
-        this.add_with_attributes(entry, 'content', None,
+        self.add_with_attributes(entry, 'content', None,
             {'type': 'application/zip',
-             'src': this.base_url + 'download/' + row.package_id + '/' + row.version,
+             'src': self.base_url + 'download/' + row.package_id + '/' + row.version,
              })
-        this.add_entry_meta(entry, row)
+        self.add_entry_meta(entry, row)
 
     def add_entry_meta(self, row):
         """
