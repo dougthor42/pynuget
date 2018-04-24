@@ -95,11 +95,9 @@ def version_row_xml():
     return expected
 
 
-@pytest.mark.skip("Not Implemented")
-def test_feedwriter_write(feedwriter):
-    result = feedwriter.write()
-
-    assert isinstance(result, str)
+def test_write(feedwriter, version_row):
+    result = feedwriter.write([version_row])
+    assert isinstance(result, bytes)
 
 
 @pytest.mark.skip("Not Implemented")
