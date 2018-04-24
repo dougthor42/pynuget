@@ -123,11 +123,13 @@ def test_add_entry(feedwriter, version_row, version_row_xml):
     assert result == expected
 
 
-def test_add_entry_meta(feedwriter, version_row):
+def test_add_entry_meta(feedwriter, version_row, version_row_xml):
     node = et.Element('root')
     feedwriter.add_entry_meta(node, version_row)
-    print(et.tostring(node))
-    assert False
+
+    expected = version_row_xml
+    result = et.tostring(node)
+    assert result == expected
 
 
 def test_render_meta_date(feedwriter):
