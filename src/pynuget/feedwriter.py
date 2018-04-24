@@ -4,6 +4,7 @@
 
 import datetime as dt
 import json
+import re
 
 class FeedWriter(object):
 
@@ -58,8 +59,15 @@ class FeedWriter(object):
         return "|".join(output)
 
 
-    def format_target_framework(self):
-        raise NotImplementedError
+    def format_target_framework(self, framework):
+        """Format a raw target framework from a NuSpec into the format
+        used in the packages feed.
+
+        Eg:
+        DNX4.5.1 -> dnx451
+        DNXCore5.0 -> dnxcore50
+        """
+        return re.sub('[^A-Z0-9]', '', framework).lower()
 
     def add_with_attributes(self):
         raise NotImplementedError
