@@ -17,8 +17,8 @@ BASE = """<?xml version="1.0" encoding="utf-8" ?>
 </feed>
 """
 ADO_BASE_URL = "http://schemas.microsoft.com/ado/2007/08/dataservices"
-SCHEMA_URL = ADO_BASE_URL + "/scheme"
-METADATA_URL = ADO_BASE_URL + "/metadata"
+ADO_SCHEMA_URL = ADO_BASE_URL + "/scheme"
+ADO_METADATA_URL = ADO_BASE_URL + "/metadata"
 
 
 class FeedWriter(object):
@@ -72,7 +72,7 @@ class FeedWriter(object):
             entry,
             'category',
             None,
-            {'term': 'NuGetGallery.V2FeedPackage', 'scheme': SCHEMA_URL},
+            {'term': 'NuGetGallery.V2FeedPackage', 'scheme': ADO_SCHEMA_URL},
         )
         self.add_with_attributes(
             entry,
@@ -117,7 +117,7 @@ class FeedWriter(object):
         row :
             SQLAlchemy result set object
         """
-        properties = entry.append('properties', None, METADATA_URL)
+        properties = entry.append('properties', None, ADO_METADATA_URL)
 
         meta = {
             'version': row.version,
