@@ -70,9 +70,11 @@ def test_begin_feed(feedwriter):
         pytest.fail("Unexpected Error: {}".format(ex))
 
 
-@pytest.mark.skip("Not Implemented")
-def test_add_entry(feedwriter):
-    pass
+def test_add_entry(feedwriter, version_row):
+    feedwriter.begin_feed()
+    feedwriter.add_entry(version_row)
+#    print(et.tostring(feedwriter.feed))
+#    pytest.fail()
 
 
 @pytest.mark.skip("Not Implemented")
