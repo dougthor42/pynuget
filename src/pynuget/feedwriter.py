@@ -176,16 +176,20 @@ class FeedWriter(object):
         if not raw:
             return ''
 
-        data = json.loads(raw)
-        if not data:
+        try:
+            data = json.loads(raw)
+        except json.decoder.JSONDecodeError:
             return ''
 
         output = []
 
         for dependency in data:
-            formatted_dependency = dependency.id + dependency.version
-            if dependency.framework:
-                formatted_dependency += self.format_target_framework(dependency.framework)
+            formatted_dependency = "{}:{}:".format(dependency['id'],
+                                                   dependency['version'])
+            if 'framework' in dependency.keys():
+                formatted_dependency += self.format_target_framework(
+                    dependency['framework'],
+                )
             output.append(formatted_dependency)
 
         return "|".join(output)
