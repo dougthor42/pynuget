@@ -2,6 +2,8 @@
 """
 """
 
+import datetime as dt
+
 class FeedWriter(object):
 
     def __init__(self, id_):
@@ -33,7 +35,8 @@ class FeedWriter(object):
         return {'value': value, type: bool}
 
     def format_date(self):
-        raise NotImplementedError
+        #  return dt.isoformat(timespec='seconds')      # Py3.6+
+        return dt.isoformat()
 
     def render_dependencies(self):
         raise NotImplementedError
