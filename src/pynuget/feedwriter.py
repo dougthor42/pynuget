@@ -16,6 +16,8 @@ BASE = """<?xml version="1.0" encoding="utf-8" ?>
 >
 </feed>
 """
+SCHEMA_URL = "http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"
+
 
 class FeedWriter(object):
 
@@ -35,15 +37,23 @@ class FeedWriter(object):
 
     def begin_feed(self):
         self.feed = et.fromstring(BASE)
-        self.feed.append(et.Element('id', text=(self.base_url + str(self.feed_id))))
-        self.add_with_attributes(self.feed, 'title', self.feed_id,
-                {'type': 'text'})
-        self.feed.append(et.Element('updated', text=self.format_date(dt.datetime.utcnow())))
-        self.add_with_attributes(self.feed, 'link', None,
-                {'rel': 'self',
-                 'title': self.feed_id,
-                 'href': self.feed_id,
-                 })
+        node = et.Element('id', text=(self.base_url + str(self.feed_id)))
+        self.feed.append(node)
+        self.add_with_attributes(
+            self.feed,
+            'title',
+            self.feed_id,
+            {'type': 'text'},
+        )
+        node = et.Element('updated',
+                          text=self.format_date(dt.datetime.utcnow()))
+        self.feed.append(node)
+        self.add_with_attributes(
+            self.feed,
+            'link',
+            None,
+            {'rel': 'self', 'title': self.feed_id, 'href': self.feed_id},
+        )
 
     def add_entry(self, row):
         """
@@ -52,37 +62,50 @@ class FeedWriter(object):
         row :
             SQLAlchemy result set object
         """
-        entry_id = 'Packages(Id="' + row.package_id + '",Version="' + row.version + '")'
+        entry_id = 'Packages(Id="{}",Version="{}")'.format(row.package_id,
+                                                           row.version)
         entry = self.feed.append('entry')
         entry.append('id', 'https://www.nuget.org/api/v2/' + entry_id)
-        self.add_with_attributes(entry, 'category', None,
-                {'term': 'NuGetGallery.V2FeedPackage',
-                 'scheme': 'http://schemas.microsoft.com/ado/2007/08/dataservices/scheme',
-                 })
-        self.add_with_attributes(entry, 'link', None,
-            {'rel': 'edit',
-             'title': 'V2FeedPackage',
-             'href': entry_id,
-             })
+        self.add_with_attributes(
+            entry,
+            'category',
+            None,
+            {'term': 'NuGetGallery.V2FeedPackage', 'scheme': SCHEMA_URL},
+        )
+        self.add_with_attributes(
+            entry,
+            'link',
+            None,
+            {'rel': 'edit', 'title': 'V2FeedPackage', 'href': entry_id},
+        )
 
         # Yes, this "title" is actually the package ID. Actual title is in
         # the metadata.
-        self.add_with_attributes(entry, 'title', row.package_id, {'type': 'text'})
+        self.add_with_attributes(entry, 'title', row.package_id,
+                                 {'type': 'text'})
         self.add_with_attributes(entry, 'summary', None, {'type': 'text'})
         entry.append('updated', self.format_date(row.created))
 
         authors = entry.append('author')
         authors.append('name', row.authors)
 
-        self.add_with_attributes(entry, 'link', None,
+        self.add_with_attributes(
+            entry,
+            'link',
+            None,
             {'rel': 'edit-media',
              'title': 'V2FeedPackage',
              'href': entry_id + '/$value',
-             })
-        self.add_with_attributes(entry, 'content', None,
-            {'type': 'application/zip',
-             'src': self.base_url + 'download/' + row.package_id + '/' + row.version,
-             })
+             },
+        )
+        url = "{}download/{}/{}".format(self.base_url, row.package_id,
+                                        row.version)
+        self.add_with_attributes(
+            entry,
+            'content',
+            None,
+            {'type': 'application/zip', 'src': url},
+        )
         self.add_entry_meta(entry, row)
 
     def add_entry_meta(self, row):
