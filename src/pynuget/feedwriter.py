@@ -214,10 +214,11 @@ class FeedWriter(object):
         attributes :
             Dict, I think.
         """
-        node = et.Element(name, text=value)
-        entry.append(node)
+        child = et.Element(name)
+        child.text = value
+        entry.append(child)
         for attr_name, attr_value in attributes.items():
-            node.set(attr_name, attr_value)
+            child.set(attr_name, str(attr_value))
 
     def add_meta(self, entry, name, value, type_=None):
         child = et.Element(name)
