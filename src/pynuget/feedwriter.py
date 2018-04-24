@@ -132,13 +132,13 @@ class FeedWriter(object):
             if isinstance(data, dict):
                 value = data['value']
                 type_ = data['type']
-            else
+            else:
                 value = data
                 type = None
 
             self.add_meta(properties, name, value, type_)
 
-    def render_meta_date(self, date)
+    def render_meta_date(self, date):
         return {'value': cls.format_date(date), 'type': dt.datetime}
 
     def render_meta_boolean(self, value):
