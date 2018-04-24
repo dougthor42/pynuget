@@ -190,7 +190,7 @@ class FeedWriter(object):
         node = et.Element(name, text=value)
         entry.append(node)
         for attr_name, attr_value in attributes.items():
-            node.add_attribute(attr_name, attr_value)
+            node.set(attr_name, attr_value)
 
     def add_meta(self, entry, name, value, type_=None):
         ado_url = 'http://schemas.microsoft.com/ado/2007/08/dataservices',
