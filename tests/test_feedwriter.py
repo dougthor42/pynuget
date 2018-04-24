@@ -100,9 +100,11 @@ def test_write(feedwriter, version_row):
     assert isinstance(result, bytes)
 
 
-@pytest.mark.skip("Not Implemented")
-def test_write_to_output(feedwriter):
-    pass
+def test_write_to_output(feedwriter, version_row):
+    try:
+        feedwriter.write_to_output([version_row])
+    except Exception as ex:
+        pytest.fail("Unexpected Error: {}".format(ex))
 
 
 def test_begin_feed(feedwriter):
