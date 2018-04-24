@@ -2,6 +2,8 @@
 """
 """
 
+import datetime as dt
+
 import pytest
 
 from pynuget import feedwriter as fw
@@ -39,7 +41,9 @@ def test_add_entry_meta(feedwriter):
 
 
 def test_render_meta_date(feedwriter):
-    raise NotImplementedError
+    date = dt.datetime(1970, 1, 1, 0, 0, 0, 0)
+    result = feedwriter.render_meta_date(date)
+    assert result == {'value': "1970-01-01T00:00:00Z", 'type': dt.datetime}
 
 
 def test_render_meta_boolean(feedwriter):
@@ -47,7 +51,6 @@ def test_render_meta_boolean(feedwriter):
     assert result == {'value': False, 'type': bool}
     result = feedwriter.render_meta_boolean(True)
     assert result == {'value': True, 'type': bool}
-
 
 
 def test_render_dependencies(feedwriter):
