@@ -69,8 +69,9 @@ def push():
     # TODO
     #core.require_auth()
 
-    # TODO: `if 'file' not in request.files`
-    file = request.files['file']
+    if 'package' not in request.files:
+        return "error: File not uploaded"
+    file = request.files['package']
     pkg = ZipFile(file, 'r')
 
     # Open the zip file that was sent and extract out the .nuspec file."
