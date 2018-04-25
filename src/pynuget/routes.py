@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 """
+import os
 
 # Third-Party
 from flask import g
@@ -68,7 +69,15 @@ def count():
 
 @app.route('/delete', methods=['DELETE'])
 def delete():
-    raise NotImplementedError
+    #core.require_auth()
+    id_ = request.args.get('id')
+    version = request.args.get('version')
+    path = core.get_package_path(id_, version)
+
+    if os.path.exists(path):
+        os.remove(path)
+
+    db.delete_version(session, id_, version)
 
 
 @app.route('/download', methods=['GET'])
