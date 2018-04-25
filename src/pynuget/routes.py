@@ -34,8 +34,9 @@ def delete():
 def download():
     raise NotImplementedError
 
-@app.route('find_by_id', methods=['GET'])
-def find_by_id:
+
+@app.route('/find_by_id', methods=['GET'])
+def find_by_id():
     raise NotImplementedError
 
 @app.route('/search', methods=['GET'])
