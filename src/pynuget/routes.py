@@ -7,9 +7,11 @@ from flask import request
 
 from pynuget import app
 
-@app.route('/', methods=['GET'])
+
+@app.route('/web')
 def root():
-    raise NotImplementedError
+    return "Hello World!"
+
 
 @app.route('/index', methods=['GET', 'PUT', 'DELETE'])
 def index():
