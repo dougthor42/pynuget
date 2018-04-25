@@ -20,5 +20,11 @@ def _setup_file_logging():
     pass
 
 
-def _setup_console_logging():
-    pass
+def _setup_console_logging(logger):
+    """Set up logging to the console."""
+    handler = logging.StreamHandler()
+    handler.setLevel(LOG_LEVEL_CONSOLE)
+    handler.set_name("Console Handler")
+    logger.addHandler(handler)
+
+    logger.info("Console logging initialized")
