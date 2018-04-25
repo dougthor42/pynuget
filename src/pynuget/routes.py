@@ -22,13 +22,16 @@ def index():
 def push():
     raise NotImplementedError
 
+
 @app.route('/count', methods=['GET'])
 def count():
     raise NotImplementedError
 
+
 @app.route('/delete', methods=['DELETE'])
 def delete():
     raise NotImplementedError
+
 
 @app.route('/download', methods=['GET'])
 def download():
@@ -39,9 +42,11 @@ def download():
 def find_by_id():
     raise NotImplementedError
 
+
 @app.route('/search', methods=['GET'])
 def search():
     raise NotImplementedError
+
 
 @app.route('/updates', methods=['GET'])
 def updates():
