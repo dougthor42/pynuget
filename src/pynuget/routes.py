@@ -8,6 +8,9 @@ from flask import Response
 import sqlalchemy as sa
 
 from pynuget import app
+from pynuget import db
+
+
 
 
 @app.route('/web')
@@ -32,7 +35,13 @@ def push():
 
 @app.route('/count', methods=['GET'])
 def count():
-    raise NotImplementedError
+    engine = sa.create_engine('sqlite:///:memory:', echo=False)
+    db.Base.metadata.create_all(engine)
+    session = sa.orm.Session(bind=engine)
+
+    resp = Response(str(db.count_packages(session)))
+    resp.headers['Content-Type'] = 'text/plain; charset=utf-8'
+    return resp
 
 
 @app.route('/delete', methods=['DELETE'])
