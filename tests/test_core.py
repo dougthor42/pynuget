@@ -14,9 +14,13 @@ def test_api_error():
 
 
 def test_require_auth():
+    # Make sure that our default config hasn't changed.
     assert app.config['API_KEYS'] == {"ChangeThisKey"}
-    assert core.require_auth('ChangeThisKey')
-    assert not core.require_auth("Invalid Key")
+
+    headers = {'X-Nuget-Apikey': 'ChangeThisKey'}
+    assert core.require_auth(headers)
+    headers = {'X-Nuget-Apikey': 'Invaldid Key'}
+    assert not core.require_auth(headers)
 
 
 @pytest.mark.skip("Not Implemented")
