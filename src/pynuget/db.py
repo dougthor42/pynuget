@@ -5,7 +5,6 @@
 import datetime as dt
 import json
 
-import sqlalchemy as sa
 from sqlalchemy import Column, Integer, String, Text, Boolean
 from sqlalchemy import ForeignKey
 from sqlalchemy import func
@@ -17,7 +16,6 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
 
 Base = declarative_base()
-engine = sa.create_engine('sqlite:///:memory:', echo=False)
 
 
 class Package(Base):
