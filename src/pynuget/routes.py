@@ -139,8 +139,10 @@ def push():
 
     # Save the package file to the local package dir. Thus far it's just been
     # floating around in magic Flask land.
-    # TODO: Custom dir
-    local_path = "./packagefiles/{}/{}.nupkg".format(id_, version)
+    local_path = os.path.join(app.config['PACKAGE_DIR'],
+                              id_,
+                              version + ".nupkg",
+                              )
 
     # Check if the pacakge's directory already exists. Create if needed.
     os.makedirs(os.path.split(local_path)[0],
