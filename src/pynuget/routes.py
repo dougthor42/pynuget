@@ -73,7 +73,19 @@ def delete():
 
 @app.route('/download', methods=['GET'])
 def download():
-    raise NotImplementedError
+    id_ = request.args.get('id')
+    version = request.args.get('version')
+
+    path = core.get_package_path(id_, version)
+    db.increment_download_count(session, id_, version)
+    filename = "{}.{}.nupkg".format(id_, version)
+
+    resp = Response()
+    resp.headers[''] = 'application/zip'
+    resp.headers['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
+    resp.headers['X-Accel-Redirect'] = path
+
+    return resp
 
 
 @app.route('/find_by_id', methods=['GET'])
