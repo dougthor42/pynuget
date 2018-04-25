@@ -36,7 +36,7 @@ def _gzip_rotator(source, dest):
     os.remove(source)
 
 
-def setup_logging(to_console=True, to_file=False, log_file=None):
+def setup_logging(to_console=True, to_file=False, log_path=None):
     # Create the logger
     logger = logging.getLogger()
     logger.setLevel(LOG_LEVEL_BASE)
@@ -45,18 +45,18 @@ def setup_logging(to_console=True, to_file=False, log_file=None):
         _setup_console_logging(logger)
 
     if to_file:
-        _setup_file_logging(logger, log_file)
+        _setup_file_logging(logger, log_path)
 
     return logger
 
 
-def _setup_file_logging(logger, log_file):
+def _setup_file_logging(logger, log_path):
     # Create paths and files as needed.
-    log_file = Path(log_file)
-    os.makedirs(log_file.parent, mode=0x0664, exist_ok=True)
-    log_file.touch(mode=0o0664, exist_ok=True)
+    log_path = Path(log_path)
+    os.makedirs(log_path.parent, mode=0x0664, exist_ok=True)
+    log_path.touch(mode=0o0664, exist_ok=True)
 
-    handler = RotatingFileHandler(str(log_file), maxBytes=1e7)
+    handler = RotatingFileHandler(str(log_path), maxBytes=1e7)
     handler.rotator = _gzip_rotator
     handler.namer = _gzip_namer
     handler.setLevel(LOG_LEVEL_FILE)
