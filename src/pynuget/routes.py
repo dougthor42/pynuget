@@ -103,7 +103,14 @@ def download():
 
 @app.route('/find_by_id', methods=['GET'])
 def find_by_id():
-    raise NotImplementedError
+    id_ = request.args.get('id')
+    version = request.args.get('version', default=None)
+
+    results = db.find_by_id(id_, version)
+    feed = FeedWriter('FindPackagesById')
+    resp = Response(feed.write_to_output(results))
+    resp.headers['Content-Type']
+    return resp
 
 
 @app.route('/search', methods=['GET'])
