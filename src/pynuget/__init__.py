@@ -2,6 +2,7 @@
 """
 """
 import os
+import sys
 
 from flask import Flask
 
@@ -27,5 +28,5 @@ logger = setup_logging(to_console=True,
 try:
     import pynuget.routes
 except FileNotFoundError:
-    raise
-    #logger.error("Can't import pynuget.routes.")
+    logger.critical("Can't import pynuget.routes. Aborting.")
+    sys.exit(1)
