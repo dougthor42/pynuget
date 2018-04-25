@@ -103,6 +103,11 @@ def download():
 
 @app.route('/find_by_id', methods=['GET'])
 def find_by_id():
+    raise NotImplementedError
+
+
+@app.route('/search', methods=['GET'])
+def search():
     # TODO: Cleanup this and db.search_pacakges call sig.
     include_prerelease = request.args.get('includeprerelease', default=False)
     order_by = request.args.get('orderby', default=None)
@@ -119,11 +124,6 @@ def find_by_id():
     resp = Response(feed.write_to_output(results))
     resp.headers['Content-Type'] = FEED_CONTENT_TYPE_HEADER
     return resp
-
-
-@app.route('/search', methods=['GET'])
-def search():
-    raise NotImplementedError
 
 
 @app.route('/updates', methods=['GET'])
