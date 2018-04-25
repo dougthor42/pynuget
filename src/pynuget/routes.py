@@ -230,6 +230,8 @@ def delete():
 
     db.delete_version(session, id_, version)
 
+    logger.info("Sucessfully deleted package %s version %s." % id_, version)
+
 
 @app.route('/download', methods=['GET'])
 def download():
