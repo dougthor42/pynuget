@@ -35,7 +35,7 @@ class FeedWriter(object):
 
     def write_to_output(self, results):
         # TODO: header line
-        self.write(results)
+        return self.write(results)
 
     def begin_feed(self):
         self.feed = et.fromstring(BASE)
