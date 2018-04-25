@@ -20,6 +20,7 @@ from werkzeug.local import LocalProxy
 from pynuget import app
 from pynuget import db
 from pynuget import core
+from pynuget import logger
 from pynuget.feedwriter import FeedWriter
 
 
@@ -51,12 +52,14 @@ session = LocalProxy(get_db_session)
 
 @app.route('/web')
 def root():
+    logger.debug("Route: /web")
     return "Hello World!"
 
 
 @app.route('/', methods=['GET', 'PUT', 'DELETE'])
 @app.route('/index', methods=['GET', 'PUT', 'DELETE'])
 def index():
+    logger.debug("Route: /index")
     if request.method == 'PUT':
         return push()
 
@@ -66,6 +69,7 @@ def index():
 
 
 def push():
+    logger.debug("push()")
     if not core.require_auth(request.headers):
         return "api_error: Missing or Invalid API key"      # TODO
 
@@ -188,6 +192,7 @@ def push():
 
 @app.route('/count', methods=['GET'])
 def count():
+    logger.debug("Route: /count")
     resp = Response(str(db.count_packages(session)))
     resp.headers['Content-Type'] = 'text/plain; charset=utf-8'
     return resp
@@ -195,6 +200,7 @@ def count():
 
 @app.route('/delete', methods=['DELETE'])
 def delete():
+    logger.debug("Route: /delete")
     if not core.require_auth(request.headers):
         return "api_error: Missing or Invalid API key"      # TODO
 
@@ -210,6 +216,7 @@ def delete():
 
 @app.route('/download', methods=['GET'])
 def download():
+    logger.debug("Route: /download")
     id_ = request.args.get('id')
     version = request.args.get('version')
 
@@ -227,6 +234,7 @@ def download():
 
 @app.route('/find_by_id', methods=['GET'])
 def find_by_id():
+    logger.debug("Route: /find_by_id")
     id_ = request.args.get('id')
     version = request.args.get('version', default=None)
 
@@ -239,6 +247,7 @@ def find_by_id():
 
 @app.route('/search', methods=['GET'])
 def search():
+    logger.debug("Route: /search")
     # TODO: Cleanup this and db.search_pacakges call sig.
     include_prerelease = request.args.get('includeprerelease', default=False)
     order_by = request.args.get('orderby', default=None)
@@ -259,6 +268,7 @@ def search():
 
 @app.route('/updates', methods=['GET'])
 def updates():
+    logger.debug("Route: /updates")
     ids = request.args.get('packageids').strip("'").split('|')
     versions = request.args.get('versions').strip("'").split('|')
     include_prerelease = request.args.get('includeprerelease', default=False)
