@@ -51,10 +51,12 @@ def setup_logging(to_console=True, to_file=False, log_file=None):
 
 
 def _setup_file_logging(logger, log_file):
+    # Create paths and files as needed.
+    log_file = Path(log_file)
+    os.makedirs(log_file.parent, mode=0x0664, exist_ok=True)
+    log_file.touch(mode=0o0664, exist_ok=True)
 
-    Path(log_file).touch(mode=0o0664, exist_ok=True)
-
-    handler = RotatingFileHandler(log_file, maxBytes=1e7)
+    handler = RotatingFileHandler(str(log_file), maxBytes=1e7)
     handler.rotator = _gzip_rotator
     handler.namer = _gzip_namer
     handler.setLevel(LOG_LEVEL_FILE)
