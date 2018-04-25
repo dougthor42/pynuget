@@ -5,6 +5,7 @@ Logging setup and handlers.
 import zlib
 import logging
 import os
+import time
 from pathlib import Path
 from logging.handlers import RotatingFileHandler
 
@@ -13,6 +14,31 @@ LOG_LEVEL_BASE = logging.DEBUG
 LOG_LEVEL_FILE = LOG_LEVEL_BASE
 LOG_LEVEL_CONSOLE = logging.DEBUG
 LOG_LEVEL_GUI = LOG_LEVEL_BASE
+
+LOG_FMT = ("%(asctime)s.%(msecs)03dZ"
+           " [%(levelname)-8.8s]"
+           " [%(module)-8.8s]"       # Note implicit string concatenation.
+           " [%(funcName)-16.16s]"
+           "  %(message)s"
+           )
+DATE_FMT = "%Y-%m-%dT%H:%M:%S"
+
+
+class CustomLoggingFormatter(logging.Formatter):
+    """
+    Custom logging formatter. Overrides funcName and module if a value
+    for name_override or module_override exists.
+    """
+    # Make sure things are saved in UTC.
+    converter = time.gmtime
+
+    def format(self, record):
+        if hasattr(record, 'name_override'):
+            record.funcName = record.name_override
+        if hasattr(record, 'module_override'):
+            record.module = record.module_override
+
+        return super(CustomLoggingFormatter, self).format(record)
 
 
 # Custom namer and rotator.
@@ -60,6 +86,8 @@ def _setup_file_logging(logger, log_path):
     handler.rotator = _gzip_rotator
     handler.namer = _gzip_namer
     handler.setLevel(LOG_LEVEL_FILE)
+    formatter = CustomLoggingFormatter(LOG_FMT, DATE_FMT)
+    handler.setFormatter(formatter)
     handler.set_name("File Handler")
     logger.addHandler(handler)
 
@@ -70,6 +98,8 @@ def _setup_console_logging(logger):
     """Set up logging to the console."""
     handler = logging.StreamHandler()
     handler.setLevel(LOG_LEVEL_CONSOLE)
+    formatter = CustomLoggingFormatter(LOG_FMT, DATE_FMT)
+    handler.setFormatter(formatter)
     handler.set_name("Console Handler")
     logger.addHandler(handler)
 
