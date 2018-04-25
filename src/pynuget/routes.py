@@ -125,4 +125,14 @@ def search():
 
 @app.route('/updates', methods=['GET'])
 def updates():
-    raise NotImplementedError
+    ids = request.args.get('packageids').strip("'").split('|')
+    versions = request.args.get('versions').strip("'").split('|')
+    include_prerelease = request.args.get('includeprerelease', default=False)
+    pkg_to_vers = {k: v for k, v in zip(ids, versions)}
+
+    results = db.package_updates(session, pkg_to_vers, include_prerelease)
+
+    feed = FeedWriter('GetUpdates')
+    resp = Response(feed.write_to_output(results))
+    resp.headers['Content-Type'] = 'application/atom+xml; type=feed; charset=UTF-8'
+    return resp
