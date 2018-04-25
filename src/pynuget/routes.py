@@ -2,7 +2,8 @@
 """
 """
 
-from flask import Flask
+# Third-Party
+from flask import request
 
 from pynuget import app
 
@@ -12,7 +13,9 @@ def root():
 
 @app.route('/index', methods=['GET', 'PUT', 'DELETE'])
 def index():
-    raise NotImplementedError
+    if request.method == 'PUT':
+        push()
+
 
 def push():
     raise NotImplementedError
