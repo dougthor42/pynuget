@@ -54,7 +54,7 @@ def _setup_file_logging(logger, log_file):
 
     Path(log_file).touch(mode=0o0664, exist_ok=True)
 
-    handler = RotatingFileHandler(log_file, maxBytes=1e8)
+    handler = RotatingFileHandler(log_file, maxBytes=1e7)
     handler.rotator = _gzip_rotator
     handler.namer = _gzip_namer
     handler.setLevel(LOG_LEVEL_FILE)
