@@ -19,6 +19,9 @@ from pynuget import core
 from pynuget.feedwriter import FeedWriter
 
 
+FEED_CONTENT_TYPE_HEADER = 'application/atom+xml; type=feed; charset=UTF-8'
+
+
 def get_db_session():
     session = getattr(g, 'session', None)
     if session is None:
@@ -114,7 +117,7 @@ def find_by_id():
 
     feed = FeedWriter('Search')
     resp = Response(feed.write_to_output(results))
-    resp.headers['Content-Type'] = 'application/atom+xml; type=feed; charset=UTF-8'
+    resp.headers['Content-Type'] = FEED_CONTENT_TYPE_HEADER
     return resp
 
 
@@ -134,5 +137,5 @@ def updates():
 
     feed = FeedWriter('GetUpdates')
     resp = Response(feed.write_to_output(results))
-    resp.headers['Content-Type'] = 'application/atom+xml; type=feed; charset=UTF-8'
+    resp.headers['Content-Type'] = FEED_CONTENT_TYPE_HEADER
     return resp
