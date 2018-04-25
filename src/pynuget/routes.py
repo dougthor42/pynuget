@@ -113,7 +113,9 @@ def find_by_id():
                                  )
 
     feed = FeedWriter('Search')
-    return feed.write_to_output(results)
+    resp = Response(feed.write_to_output(results))
+    resp.headers['Content-Type'] = 'application/atom+xml; type=feed; charset=UTF-8'
+    return resp
 
 
 @app.route('/search', methods=['GET'])
