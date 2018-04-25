@@ -74,12 +74,14 @@ def push():
     pkg = ZipFile(file, 'r')
 
     # Open the zip file that was sent and extract out the .nuspec file."
-    # TODO: Cleanup, python-ize
     nuspec_file = None
-    if '.nuspec' not in pkg.namelist():
+    pattern = re.compile(r'^.*\.nuspec$', re.IGNORECASE)
+    nuspec_file = list(filter(pattern.search, pkg.namelist()))
+    if len(nuspec_file) > 1:
+        return "api_error: multiple nuspec files found"
+    elif len(nuspec_file) == 0:
         return "api_error: nuspec file not found"      # TODO
-    else:
-        nuspec_file = "some.nuspec"
+    nuspec_file = nuspec_file[0]
 
     with pkg.open(nuspec_file, 'r') as openf:
         nuspec_string = openf.read()
