@@ -66,8 +66,8 @@ def index():
 
 
 def push():
-    # TODO
-    #core.require_auth()
+    if not core.require_auth(request.headers):
+        return "api_error: Missing or Invalid API key"      # TODO
 
     if 'package' not in request.files:
         return "error: File not uploaded"
@@ -195,7 +195,9 @@ def count():
 
 @app.route('/delete', methods=['DELETE'])
 def delete():
-    #core.require_auth()
+    if not core.require_auth(request.headers):
+        return "api_error: Missing or Invalid API key"      # TODO
+
     id_ = request.args.get('id')
     version = request.args.get('version')
     path = core.get_package_path(id_, version)
