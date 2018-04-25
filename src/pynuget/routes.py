@@ -12,7 +12,6 @@ from zipfile import ZipFile
 from flask import g
 from flask import request
 from flask import Response
-import sqlalchemy as sa
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -32,6 +31,7 @@ def get_db_session():
     if session is None:
         # TODO: Handle pre-existing DB files.
         # TODO: Use files not memory
+        # TODO: Handle MySQL/PostgreSQL backends.
         engine = create_engine('sqlite:///:memory:', echo=False)
         Session = sessionmaker(bind=engine)
         db.Base.metadata.create_all(engine)
@@ -89,10 +89,9 @@ def push():
 
     nuspec = et.fromstring(nuspec_string)
 
-    # TODO
     # Make sure both the ID and the version are provided in the .nuspec file.
     if nuspec['metadata']['id'] is None or nuspec['metadata']['version'] is None:
-        return "api_error: ID or version missing"
+        return "api_error: ID or version missing"        # TODO
 
     id_ = str(nuspec['metadata']['id'])
     version = str(nuspec['metadata']['version'])
