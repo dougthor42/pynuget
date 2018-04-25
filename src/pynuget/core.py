@@ -3,15 +3,17 @@
 """
 
 
+from pynuget import app
+
+
 # XXX: Not needed?
 def api_error():
     raise NotImplementedError
 
 
-# XXX: Not needed?
-def require_auth():
+def require_auth(key):
     """Ensure that the API key is valid."""
-    raise NotImplementedError
+    return key in app.config['API_KEYS']
 
 
 # XXX: Not needed?
