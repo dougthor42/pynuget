@@ -16,6 +16,7 @@ from werkzeug.local import LocalProxy
 from pynuget import app
 from pynuget import db
 from pynuget import core
+from pynuget.feedwriter import FeedWriter
 
 
 def get_db_session():
@@ -99,7 +100,20 @@ def download():
 
 @app.route('/find_by_id', methods=['GET'])
 def find_by_id():
-    raise NotImplementedError
+    # TODO: Cleanup this and db.search_pacakges call sig.
+    include_prerelease = request.args.get('includeprerelease', default=False)
+    order_by = request.args.get('orderby', default=None)
+    filter_ = request.args.get('filter', default=None)
+    search_query = request.args.get('searchQuery', default=None)
+    results = db.search_packages(session,
+                                 include_prerelease,
+                                 #order_by
+                                 filter_,
+                                 search_query,
+                                 )
+
+    feed = FeedWriter('Search')
+    return feed.write_to_output(results)
 
 
 @app.route('/search', methods=['GET'])
