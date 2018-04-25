@@ -216,7 +216,7 @@ class FeedWriter(object):
         DNX4.5.1 -> dnx451
         DNXCore5.0 -> dnxcore50
         """
-        return re.sub('[^A-Z0-9]', '', framework).lower()
+        return re.sub('[^A-Z0-9]', '', framework, flags=re.IGNORECASE).lower()
 
     def add_with_attributes(self, entry, name, value, attributes):
         """
