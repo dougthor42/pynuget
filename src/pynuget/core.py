@@ -4,6 +4,7 @@
 
 
 from pynuget import app
+from pynuget import logger
 
 
 # XXX: Not needed?
@@ -14,7 +15,10 @@ def api_error():
 def require_auth(headers):
     """Ensure that the API key is valid."""
     key = headers.get('X-Nuget-Apikey', None)
-    return key is not None and key in app.config['API_KEYS']
+    is_valid = key is not None and key in app.config['API_KEYS']
+    if not is_valid:
+        logger.error("Missing or Invalid API key")
+    return is_valid
 
 
 # XXX: Not needed?

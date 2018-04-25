@@ -71,7 +71,6 @@ def index():
 def push():
     logger.debug("push()")
     if not core.require_auth(request.headers):
-        logger.error("Missing or Invalid API key")
         return "api_error: Missing or Invalid API key"      # TODO
 
     logger.debug("Checking for uploaded file.")
