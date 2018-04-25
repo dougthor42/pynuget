@@ -20,6 +20,7 @@ from werkzeug.local import LocalProxy
 from pynuget import app
 from pynuget import db
 from pynuget import core
+from pynuget import logger
 from pynuget.feedwriter import FeedWriter
 
 
@@ -51,12 +52,14 @@ session = LocalProxy(get_db_session)
 
 @app.route('/web')
 def root():
+    logger.debug("Route: /web")
     return "Hello World!"
 
 
 @app.route('/', methods=['GET', 'PUT', 'DELETE'])
 @app.route('/index', methods=['GET', 'PUT', 'DELETE'])
 def index():
+    logger.debug("Route: /index")
     if request.method == 'PUT':
         return push()
 
@@ -66,31 +69,39 @@ def index():
 
 
 def push():
+    logger.debug("push()")
     if not core.require_auth(request.headers):
         return "api_error: Missing or Invalid API key"      # TODO
 
+    logger.debug("Checking for uploaded file.")
     if 'package' not in request.files:
+        logger.error("Package file was not uploaded.")
         return "error: File not uploaded"
     file = request.files['package']
     pkg = ZipFile(file, 'r')
 
     # Open the zip file that was sent and extract out the .nuspec file."
+    logger.debug("Parsing uploaded file.")
     nuspec_file = None
     pattern = re.compile(r'^.*\.nuspec$', re.IGNORECASE)
     nuspec_file = list(filter(pattern.search, pkg.namelist()))
     if len(nuspec_file) > 1:
+        logger.error("Multiple NuSpec files found within the package.")
         return "api_error: multiple nuspec files found"
     elif len(nuspec_file) == 0:
+        logger.error("No NuSpec file found in the package.")
         return "api_error: nuspec file not found"      # TODO
     nuspec_file = nuspec_file[0]
 
     with pkg.open(nuspec_file, 'r') as openf:
         nuspec_string = openf.read()
 
+    logger.debug("Parsing NuSpec file XML")
     nuspec = et.fromstring(nuspec_string)
 
     # Make sure both the ID and the version are provided in the .nuspec file.
     if nuspec['metadata']['id'] is None or nuspec['metadata']['version'] is None:
+        logger.error("ID or version missing from NuSpec file.")
         return "api_error: ID or version missing"        # TODO
 
     id_ = str(nuspec['metadata']['id'])
@@ -99,13 +110,16 @@ def push():
 
     # Make sure that the ID and version are sane
     if not re.match(valid_id, id_) or not re.match(valid_id, version):
+        logger.error("Invalid ID or version.")
         return "api_error: Invlaid ID or Version"      # TODO
 
     # and that we don't already have that ID+version in our database
     if db.validate_id_and_version(session, id_, version):
+        logger.error("Package %s version %s already exists" % id_, version)
         return "api_error: Package version already exists"      # TODO
 
     # Hash the uploaded file and encode the hash in Base64. For some reason.
+    logger.debug("Hashing and encoding uploaded file.")
     m = hashlib.sha512()
     with open(file, 'r') as openf:
         m.update(openf.read())
@@ -116,6 +130,7 @@ def push():
 
     # Determine dependencies.
     # TODO: python-ify
+    logger.debug("Parsing dependencies.")
     dependencies = []
     if nuspec['metadata']['dependencies']:
         if nuspec['metadata']['dependencies']['dependency']:
@@ -149,12 +164,16 @@ def push():
                 exist_ok=True,      # do not throw an error path exists.
                 )
 
+    logger.debug("Saving uplaoded file to filesystem.")
     try:
         file.save(local_path)
     except Exception:       # TODO: specify exceptions
         return "api_error: Unable to save file"
+    else:
+        logger.info("Succesfully saved pacakge to '%s'" % local_path)
 
     # and finaly, update our database.
+    logger.debug("Updating database entries.")
     db.insert_or_update_package(session,
                                 package_id=id_,
                                 title=nuspec['metadata']['title'],
@@ -181,6 +200,8 @@ def push():
         version=version,
     )
 
+    logger.info("Sucessfully updated database entries for package %s version %s." % id_, version)
+
     resp = Response()
     resp.status = 201
     return resp
@@ -188,6 +209,7 @@ def push():
 
 @app.route('/count', methods=['GET'])
 def count():
+    logger.debug("Route: /count")
     resp = Response(str(db.count_packages(session)))
     resp.headers['Content-Type'] = 'text/plain; charset=utf-8'
     return resp
@@ -195,6 +217,7 @@ def count():
 
 @app.route('/delete', methods=['DELETE'])
 def delete():
+    logger.debug("Route: /delete")
     if not core.require_auth(request.headers):
         return "api_error: Missing or Invalid API key"      # TODO
 
@@ -207,9 +230,12 @@ def delete():
 
     db.delete_version(session, id_, version)
 
+    logger.info("Sucessfully deleted package %s version %s." % id_, version)
+
 
 @app.route('/download', methods=['GET'])
 def download():
+    logger.debug("Route: /download")
     id_ = request.args.get('id')
     version = request.args.get('version')
 
@@ -227,6 +253,7 @@ def download():
 
 @app.route('/find_by_id', methods=['GET'])
 def find_by_id():
+    logger.debug("Route: /find_by_id")
     id_ = request.args.get('id')
     version = request.args.get('version', default=None)
 
@@ -239,6 +266,7 @@ def find_by_id():
 
 @app.route('/search', methods=['GET'])
 def search():
+    logger.debug("Route: /search")
     # TODO: Cleanup this and db.search_pacakges call sig.
     include_prerelease = request.args.get('includeprerelease', default=False)
     order_by = request.args.get('orderby', default=None)
@@ -259,6 +287,7 @@ def search():
 
 @app.route('/updates', methods=['GET'])
 def updates():
+    logger.debug("Route: /updates")
     ids = request.args.get('packageids').strip("'").split('|')
     versions = request.args.get('versions').strip("'").split('|')
     include_prerelease = request.args.get('includeprerelease', default=False)

@@ -7,6 +7,8 @@ import json
 import re
 import xml.etree.ElementTree as et
 
+from pynuget import logger
+
 BASE = """<?xml version="1.0" encoding="utf-8" ?>
 <feed
   xml:base="https://www.nuget.org/api/v2/"
@@ -24,20 +26,24 @@ ADO_METADATA_URL = ADO_BASE_URL + "/metadata"
 class FeedWriter(object):
 
     def __init__(self, id_):
+        logger.debug("Initializing FeedWriter")
         self.feed_id = id_
         self.base_url = 'TBD'
 
     def write(self, results):
+        logger.debug("FeedWriter.write(%d)" % len(results))
         self.begin_feed()
         for result in results:
             self.add_entry(result)
         return et.tostring(self.feed)
 
     def write_to_output(self, results):
+        logger.debug("FeedWriter.write_to_output(%d)" % len(results))
         # TODO: header line
         return self.write(results)
 
     def begin_feed(self):
+        logger.debug("FeedWriter.begin_feed()")
         self.feed = et.fromstring(BASE)
         node = et.Element('id')
         node.text = self.base_url + str(self.feed_id)
@@ -65,6 +71,7 @@ class FeedWriter(object):
         row :
             SQLAlchemy result set object
         """
+        logger.debug("FeedWriter.add_entry(%s)" % row)
         entry_id = 'Packages(Id="{}",Version="{}")'.format(row.package_id,
                                                            row.version)
         entry = et.Element('entry')
@@ -126,6 +133,7 @@ class FeedWriter(object):
         row :
             SQLAlchemy result set object
         """
+        logger.debug("FeedWriter.add_entry_meta(%s, %s)" % (entry, row))
         properties = et.Element('properties')
         entry.append(properties)
 
@@ -187,6 +195,7 @@ class FeedWriter(object):
         return value.isoformat()
 
     def render_dependencies(self, raw):
+        logger.debug("FeedWriter.render_dependencies(%s)" % raw)
         if not raw:
             return ''
 
@@ -228,6 +237,7 @@ class FeedWriter(object):
         attributes :
             Dict, I think.
         """
+        logger.debug("FeedWriter.add_with_attributes(...)")
         child = et.Element(name)
         child.text = str(value)
         entry.append(child)
@@ -235,6 +245,7 @@ class FeedWriter(object):
             child.set(attr_name, str(attr_value))
 
     def add_meta(self, entry, name, value, type_=None):
+        logger.debug("FeedWriter.add_meta(...)")
         child = et.Element(name)
         child.text = value
         entry.append(child)

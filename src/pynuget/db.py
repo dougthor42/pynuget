@@ -15,6 +15,9 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
 
+from pynuget import logger
+
+
 Base = declarative_base()
 
 
@@ -77,6 +80,7 @@ class Version(Base):
 
 def count_packages(session):
     """Count the number of packages on the server."""
+    logger.debug("db.count_packages()")
     return session.query(func.count(Package.package_id)).scalar()
 
 
@@ -85,7 +89,7 @@ def search_packages(session,
                     order_by=desc(Version.version_download_count),
                     filter_=None,
                     search_query=None):
-
+    logger.debug("db.search_packages(...)")
     query = session.query(Version).join(Package)
 
     if search_query is not None:
@@ -127,6 +131,7 @@ def package_updates(session, packages_dict, include_prerelease=False):
     packages_dict : dict
         Dict of {package_id, version}.
     """
+    logger.debug("db.package_updates(...)")
     package_versions = ["{}~~{}".format(pkg, vers)
                         for pkg, vers
                         in packages_dict.items()]
@@ -143,6 +148,7 @@ def package_updates(session, packages_dict, include_prerelease=False):
 
 def find_by_id(session, package_id, version=None):
     """Find a package by ID and version. If no version given, return all."""
+    logger.debug("db.find_by_id(...)")
     query = session.query(Version).filter(Version.package_id == package_id)
     if version:
         query = query.filter(Version.version == version)
@@ -163,6 +169,7 @@ def validate_id_and_version(session, package_id, version):
     """Not exactly sure what this is supposed to do, but I *think* it simply
     makes sure that the given pacakge_id and version exist... So that's
     what I've decided to make it do."""
+    logger.debug("db.validate_id_and_version(...)")
     query = (session.query(Version)
              .filter(Version.package_id == package_id)
              .filter(Version.version == version)
@@ -172,6 +179,7 @@ def validate_id_and_version(session, package_id, version):
 
 def increment_download_count(session, package_id, version):
     """Increment the download count for a given package version."""
+    logger.debug("db.increment_download_count(...)")
     obj = (session.query(Version)
            .filter(Version.package_id == package_id)
            .filter(Version.version == version)
@@ -182,6 +190,7 @@ def increment_download_count(session, package_id, version):
 
 
 def insert_or_update_package(session, package_id, title, latest_version):
+    logger.debug("db.insert_or_update_package(...)")
     sql = session.query(Package).filter(Package.package_id == package_id)
     obj = sql.one_or_none()
     if obj is None:
@@ -195,6 +204,7 @@ def insert_or_update_package(session, package_id, title, latest_version):
 
 def insert_version(session, **kwargs):
     """Insert a new version of an existing package."""
+    logger.debug("db.insert_version(...)")
     kwargs['created'] = dt.datetime.utcnow()
     if 'dependencies' in kwargs:
         kwargs['dependencies'] = json.dumps(kwargs['dependencies'])
@@ -209,6 +219,7 @@ def insert_version(session, **kwargs):
 
 
 def delete_version(session, package_id, version):
+    logger.debug("db.delete_version(...)")
     sql = (session.query(Version)
             .filter(Version.package_id == package_id)
             .filter(Version.version == version)
