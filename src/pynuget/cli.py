@@ -25,17 +25,19 @@ def main():
         help="Print the version number and exit.",
     )
 
-    # Main parser.
+    # Main parser
     parser = ArgumentParser(
         description="Administer the PyNuGet Server.",
         parents=[parent_parser],
     )
 
-    # Subparsers
+    # Subparsers ###########################################################
     subparser = parser.add_subparsers(
         title='subcommands',
         dest="verb",
     )
+
+    # Init
     parser_init = subparser.add_parser(
         'init',
         help=("Create necessary folders and files. Copy Apache configuration"
@@ -49,6 +51,7 @@ def main():
         default="pynuget.conf",
     )
 
+    # Clear
     parser_clear = subparser.add_parser(
         "clear",
         help=("Delete all packages and empty the package database. Basically"
