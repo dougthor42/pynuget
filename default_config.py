@@ -20,7 +20,10 @@ DB_NAME = "nuget_packages.sqlite"
 
 # Server path: root path for things like the SQLite file and the packge files.
 # Must be asolute.
+### XXX DO NOT CHANGE THIS XXX ###
+# I haven't spent the time needed in order to have a custom install dir...
 SERVER_PATH = "/var/www/pynuget"
+### XXXXXXXXXXXXXXXXXXXXXXXXXX ###
 
 # Where nuget packages will be saved to and sourced from.
 # Can be absolute or relative. Defaults to $SERVER_PATH\$PACAKGE_DIR

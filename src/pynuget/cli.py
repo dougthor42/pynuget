@@ -9,6 +9,9 @@ from argparse import ArgumentParser
 from pynuget import commands
 
 
+SERVER_PATH = '/var/www/pynuget'
+
+
 def main():
     """
     """
@@ -29,13 +32,13 @@ def main():
     )
 
     # Common argument
-    server_path_arg = ArgumentParser(add_help=False)
-    server_path_arg.add_argument(
-        "--server-path",
-        help=("The path that the server should live at. Must be an absolute"
-              " path. Defaults to '/var/www/pynuget'"),
-        default="/var/www/pynuget",
-    )
+#    server_path_arg = ArgumentParser(add_help=False)
+#    server_path_arg.add_argument(
+#        "--server-path",
+#        help=("The path that the server should live at. Must be an absolute"
+#              " path. Defaults to '/var/www/pynuget'"),
+#        default="/var/www/pynuget",
+#    )
 
     # Main parser
     parser = ArgumentParser(
@@ -54,7 +57,7 @@ def main():
         'init',
         help=("Create necessary folders and files. Copy Apache configuration"
               " template if one doesn't already exist."),
-        parents=[parent_parser, server_path_arg],
+        parents=[parent_parser],
     )
     parser_init.set_defaults(func=run_init)
     parser_init.add_argument(
@@ -93,7 +96,7 @@ def main():
         help=("Delete all packages and empty the package database. Basically"
               " resets things to a fresh install but does not change any"
               " settings."),
-        parents=[parent_parser, server_path_arg],
+        parents=[parent_parser],
     )
     parser_clear.set_defaults(func=run_clear)
     parser_clear.add_argument(
@@ -115,7 +118,7 @@ def main():
 
 
 def run_init(args):
-    commands.init(server_path=args.server_path,
+    commands.init(server_path=SERVER_PATH,
                   package_dir=args.package_dir,
                   db_name=args.db_name,
                   db_backend=args.db_backend,
@@ -123,4 +126,4 @@ def run_init(args):
 
 
 def run_clear(args):
-    commands.clear(server_path=args.server_path)
+    commands.clear(server_path=SERVER_PATH)
