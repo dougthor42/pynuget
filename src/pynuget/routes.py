@@ -218,28 +218,28 @@ def push():
     # and finaly, update our database.
     logger.debug("Updating database entries.")
     db.insert_or_update_package(session,
-                                package_id=id_,
-                                title=nuspec['metadata']['title'],
-                                version=version)
+                                package_id=id_.text,
+                                title=metadata.find('nuspec:title', ns).text,
+                                version=version.text)
     db.insert_version(
         session,
-        authors=nuspec['metadata']['authors'],
-        copyright_=nuspec['metadata']['copyright'],
+        authors=metadata.find('nuspec:authors', ns).text,
+        copyright_=metadata.find('nuspec:copyright', ns).text,
         dependencies=dependencies,
-        description=nuspec['metadata']['description'],
+        description=metadata.find('nuspec:description', ns).text,
         package_hash=hash_,
         package_hash_algorithm='SHA512',
         pacakge_size=filesize,
-        icon_url=nuspec['metadata']['iconUrl'],
+        icon_url=metadata.find('nuspec:iconUrl', ns).text,
         is_prerelease='-' in version,
-        license_url=nuspec['metadata']['licenseUrl'],
-        owners=nuspec['metadata']['owners'],
+        license_url=metadata.find('nuspec:licenseUrl', ns).text,
+        owners=metadata.find('nuspec:owners', ns).text,
         package_id=id_,
-        project_url=nuspec['metadata']['projectUrl'],
-        release_notes=nuspec['metadata']['releaseNotes'],
-        require_license_agreement=nuspec['metadata']['requireLicenseAcceptance'] == 'true',
-        tags=nuspec['metadata']['tags'],
-        title=nuspec['metadata']['title'],
+        project_url=metadata.find('nuspec:projectUrl', ns).text,
+        release_notes=metadata.find('nuspec:releaseNotes', ns).text,
+        require_license_agreement=metadata.find('nuspec:requireLicenseAcceptance', ns).text == 'true',
+        tags=metadata.find('nuspec:tags', ns).text,
+        title=metadata.find('nuspec:title', ns).text,
         version=version,
     )
 
