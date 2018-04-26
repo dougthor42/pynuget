@@ -28,6 +28,15 @@ def main():
         help="Print the version number and exit.",
     )
 
+    # Common argument
+    server_path_arg = ArgumentParser(add_help=False)
+    server_path_arg.add_argument(
+        "--server-path",
+        help=("The path that the server should live at. Must be an absolute"
+              " path. Defaults to '/var/www/pynuget'"),
+        default="/var/www/pynuget",
+    )
+
     # Main parser
     parser = ArgumentParser(
         description="Administer the PyNuGet Server.",
@@ -45,7 +54,7 @@ def main():
         'init',
         help=("Create necessary folders and files. Copy Apache configuration"
               " template if one doesn't already exist."),
-        parents=[parent_parser],
+        parents=[parent_parser, server_path_arg],
     )
     parser_init.set_defaults(func=run_init)
     parser_init.add_argument(
@@ -53,12 +62,6 @@ def main():
         help=("Define a custom name for the Apache configuation file."
               " Defaults to 'pynuget.conf'."),
         default="pynuget.conf",
-    )
-    parser_init.add_argument(
-        "--server-path",
-        help=("The path that the server should live at. Must be an absolute"
-              " path. Defaults to '/var/www/pynuget'"),
-        default="/var/www/pynuget",
     )
     parser_init.add_argument(
         "--package-dir",
@@ -90,7 +93,7 @@ def main():
         help=("Delete all packages and empty the package database. Basically"
               " resets things to a fresh install but does not change any"
               " settings."),
-        parents=[parent_parser],
+        parents=[parent_parser, server_path_arg],
     )
     parser_clear.set_defaults(func=run_clear)
     parser_clear.add_argument(
