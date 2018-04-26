@@ -5,6 +5,7 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 
 from sqlalchemy import create_engine
@@ -61,12 +62,35 @@ def init(server_path, package_dir, db_name, db_backend, apache_config):
     _save_config(**args)
 
 
-def clear():
+def clear(server_path, force=False):
     """
     +  Truncate/drop all tables and recreate them
     +  Delete all packages in package_files
     """
-    pass
+    # Confirm:
+    ans = input("Are you sure you want to delete all packages? [yN]")
+    if ans.lower() in ('y', 'yes'):
+        pass
+    elif ans.lower() in('n', 'no'):
+        logger.debug("User aborted.")
+        sys.exit(0)
+    else:
+        logger.debug("Unknown response '%s'. Aborting." % ans)
+        sys.exit(1)
+
+    # Read the config file to find our other locations
+    # TODO: I hate this...
+    sys.path.append(server_path)
+    import config
+
+    # Delete all the packages
+    pkg_path = Path(config.SERVER_PATH) / Path(config.PACKAGE_DIR)
+    shutil.rmtree(str(pkg_path))
+
+    # Delete/drop the database
+    if config.DB_BACKEND == 'sqlite':
+        sqlite_path = Path(config.SERVER_PATH) / Path(config.DB_NAME)
+        sqlite_path.unlink()
 
 
 def _check_permissions():
@@ -163,8 +187,9 @@ def _enable_apache_conf(apache_config):
 def _save_config(**kwargs):
     """Save the values to the configuration file."""
     logger.info("Saving configuration.")
+
     # Open the default config file.
-    with open('config.py', 'r') as openf:
+    with open('default_config.py', 'r') as openf:
         raw = openf.read()
 
         for variable, new_value in kwargs.items():
