@@ -123,4 +123,4 @@ def run_init(args):
 
 
 def run_clear(args):
-    commands.clear()
+    commands.clear(server_path=args.server_path)
