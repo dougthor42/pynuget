@@ -99,6 +99,7 @@ def push():
 
     logger.debug("Parsing NuSpec file XML")
     nuspec = et.fromstring(nuspec_string)
+    assert isinstance(nuspec, et.Element)
 
     # Make sure both the ID and the version are provided in the .nuspec file.
     if nuspec['metadata']['id'] is None or nuspec['metadata']['version'] is None:
