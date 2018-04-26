@@ -92,6 +92,10 @@ def clear(server_path, force=False):
         sqlite_path = Path(config.SERVER_PATH) / Path(config.DB_NAME)
         sqlite_path.unlink()
 
+    # And receate the directories and database based on the config file.
+    _create_directories(server_path, config.PACKAGE_DIR)
+    _create_db(config.DB_BACKEND, config.DB_NAME, server_path)
+
 
 def _check_permissions():
     """Raise PermissionError if we're not root/sudo."""
