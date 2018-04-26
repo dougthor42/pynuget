@@ -187,7 +187,8 @@ def push():
     # TODO: python-ify
     logger.debug("Parsing dependencies.")
     dependencies = []
-    if metadata.find(['nuspec:dependencies'], ns):
+    if metadata.find('nuspec:dependencies', ns):
+        logger.debug("Found dependencies.")
         if nuspec['metadata']['dependencies']['dependency']:
             # Dependencies that are not specific to any framework
             for dependency in nuspec['metadata']['dependencies']['dependency']:
