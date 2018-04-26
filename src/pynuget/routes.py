@@ -139,7 +139,7 @@ def push():
 
     # and that we don't already have that ID+version in our database
     if db.validate_id_and_version(session, id_.text, version.text):
-        logger.error("Package %s version %s already exists" % id_.text, version.text)
+        logger.error("Package %s version %s already exists" % (id_.text, version.text))
         return "api_error: Package version already exists"      # TODO
 
     # Hash the uploaded file and encode the hash in Base64. For some reason.
@@ -251,7 +251,7 @@ def push():
         version=version.text,
     )
 
-    logger.info("Sucessfully updated database entries for package %s version %s." % id_, version)
+    logger.info("Sucessfully updated database entries for package %s version %s." % (id_.text, version.text))
 
     resp = Response()
     resp.status = 201
