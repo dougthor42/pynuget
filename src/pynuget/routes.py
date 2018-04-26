@@ -111,6 +111,10 @@ def push():
     nuspec = et.fromstring(nuspec_string)
     assert isinstance(nuspec, et.Element)
 
+    # The NuSpec XML file uses namespaces.
+    # TODO: What if the namespace changes?
+    ns = {'nuspec': 'http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd'}
+
     # Make sure both the ID and the version are provided in the .nuspec file.
     if nuspec['metadata']['id'] is None or nuspec['metadata']['version'] is None:
         logger.error("ID or version missing from NuSpec file.")
