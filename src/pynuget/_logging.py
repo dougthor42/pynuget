@@ -64,7 +64,7 @@ def _gzip_rotator(source, dest):
 
 def setup_logging(to_console=True, to_file=False, log_path=None):
     # Create the logger
-    logger = logging.getLogger()
+    logger = logging.getLogger('pynuget')
     logger.setLevel(LOG_LEVEL_BASE)
 
     if to_console:
