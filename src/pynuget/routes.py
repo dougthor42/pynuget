@@ -5,8 +5,11 @@ import base64
 import hashlib
 import os
 import re
+import shutil
+import tempfile
 import xml.etree.ElementTree as et
 from pathlib import Path
+from uuid import uuid4
 from zipfile import ZipFile
 
 # Third-Party
@@ -141,13 +144,44 @@ def push():
 
     # Hash the uploaded file and encode the hash in Base64. For some reason.
     logger.debug("Hashing and encoding uploaded file.")
-    m = hashlib.sha512()
-    with open(file, 'r') as openf:
-        m.update(openf.read())
-    hash_ = base64.b64encode(m.digest())
+    with tempfile.TemporaryDirectory() as tmpdir:
+        name = str(uuid4()) + ".tmp"
+        temp_file = os.path.join(tmpdir, name)
+        logger.debug("Saving uploaded file to temporary location.")
+        file.save(temp_file)
+        m = hashlib.sha512()
+        logger.debug("Hashing file.")
+        with open(temp_file, 'rb') as openf:
+            m.update(openf.read())
+        logger.debug("Encoding in Base64.")
+        hash_ = base64.b64encode(m.digest())
 
-    # Get the filesize of the uploaded file. Used later.
-    filesize = os.path.getsize(file)
+        # Get the filesize of the uploaded file. Used later.
+        filesize = os.path.getsize(temp_file)
+        logger.debug("File size: %d bytes" % filesize)
+
+        # Save the package file to the local package dir. Thus far it's just been
+        # floating around in magic Flask land.
+        local_path = Path(app.config['SERVER_PATH']) / Path(app.config['PACKAGE_DIR'])
+        local_path = os.path.join(str(local_path),
+                                  id_.text,
+                                  version.text + ".nupkg",
+                                  )
+
+        # Check if the pacakge's directory already exists. Create if needed.
+        os.makedirs(os.path.split(local_path)[0],
+                    mode=0o0755,
+                    exist_ok=True,      # do not throw an error path exists.
+                    )
+
+        logger.debug("Saving uploaded file to filesystem.")
+        try:
+            shutil.copy(temp_file, local_path)
+        except Exception as err:       # TODO: specify exceptions
+            logger.error("Unknown exception: %s" % err)
+            return "api_error: Unable to save file"
+        else:
+            logger.info("Succesfully saved package to '%s'" % local_path)
 
     # Determine dependencies.
     # TODO: python-ify
@@ -171,27 +205,8 @@ def push():
                          'version': str(dependency['version']),
                          }
                     dependencies.append(d)
-
-    # Save the package file to the local package dir. Thus far it's just been
-    # floating around in magic Flask land.
-    local_path = os.path.join(app.config['PACKAGE_DIR'],
-                              id_,
-                              version + ".nupkg",
-                              )
-
-    # Check if the pacakge's directory already exists. Create if needed.
-    os.makedirs(os.path.split(local_path)[0],
-                mode=0o0755,
-                exist_ok=True,      # do not throw an error path exists.
-                )
-
-    logger.debug("Saving uplaoded file to filesystem.")
-    try:
-        file.save(local_path)
-    except Exception:       # TODO: specify exceptions
-        return "api_error: Unable to save file"
     else:
-        logger.info("Succesfully saved pacakge to '%s'" % local_path)
+        logger.debug("No dependencies found.")
 
     # and finaly, update our database.
     logger.debug("Updating database entries.")
