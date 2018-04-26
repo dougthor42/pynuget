@@ -107,9 +107,14 @@ def _create_db(db_backend, db_name):
             db.Base.metadata.create_all(engine)
             shutil.chown(db_name, 'www-data', 'www-data')
     elif db_backend in ('mysql', 'postgresql'):
-        logger.error('Other database backends are not yet supported.pass
+        msg = "The backend '%s' is not yet implmented" % db_backend
+        logger.error('Other database backends are not yet supported')
+        raise NotImplementedError(msg)
     else:
-        logger.error("Invalid `db_backend` value: %s. Must be one of %s." % (db_backend, ('sqlite', 'mysql', 'postgresql'))
+        msg = "Invalid `db_backend` value: %s. Must be one of %s."
+        msg = msg % (db_backend, ('sqlite', 'mysql', 'postgresql'))
+        logger.error(msg)
+        raise ValueError(msg)
 
 
 def _copy_wsgi():
