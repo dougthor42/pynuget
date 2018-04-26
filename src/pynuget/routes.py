@@ -31,6 +31,7 @@ def get_db_session():
     session = getattr(g, 'session', None)
     if session is None:
         # TODO: Handle pre-existing DB files.
+        #       Actually not really. The cli will create the file.
         # TODO: Use files not memory
         # TODO: Handle MySQL/PostgreSQL backends.
         engine = create_engine('sqlite:///:memory:', echo=False)
