@@ -85,14 +85,21 @@ def clear(server_path, force=False):
 
     # Delete all the packages
     pkg_path = Path(config.SERVER_PATH) / Path(config.PACKAGE_DIR)
-    shutil.rmtree(str(pkg_path))
+    try:
+        shutil.rmtree(str(pkg_path))
+    except FileNotFoundError:
+        logger.warn("Path '%s' does not exist." % str(pkg_path))
 
     # Delete/drop the database
     if config.DB_BACKEND == 'sqlite':
         sqlite_path = Path(config.SERVER_PATH) / Path(config.DB_NAME)
-        sqlite_path.unlink()
+        try:
+            sqlite_path.unlink()
+        except FileNotFoundError:
+            logger.warn("Path '%s' does not exist." % str(pkg_path))
 
     # And receate the directories and database based on the config file.
+    logger.info("Recreating database and package dir.")
     _create_directories(server_path, config.PACKAGE_DIR)
     _create_db(config.DB_BACKEND, config.DB_NAME, server_path)
 
