@@ -92,6 +92,7 @@ def main():
               " settings."),
         parents=[parent_parser],
     )
+    parser_clear.set_defaults(func=run_clear)
     parser_clear.add_argument(
         '-y', "--yes",
         help=("Ignore the confirmation prompt and delete everything."),
@@ -116,3 +117,7 @@ def run_init(args):
                   db_name=args.db_name,
                   db_backend=args.db_backend,
                   apache_config=args.apache_config)
+
+
+def run_clear(args):
+    commands.clear()
