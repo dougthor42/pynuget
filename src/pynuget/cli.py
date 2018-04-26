@@ -45,10 +45,39 @@ def main():
         parents=[parent_parser],
     )
     parser_init.add_argument(
-        "--config-name",
+        "--apache-config",
         help=("Define a custom name for the Apache configuation file."
               " Defaults to 'pynuget.conf'."),
         default="pynuget.conf",
+    )
+    parser_init.add_argument(
+        "--server-path",
+        help=("The path that the server should live at. Must be an absolute"
+              " path. Defaults to '/var/www/pynuget'"),
+        default="/var/www/pynuget",
+    )
+    parser_init.add_argument(
+        "--package-dir",
+        help=("The directory that the packages will be saved in and served"
+              " from. If this value is not an absolute path, `server_path`"
+              " will be used as the root. Defaults to 'packages' in"
+              " `server_path`"),
+        default="nuget_packages",
+    )
+    parser_init.add_argument(
+        "--db-name",
+        help=("The name of the database to use. If `db_backend` == 'sqlite',"
+              " then this is the relative or absolute path to the SQLite file"
+              " to use. If `db_backend` != 'sqlite', then this is the name of"
+              " the Schema to create. Defaults to 'nuget_packages.sqlite' in"
+              " `server_path`."),
+        default="nuget_packages.sqlite",
+    )
+    parser_init.add_argument(
+        "--db-backend",
+        help=("What database backend to use. Defaults to 'sqlite'."),
+        default="sqlite",
+        choices=["sqlite", "mysql", "postgresql"],
     )
 
     # Clear
