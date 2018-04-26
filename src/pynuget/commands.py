@@ -47,6 +47,7 @@ def init(server_path, package_dir, db_name, db_backend, apache_config):
     +  Enable Apache site.
     +  Create the DB file or schema if it doesn't exist.
     """
+    args = locals()
     _check_permissions()
     _create_directories(server_path, package_dir)
     _create_db(db_backend, db_name, server_path)
@@ -55,6 +56,8 @@ def init(server_path, package_dir, db_name, db_backend, apache_config):
 #    _copy_wsgi()
 
 #    _copy_apache_config(apache_config)
+
+    _save_config(**args)
 
 
 def clear():
@@ -154,3 +157,8 @@ def _enable_apache_conf(apache_config):
     except subprocess.CalledProcessError as err:
         logger.error("Unable to enable the Apache site '%s'" % apache_config)
         logger.error(err)
+
+
+def _save_config(**kwargs):
+    """Save the values to the configuration file."""
+    pass
