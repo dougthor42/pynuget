@@ -64,7 +64,7 @@ def _gzip_rotator(source, dest):
 
 def setup_logging(to_console=True, to_file=False, log_path=None):
     # Create the logger
-    logger = logging.getLogger()
+    logger = logging.getLogger('pynuget')
     logger.setLevel(LOG_LEVEL_BASE)
 
     if to_console:
@@ -88,10 +88,11 @@ def _setup_file_logging(logger, log_path):
     handler.setLevel(LOG_LEVEL_FILE)
     formatter = CustomLoggingFormatter(LOG_FMT, DATE_FMT)
     handler.setFormatter(formatter)
-    handler.set_name("File Handler")
-    logger.addHandler(handler)
-
-    logger.info("File logging initialized")
+    name = "File Handler"
+    handler.set_name(name)
+    if name not in [h.name for h in logger.handlers]:
+        logger.addHandler(handler)
+        logger.info("File logging initialized")
 
 
 def _setup_console_logging(logger):
@@ -100,7 +101,8 @@ def _setup_console_logging(logger):
     handler.setLevel(LOG_LEVEL_CONSOLE)
     formatter = CustomLoggingFormatter(LOG_FMT, DATE_FMT)
     handler.setFormatter(formatter)
-    handler.set_name("Console Handler")
-    logger.addHandler(handler)
-
-    logger.info("Console logging initialized")
+    name = "Console Handler"
+    handler.set_name(name)
+    if name not in [h.name for h in logger.handlers]:
+        logger.addHandler(handler)
+        logger.info("Console logging initialized")
