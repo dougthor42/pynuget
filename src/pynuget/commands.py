@@ -52,9 +52,9 @@ def init(server_path, package_dir, db_name, db_backend, apache_config):
     _create_db(db_backend, db_name, server_path)
 
     # TODO
-    _copy_wsgi()
+#    _copy_wsgi()
 
-    _copy_apache_config(apache_config)
+#    _copy_apache_config(apache_config)
 
 
 def clear():
