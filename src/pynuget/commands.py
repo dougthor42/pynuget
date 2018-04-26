@@ -2,6 +2,7 @@
 """
 """
 import os
+import re
 import shutil
 import subprocess
 from pathlib import Path
@@ -161,4 +162,26 @@ def _enable_apache_conf(apache_config):
 
 def _save_config(**kwargs):
     """Save the values to the configuration file."""
-    pass
+    logger.info("Saving configuration.")
+    # Open the default config file.
+    with open('config.py', 'r') as openf:
+        raw = openf.read()
+
+        for variable, new_value in kwargs.items():
+            global_variable = variable.upper()
+
+            pat = r'''^(?P<variable>{} = )['"](?P<value>.+)['"]$'''
+            pat = re.compile(pat.format(global_variable), re.MULTILINE)
+
+            old_value = pat.search(raw).group('value')
+            if old_value == new_value:
+                continue
+
+            raw = pat.sub('\g<variable>"{}"'.format(new_value), raw)
+            new_value = pat.search(raw).group('value')
+            msg = "Replaced %s: '%s' with '%s'"
+            logger.debug(msg % (variable, old_value, new_value))
+
+    config_path = Path(kwargs['server_path']) / Path('config.py')
+    with open(str(config_path), 'w') as openf:
+        openf.write(raw)
