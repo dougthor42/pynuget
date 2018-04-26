@@ -49,7 +49,7 @@ def init(server_path, package_dir, db_name, db_backend, apache_config):
     """
     _check_permissions()
     _create_directories(server_path, package_dir)
-    _create_db(db_backend, db_name)
+    _create_db(db_backend, db_name, server_path)
 
     # TODO
     _copy_wsgi()
@@ -95,7 +95,7 @@ def _create_directories(server_path, package_dir):
     shutil.chown(str(package_dir), 'www-data', 'www-data')
 
 
-def _create_db(db_backend, db_name):
+def _create_db(db_backend, db_name, server_path):
     """Create the database (file or schema) if it doesn't exist."""
     logger.info("Creating database.")
     logger.debug("db_backend={}, db_name={}".format(db_backend, db_name))
@@ -103,7 +103,9 @@ def _create_db(db_backend, db_name):
     url = None
 
     if db_backend == 'sqlite':
-        db_name = Path(db_name)
+        db_name = Path(server_path) / Path(db_name)
+        url = "sqlite:///{}".format(str(db_name))
+        logger.debug(url)
 
         if db_name.exists():
             # assume that the sqlite file has the correct structure.
