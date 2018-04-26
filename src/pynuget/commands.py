@@ -73,6 +73,7 @@ def _check_permissions():
 
 def _create_directories(server_path, package_dir):
     """Create the server directories if they don't exist."""
+    logger.info("Creating directories (if they don't exist).")
     server_path = Path(server_path)
     package_dir = Path(package_dir)
 
@@ -81,20 +82,26 @@ def _create_directories(server_path, package_dir):
 
     if not package_dir.is_absolute():
         package_dir = server_path / package_dir
-        logger.info("'package_dir' is not absolue, setting to %s" % package_dir)
+        logger.debug("'package_dir' is not absolue, setting to %s" % package_dir)
 
     # os.makedirs will not change permissions of existing directories
-    logger.info("Making '%s'" % server_path)
-    os.makedirs(server_path,
+    logger.debug("Creating '%s'" % server_path)
+    os.makedirs(str(server_path),
                 mode=0o2775,        # u=rwx,g=srwx,o=rx
                 exist_ok=True)
 
-    logger.info("Making '%s'" % package_dir)
-    os.makedirs(package_dir, mode=0o2775, exist_ok=True)
+    logger.debug("Creating '%s'" % package_dir)
+    os.makedirs(str(package_dir), mode=0o2775, exist_ok=True)
+    shutil.chown(str(package_dir), 'www-data', 'www-data')
 
 
 def _create_db(db_backend, db_name):
     """Create the database (file or schema) if it doesn't exist."""
+    logger.info("Creating database.")
+    logger.debug("db_backend={}, db_name={}".format(db_backend, db_name))
+
+    url = None
+
     if db_backend == 'sqlite':
         db_name = Path(db_name)
 
@@ -103,9 +110,10 @@ def _create_db(db_backend, db_name):
             pass
         else:
             # create the sqlite file and database.
-            engine = create_engine(db_name.resolve().as_posix(), echo=False)
+            engine = create_engine(url, echo=False)
             db.Base.metadata.create_all(engine)
-            shutil.chown(db_name, 'www-data', 'www-data')
+            shutil.chown(str(db_name), 'www-data', 'www-data')
+            os.chmod(str(db_name), 0o0664)
     elif db_backend in ('mysql', 'postgresql'):
         msg = "The backend '%s' is not yet implmented" % db_backend
         logger.error('Other database backends are not yet supported')
@@ -119,11 +127,13 @@ def _create_db(db_backend, db_name):
 
 def _copy_wsgi():
     """Copy the WSGI file to the server directory."""
+    logger.info("Copying WSGI file.")
     pass
 
 
 def _copy_apache_config(apache_config):
     """Copy the example apache config to the Apache sites."""
+    logger.info("Copying example Apache Config.")
     apache_path = Path('/etc/apache2/site-available/')
     apache_config = Path(apache_config)
     if apache_config.is_absolute():
@@ -136,6 +146,7 @@ def _copy_apache_config(apache_config):
 
 def _enable_apache_conf(apache_config):
     """Enable the apache site."""
+    logger.info("Enabling Apache site.")
     try:
         subprocess.run(['a2ensite', apache_config], shell=True, check=True)
     except subprocess.CalledProcessError as err:
