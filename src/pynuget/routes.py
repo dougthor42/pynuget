@@ -116,22 +116,27 @@ def push():
     ns = {'nuspec': 'http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd'}
 
     # Make sure both the ID and the version are provided in the .nuspec file.
-    if nuspec['metadata']['id'] is None or nuspec['metadata']['version'] is None:
+    metadata = nuspec.find('nuspec:metadata', ns)
+    if metadata is None:
+        logger.error('Unalbe to find the metadata tag!')
+        return
+
+    id_ = metadata.find('nuspec:id', ns)
+    version = metadata.find('nuspec:version', ns)
+    if id_ is None or version is None:
         logger.error("ID or version missing from NuSpec file.")
         return "api_error: ID or version missing"        # TODO
 
-    id_ = str(nuspec['metadata']['id'])
-    version = str(nuspec['metadata']['version'])
     valid_id = re.compile('^[A-Z0-9\.\~\+\_\-]+$', re.IGNORECASE)
 
     # Make sure that the ID and version are sane
-    if not re.match(valid_id, id_) or not re.match(valid_id, version):
+    if not re.match(valid_id, id_.text) or not re.match(valid_id, version.text):
         logger.error("Invalid ID or version.")
         return "api_error: Invlaid ID or Version"      # TODO
 
     # and that we don't already have that ID+version in our database
-    if db.validate_id_and_version(session, id_, version):
-        logger.error("Package %s version %s already exists" % id_, version)
+    if db.validate_id_and_version(session, id_.text, version.text):
+        logger.error("Package %s version %s already exists" % id_.text, version.text)
         return "api_error: Package version already exists"      # TODO
 
     # Hash the uploaded file and encode the hash in Base64. For some reason.
@@ -148,7 +153,7 @@ def push():
     # TODO: python-ify
     logger.debug("Parsing dependencies.")
     dependencies = []
-    if nuspec['metadata']['dependencies']:
+    if metadata.find(['nuspec:dependencies'], ns):
         if nuspec['metadata']['dependencies']['dependency']:
             # Dependencies that are not specific to any framework
             for dependency in nuspec['metadata']['dependencies']['dependency']:
