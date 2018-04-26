@@ -96,6 +96,7 @@ def push():
 
     with pkg.open(nuspec_file, 'r') as openf:
         nuspec_string = openf.read()
+        logger.debug(nuspec_string)
 
     logger.debug("Parsing NuSpec file XML")
     nuspec = et.fromstring(nuspec_string)
