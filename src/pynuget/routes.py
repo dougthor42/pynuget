@@ -190,19 +190,21 @@ def push():
     dep = metadata.find('nuspec:dependencies', ns)
     if dep:
         logger.debug("Found dependencies.")
-        if dep.find('nuspec:dependency', ns):
+        dep_no_fw = dep.findall('nuspec:dependency', ns)
+        if dep_no_fw:
             logger.debug("Found dependencies not specific to any framework.")
-            # Dependencies that are not specific to any framework
-            for dependency in nuspec['metadata']['dependencies']['dependency']:
+            for dependency in dep_no_fw:
                 d = {'framework': None,
                      'id': str(dependency['id']),
                      'version': str(dependency['version']),
                      }
                 dependencies.append(d)
-        if nuspec['metadata']['dependencies']['group']:
-            # Dependencies that are specific to a particular framework
-            for group in nuspec['metadata']['dependencies']['group']:
-                for dependency in group['dependency']:
+        dep_fw = dep.findall('nuspec:group', ns)
+        if dep_fw:
+            logger.debug("Found dependencies specific to a framework")
+            for group in dep_fw:
+                group_elem = group.findall('nuspec:dependency', ns)
+                for dependency in group_elem:
                     d = {'framework': str(group['targetFramework']),
                          'id': str(dependency['id']),
                          'version': str(dependency['version']),
@@ -210,6 +212,8 @@ def push():
                     dependencies.append(d)
     else:
         logger.debug("No dependencies found.")
+
+    logger.debug(dependencies)
 
     # and finaly, update our database.
     logger.debug("Updating database entries.")
