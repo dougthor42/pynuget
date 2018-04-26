@@ -6,6 +6,7 @@ import hashlib
 import os
 import re
 import xml.etree.ElementTree as et
+from pathlib import Path
 from zipfile import ZipFile
 
 # Third-Party
@@ -30,13 +31,20 @@ FEED_CONTENT_TYPE_HEADER = 'application/atom+xml; type=feed; charset=UTF-8'
 def get_db_session():
     session = getattr(g, 'session', None)
     if session is None:
-        # TODO: Handle pre-existing DB files.
-        #       Actually not really. The cli will create the file.
-        # TODO: Use files not memory
         # TODO: Handle MySQL/PostgreSQL backends.
-        engine = create_engine('sqlite:///:memory:', echo=False)
+        db_name = Path(app.config['SERVER_PATH']) / Path(app.config['DB_NAME'])
+
+        # TODO: Move this check so that it gets run on server start, not
+        # just when a route that uses the session is called.
+        if not db_name.exists():
+            msg = "'{}' does not exist. Did you forget to run pynuget init?"
+            msg = msg.format(str(db_name))
+            logger.critical(msg)
+            raise FileNotFoundError(msg)
+
+        url = "sqlite:///{}".format(str(db_name))
+        engine = create_engine(url, echo=False)
         Session = sessionmaker(bind=engine)
-        db.Base.metadata.create_all(engine)
         session = g.session = Session()
     return session
 
