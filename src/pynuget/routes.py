@@ -217,30 +217,38 @@ def push():
 
     # and finaly, update our database.
     logger.debug("Updating database entries.")
+
+    # Helper function
+    def et_to_str(node):
+        try:
+            return node.text
+        except AttributeError:
+            return None
+
     db.insert_or_update_package(session,
                                 package_id=id_.text,
-                                title=metadata.find('nuspec:title', ns).text,
-                                version=version.text)
+                                title=et_to_str(metadata.find('nuspec:title', ns)),
+                                latest_version=version.text)
     db.insert_version(
         session,
-        authors=metadata.find('nuspec:authors', ns).text,
-        copyright_=metadata.find('nuspec:copyright', ns).text,
+        authors=et_to_str(metadata.find('nuspec:authors', ns)),
+        copyright_=et_to_str(metadata.find('nuspec:copyright', ns)),
         dependencies=dependencies,
-        description=metadata.find('nuspec:description', ns).text,
+        description=et_to_str(metadata.find('nuspec:description', ns)),
         package_hash=hash_,
         package_hash_algorithm='SHA512',
-        pacakge_size=filesize,
-        icon_url=metadata.find('nuspec:iconUrl', ns).text,
+        package_size=filesize,
+        icon_url=et_to_str(metadata.find('nuspec:iconUrl', ns)),
         is_prerelease='-' in version,
-        license_url=metadata.find('nuspec:licenseUrl', ns).text,
-        owners=metadata.find('nuspec:owners', ns).text,
-        package_id=id_,
-        project_url=metadata.find('nuspec:projectUrl', ns).text,
-        release_notes=metadata.find('nuspec:releaseNotes', ns).text,
-        require_license_agreement=metadata.find('nuspec:requireLicenseAcceptance', ns).text == 'true',
-        tags=metadata.find('nuspec:tags', ns).text,
-        title=metadata.find('nuspec:title', ns).text,
-        version=version,
+        license_url=et_to_str(metadata.find('nuspec:licenseUrl', ns)),
+        owners=et_to_str(metadata.find('nuspec:owners', ns)),
+        package_id=id_.text,
+        project_url=et_to_str(metadata.find('nuspec:projectUrl', ns)),
+        release_notes=et_to_str(metadata.find('nuspec:releaseNotes', ns)),
+        require_license_acceptance=et_to_str(metadata.find('nuspec:requireLicenseAcceptance', ns)) == 'true',
+        tags=et_to_str(metadata.find('nuspec:tags', ns)),
+        title=et_to_str(metadata.find('nuspec:title', ns)),
+        version=version.text,
     )
 
     logger.info("Sucessfully updated database entries for package %s version %s." % id_, version)
