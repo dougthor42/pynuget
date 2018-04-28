@@ -104,6 +104,58 @@ def clear(server_path, force=False):
     _create_db(config.DB_BACKEND, config.DB_NAME, server_path)
 
 
+def rebuild():
+    """Rebuild the package database."""
+    # First let's get a list of all the packages in the database.
+    # TODO: create the session.
+    logger.debug("Getting database packages and versions.")
+    db_data = db.search_packages(session, include_prerelease=True)
+    # TODO: munge the data
+    # A dict of {'pkg_name': ['vers1', 'vers2']} should work pretty well
+    logger.debug("Found %d database packages." % len(db_data))
+    logger.debug("Found %d database versions." % sum(len(v) for v
+                                                     in db_data.values()))
+
+    # Then we'll get the list of all the packages in the package directory
+    # Same data structure as the db data.
+    pkg_path = Path(config.SERVER_PATH) / Path(config.PACKAGE_DIR)
+    file_data = {}
+    # XXX: There's got to be a better way!
+    for root, dirs, _ in os.walk(str(pkg_path)):
+        rel_path = Path(root).relative_to(pkg_path)
+        pkg = str(rel_path.parent())
+        if pkg == '.':
+            # We're at a package-level item.
+            file_data[pkg] = []
+        else:
+            # We're looking at a version
+            file_data[pkg].append(rel_path.name)
+
+    logger.debug("Found %d packages." % len(file_data))
+    logger.debug("Found %d versions." % sum(len(v) for v
+                                            in file_data.values()))
+
+    # Add new packages to the database.
+    for pkg, versions in file_data.items():
+        # TODO
+        # Check that the package exists in the database.
+        if not package_in_db(pkg):
+            add_to_db(pkg)
+
+        for version in versions:
+            if not version_in_db(pkg, version):
+                add_to_db(pkg, version)
+
+    # Remove missing packages from the database.
+    for pkg, versions in db_data.items():
+        if pkg not in file_data.keys():
+            remove_from_db(pkg):
+        else:
+            for version in versions:
+                if version not in file_data[pkg]:
+                    remove_from_db(pkg, version)
+
+
 def _check_permissions():
     """Raise PermissionError if we're not root/sudo."""
     if os.getuid() != 0:
