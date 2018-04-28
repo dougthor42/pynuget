@@ -105,6 +105,16 @@ def main():
         action='store_true',
     )
 
+    # Rebuild
+    parser_rebuild = subparser.add_parser(
+        "rebuild",
+        help=("Rebuild the package database based on the files in"
+              " the package directory. Useful when manually adding or"
+              " removing NuGet package files."),
+        parents=[parent_parser],
+    )
+    parser_rebuild.set_defaults(func=run_rebuild)
+
     # Parse the args
     args = parser.parse_args()
 
@@ -127,3 +137,7 @@ def run_init(args):
 
 def run_clear(args):
     commands.clear(server_path=SERVER_PATH)
+
+
+def run_rebuild(args):
+    pass
