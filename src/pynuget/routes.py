@@ -26,6 +26,8 @@ from pynuget import db
 from pynuget import core
 from pynuget import logger
 from pynuget.feedwriter import FeedWriter
+from pynuget.core import et_to_str
+from pynuget.core import ApiException
 
 
 FEED_CONTENT_TYPE_HEADER = 'application/atom+xml; type=feed; charset=UTF-8'
@@ -90,145 +92,60 @@ def push():
         logger.error("Package file was not uploaded.")
         return "error: File not uploaded"
     file = request.files['package']
-    pkg = ZipFile(file, 'r')
 
     # Open the zip file that was sent and extract out the .nuspec file."
-    logger.debug("Parsing uploaded file.")
-    nuspec_file = None
-    pattern = re.compile(r'^.*\.nuspec$', re.IGNORECASE)
-    nuspec_file = list(filter(pattern.search, pkg.namelist()))
-    if len(nuspec_file) > 1:
-        logger.error("Multiple NuSpec files found within the package.")
-        return "api_error: multiple nuspec files found"
-    elif len(nuspec_file) == 0:
-        logger.error("No NuSpec file found in the package.")
-        return "api_error: nuspec file not found"      # TODO
-    nuspec_file = nuspec_file[0]
-
-    with pkg.open(nuspec_file, 'r') as openf:
-        nuspec_string = openf.read()
-        logger.debug("NuSpec string:")
-        logger.debug(nuspec_string)
-
-    logger.debug("Parsing NuSpec file XML")
-    nuspec = et.fromstring(nuspec_string)
-    assert isinstance(nuspec, et.Element)
+    try:
+        nuspec = core.extract_nuspec(file)
+    except Exception as err:
+        logger.error("Exception: %s" % err)
+        return "api_error: Zero or multiple nuspec files found"
 
     # The NuSpec XML file uses namespaces.
     # TODO: What if the namespace changes?
     ns = {'nuspec': 'http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd'}
 
     # Make sure both the ID and the version are provided in the .nuspec file.
-    metadata = nuspec.find('nuspec:metadata', ns)
-    if metadata is None:
-        logger.error('Unalbe to find the metadata tag!')
-        return
-
-    id_ = metadata.find('nuspec:id', ns)
-    version = metadata.find('nuspec:version', ns)
-    if id_ is None or version is None:
-        logger.error("ID or version missing from NuSpec file.")
-        return "api_error: ID or version missing"        # TODO
+    try:
+        metadata, id_, version = core.parse_nuspec(nuspec, ns)
+    except ApiException as err:
+        return str(err)
+    except Exception:
+        raise
 
     valid_id = re.compile('^[A-Z0-9\.\~\+\_\-]+$', re.IGNORECASE)
 
     # Make sure that the ID and version are sane
-    if not re.match(valid_id, id_.text) or not re.match(valid_id, version.text):
+    if not re.match(valid_id, id_) or not re.match(valid_id, version):
         logger.error("Invalid ID or version.")
         return "api_error: Invlaid ID or Version"      # TODO
 
     # and that we don't already have that ID+version in our database
-    if db.validate_id_and_version(session, id_.text, version.text):
-        logger.error("Package %s version %s already exists" % (id_.text, version.text))
+    if db.validate_id_and_version(session, id_, version):
+        logger.error("Package %s version %s already exists" % (id_, version))
         return "api_error: Package version already exists"      # TODO
 
     # Hash the uploaded file and encode the hash in Base64. For some reason.
-    logger.debug("Hashing and encoding uploaded file.")
-    with tempfile.TemporaryDirectory() as tmpdir:
-        name = str(uuid4()) + ".tmp"
-        temp_file = os.path.join(tmpdir, name)
-        logger.debug("Saving uploaded file to temporary location.")
-        file.save(temp_file)
-        m = hashlib.sha512()
-        logger.debug("Hashing file.")
-        with open(temp_file, 'rb') as openf:
-            m.update(openf.read())
-        logger.debug("Encoding in Base64.")
-        hash_ = base64.b64encode(m.digest())
+    try:
+        hash_, filesize = core.hash_and_encode_file(file, id_, version)
+    except Exception as err:
+        logger.error("Exception: %s" % err)
+        return "api_error: Unable to save file"
 
-        # Get the filesize of the uploaded file. Used later.
-        filesize = os.path.getsize(temp_file)
-        logger.debug("File size: %d bytes" % filesize)
-
-        # Save the package file to the local package dir. Thus far it's just been
-        # floating around in magic Flask land.
-        local_path = Path(app.config['SERVER_PATH']) / Path(app.config['PACKAGE_DIR'])
-        local_path = os.path.join(str(local_path),
-                                  id_.text,
-                                  version.text + ".nupkg",
-                                  )
-
-        # Check if the pacakge's directory already exists. Create if needed.
-        os.makedirs(os.path.split(local_path)[0],
-                    mode=0o0755,
-                    exist_ok=True,      # do not throw an error path exists.
-                    )
-
-        logger.debug("Saving uploaded file to filesystem.")
-        try:
-            shutil.copy(temp_file, local_path)
-        except Exception as err:       # TODO: specify exceptions
-            logger.error("Unknown exception: %s" % err)
-            return "api_error: Unable to save file"
-        else:
-            logger.info("Succesfully saved package to '%s'" % local_path)
-
-    # Determine dependencies.
-    # TODO: python-ify
-    logger.debug("Parsing dependencies.")
-    dependencies = []
-    dep = metadata.find('nuspec:dependencies', ns)
-    if dep:
-        logger.debug("Found dependencies.")
-        dep_no_fw = dep.findall('nuspec:dependency', ns)
-        if dep_no_fw:
-            logger.debug("Found dependencies not specific to any framework.")
-            for dependency in dep_no_fw:
-                d = {'framework': None,
-                     'id': str(dependency['id']),
-                     'version': str(dependency['version']),
-                     }
-                dependencies.append(d)
-        dep_fw = dep.findall('nuspec:group', ns)
-        if dep_fw:
-            logger.debug("Found dependencies specific to a framework")
-            for group in dep_fw:
-                group_elem = group.findall('nuspec:dependency', ns)
-                for dependency in group_elem:
-                    d = {'framework': str(group['targetFramework']),
-                         'id': str(dependency['id']),
-                         'version': str(dependency['version']),
-                         }
-                    dependencies.append(d)
-    else:
-        logger.debug("No dependencies found.")
+    try:
+        dependencies = core.determine_dependencies(metadata, ns)
+    except Exception as err:
+        logger.error("Exception: %s" % err)
+        return "api_error: Unable to parse dependencies."
 
     logger.debug(dependencies)
 
     # and finaly, update our database.
     logger.debug("Updating database entries.")
 
-    # Helper function
-    def et_to_str(node):
-        try:
-            return node.text
-        except AttributeError:
-            return None
-
     db.insert_or_update_package(session,
-                                package_id=id_.text,
+                                package_id=id_,
                                 title=et_to_str(metadata.find('nuspec:title', ns)),
-                                latest_version=version.text)
+                                latest_version=version)
     db.insert_version(
         session,
         authors=et_to_str(metadata.find('nuspec:authors', ns)),
@@ -242,16 +159,16 @@ def push():
         is_prerelease='-' in version,
         license_url=et_to_str(metadata.find('nuspec:licenseUrl', ns)),
         owners=et_to_str(metadata.find('nuspec:owners', ns)),
-        package_id=id_.text,
+        package_id=id_,
         project_url=et_to_str(metadata.find('nuspec:projectUrl', ns)),
         release_notes=et_to_str(metadata.find('nuspec:releaseNotes', ns)),
         require_license_acceptance=et_to_str(metadata.find('nuspec:requireLicenseAcceptance', ns)) == 'true',
         tags=et_to_str(metadata.find('nuspec:tags', ns)),
         title=et_to_str(metadata.find('nuspec:title', ns)),
-        version=version.text,
+        version=version,
     )
 
-    logger.info("Sucessfully updated database entries for package %s version %s." % (id_.text, version.text))
+    logger.info("Sucessfully updated database entries for package %s version %s." % (id_, version))
 
     resp = Response()
     resp.status = 201
