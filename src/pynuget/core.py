@@ -181,3 +181,27 @@ def extract_nuspec(file):
         raise TypeError(msg.format(type(nuspec)))
 
     return nuspec
+
+
+def parse_nuspec(nuspec, ns=None):
+    """
+    Parameters
+    ----------
+    nuspec : :class:`xml.etree.ElementTree.Element` object
+        The parsed nuspec data.
+    ns : string
+        The namespace to search.
+    """
+    metadata = nuspec.find('nuspec:metadata', ns)
+    if metadata is None:
+        msg = 'Unable to find the metadata tag!'
+        logger.error(msg)
+        return ApiException(msg)
+
+    id_ = metadata.find('nuspec:id', ns)
+    version = metadata.find('nuspec:version', ns)
+    if id_ is None or version is None:
+        logger.error("ID or version missing from NuSpec file.")
+        return ApiException("api_error: ID or version missing")        # TODO
+
+    return metadata, id_, version

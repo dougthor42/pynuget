@@ -27,6 +27,7 @@ from pynuget import core
 from pynuget import logger
 from pynuget.feedwriter import FeedWriter
 from pynuget.core import et_to_str
+from pynuget.core import ApiException
 
 
 FEED_CONTENT_TYPE_HEADER = 'application/atom+xml; type=feed; charset=UTF-8'
@@ -104,16 +105,12 @@ def push():
     ns = {'nuspec': 'http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd'}
 
     # Make sure both the ID and the version are provided in the .nuspec file.
-    metadata = nuspec.find('nuspec:metadata', ns)
-    if metadata is None:
-        logger.error('Unalbe to find the metadata tag!')
-        return
-
-    id_ = metadata.find('nuspec:id', ns)
-    version = metadata.find('nuspec:version', ns)
-    if id_ is None or version is None:
-        logger.error("ID or version missing from NuSpec file.")
-        return "api_error: ID or version missing"        # TODO
+    try:
+        metadata, id_, version = core.parse_nuspec(nuspec, ns)
+    except ApiException as err:
+        return str(err)
+    except Exception:
+        raise
 
     valid_id = re.compile('^[A-Z0-9\.\~\+\_\-]+$', re.IGNORECASE)
 
