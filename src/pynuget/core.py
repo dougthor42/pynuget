@@ -44,3 +44,37 @@ def et_to_str(node):
         return node.text
     except AttributeError:
         return None
+
+
+def determine_dependencies(metadata_element, namespace):
+    """"""
+    # TODO: python-ify
+    logger.debug("Parsing dependencies.")
+    dependencies = []
+    dep = metadata_element.find('nuspec:dependencies', namespace)
+    if dep:
+        logger.debug("Found dependencies.")
+        dep_no_fw = dep.findall('nuspec:dependency', namespace)
+        if dep_no_fw:
+            logger.debug("Found dependencies not specific to any framework.")
+            for dependency in dep_no_fw:
+                d = {'framework': None,
+                     'id': str(dependency['id']),
+                     'version': str(dependency['version']),
+                     }
+                dependencies.append(d)
+        dep_fw = dep.findall('nuspec:group', namespace)
+        if dep_fw:
+            logger.debug("Found dependencies specific to a framework")
+            for group in dep_fw:
+                group_elem = group.findall('nuspec:dependency', namespace)
+                for dependency in group_elem:
+                    d = {'framework': str(group['targetFramework']),
+                         'id': str(dependency['id']),
+                         'version': str(dependency['version']),
+                         }
+                    dependencies.append(d)
+    else:
+        logger.debug("No dependencies found.")
+
+    return dependencies

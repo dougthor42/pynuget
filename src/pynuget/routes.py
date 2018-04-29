@@ -184,35 +184,7 @@ def push():
         else:
             logger.info("Succesfully saved package to '%s'" % local_path)
 
-    # Determine dependencies.
-    # TODO: python-ify
-    logger.debug("Parsing dependencies.")
-    dependencies = []
-    dep = metadata.find('nuspec:dependencies', ns)
-    if dep:
-        logger.debug("Found dependencies.")
-        dep_no_fw = dep.findall('nuspec:dependency', ns)
-        if dep_no_fw:
-            logger.debug("Found dependencies not specific to any framework.")
-            for dependency in dep_no_fw:
-                d = {'framework': None,
-                     'id': str(dependency['id']),
-                     'version': str(dependency['version']),
-                     }
-                dependencies.append(d)
-        dep_fw = dep.findall('nuspec:group', ns)
-        if dep_fw:
-            logger.debug("Found dependencies specific to a framework")
-            for group in dep_fw:
-                group_elem = group.findall('nuspec:dependency', ns)
-                for dependency in group_elem:
-                    d = {'framework': str(group['targetFramework']),
-                         'id': str(dependency['id']),
-                         'version': str(dependency['version']),
-                         }
-                    dependencies.append(d)
-    else:
-        logger.debug("No dependencies found.")
+    dependencies = core.determine_dependencies(metadata, ns)
 
     logger.debug(dependencies)
 
