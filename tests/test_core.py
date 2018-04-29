@@ -69,3 +69,17 @@ def test_parse_nuspec():
     assert isinstance(nuspec, et.Element)
     assert id_ == 'NuGetTest'
     assert version == '0.0.1'
+
+
+def test_extract_nuspec():
+    no_nuspec = os.path.join(DATA_DIR, "no_nuspec.nupkg")
+    with pytest.raises(core.ApiException):
+        core.extract_nuspec(no_nuspec)
+
+    multiple_nuspec = os.path.join(DATA_DIR, "multiple_nuspec.nupkg")
+    with pytest.raises(core.ApiException):
+        core.extract_nuspec(multiple_nuspec)
+
+    good = os.path.join(DATA_DIR, "good.nupkg")
+    result = core.extract_nuspec(good)
+    assert isinstance(result, et.Element)

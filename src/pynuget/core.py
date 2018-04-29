@@ -153,7 +153,7 @@ def extract_nuspec(file):
     """
     Parameters
     ----------
-    file : :class:`werkzeug.datastructures.FileStorage` object
+    file : :class:`werkzeug.datastructures.FileStorage` object or path (str)
         The file as retrieved by Flask.
     """
     pkg = ZipFile(file, 'r')
