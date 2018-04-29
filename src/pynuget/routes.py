@@ -126,7 +126,7 @@ def push():
 
     # Hash the uploaded file and encode the hash in Base64. For some reason.
     try:
-        hash_, filesize = core.hash_and_encode_file()
+        hash_, filesize = core.hash_and_encode_file(file, id_, version)
     except Exception as err:
         logger.error("Exception: %s" % err)
         return "api_error: Unable to save file"
