@@ -103,8 +103,8 @@ def hash_and_encode_file(file, id_, version):
     ----------
     file : :class:`werkzeug.datastructures.FileStorage` object
         The file as retrieved by Flask.
-    id_ : :class:`xml.etree.ElementTree.Element` object
-    version : :class:`xml.etree.ElementTree.Element` object
+    id_ : str
+    version : str
     """
     logger.debug("Hashing and encoding uploaded file.")
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -127,8 +127,8 @@ def hash_and_encode_file(file, id_, version):
         # just been floating around in magic Flask land.
         local_path = Path(app.config['SERVER_PATH']) / Path(app.config['PACKAGE_DIR'])
         local_path = os.path.join(str(local_path),
-                                  id_.text,
-                                  version.text + ".nupkg",
+                                  id_,
+                                  version + ".nupkg",
                                   )
 
         # Check if the pacakge's directory already exists. Create if needed.
@@ -191,6 +191,12 @@ def parse_nuspec(nuspec, ns=None):
         The parsed nuspec data.
     ns : string
         The namespace to search.
+
+    Returns
+    -------
+    metadata : :class:`xml.etree.ElementTree.Element`
+    id_ : str
+    version : str
     """
     metadata = nuspec.find('nuspec:metadata', ns)
     if metadata is None:
@@ -198,10 +204,11 @@ def parse_nuspec(nuspec, ns=None):
         logger.error(msg)
         return ApiException(msg)
 
+    # TODO: I think I need different error handling around `.text`.
     id_ = metadata.find('nuspec:id', ns)
     version = metadata.find('nuspec:version', ns)
     if id_ is None or version is None:
         logger.error("ID or version missing from NuSpec file.")
         return ApiException("api_error: ID or version missing")        # TODO
 
-    return metadata, id_, version
+    return metadata, id_.text, version.text

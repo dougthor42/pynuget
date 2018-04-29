@@ -115,13 +115,13 @@ def push():
     valid_id = re.compile('^[A-Z0-9\.\~\+\_\-]+$', re.IGNORECASE)
 
     # Make sure that the ID and version are sane
-    if not re.match(valid_id, id_.text) or not re.match(valid_id, version.text):
+    if not re.match(valid_id, id_) or not re.match(valid_id, version):
         logger.error("Invalid ID or version.")
         return "api_error: Invlaid ID or Version"      # TODO
 
     # and that we don't already have that ID+version in our database
-    if db.validate_id_and_version(session, id_.text, version.text):
-        logger.error("Package %s version %s already exists" % (id_.text, version.text))
+    if db.validate_id_and_version(session, id_, version):
+        logger.error("Package %s version %s already exists" % (id_, version))
         return "api_error: Package version already exists"      # TODO
 
     # Hash the uploaded file and encode the hash in Base64. For some reason.
@@ -143,9 +143,9 @@ def push():
     logger.debug("Updating database entries.")
 
     db.insert_or_update_package(session,
-                                package_id=id_.text,
+                                package_id=id_,
                                 title=et_to_str(metadata.find('nuspec:title', ns)),
-                                latest_version=version.text)
+                                latest_version=version)
     db.insert_version(
         session,
         authors=et_to_str(metadata.find('nuspec:authors', ns)),
@@ -159,16 +159,16 @@ def push():
         is_prerelease='-' in version,
         license_url=et_to_str(metadata.find('nuspec:licenseUrl', ns)),
         owners=et_to_str(metadata.find('nuspec:owners', ns)),
-        package_id=id_.text,
+        package_id=id_,
         project_url=et_to_str(metadata.find('nuspec:projectUrl', ns)),
         release_notes=et_to_str(metadata.find('nuspec:releaseNotes', ns)),
         require_license_acceptance=et_to_str(metadata.find('nuspec:requireLicenseAcceptance', ns)) == 'true',
         tags=et_to_str(metadata.find('nuspec:tags', ns)),
         title=et_to_str(metadata.find('nuspec:title', ns)),
-        version=version.text,
+        version=version,
     )
 
-    logger.info("Sucessfully updated database entries for package %s version %s." % (id_.text, version.text))
+    logger.info("Sucessfully updated database entries for package %s version %s." % (id_, version))
 
     resp = Response()
     resp.status = 201
