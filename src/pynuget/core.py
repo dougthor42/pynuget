@@ -202,13 +202,13 @@ def parse_nuspec(nuspec, ns=None):
     if metadata is None:
         msg = 'Unable to find the metadata tag!'
         logger.error(msg)
-        return ApiException(msg)
+        raise ApiException(msg)
 
     # TODO: I think I need different error handling around `.text`.
     id_ = metadata.find('nuspec:id', ns)
     version = metadata.find('nuspec:version', ns)
     if id_ is None or version is None:
         logger.error("ID or version missing from NuSpec file.")
-        return ApiException("api_error: ID or version missing")        # TODO
+        raise ApiException("api_error: ID or version missing")        # TODO
 
     return metadata, id_.text, version.text
