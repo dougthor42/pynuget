@@ -109,3 +109,25 @@ def test_hash_and_encode_file():
     shutil.rmtree(os.path.join(DATA_DIR, pkg_name), ignore_errors=True)
     app.config['SERVER_PATH'] = old_server_path
     app.config['PACKAGE_DIR'] = old_package_dir
+
+
+def test_determine_dependencies():
+    no_dependencies = et.parse(os.path.join(DATA_DIR, "good.nuspec"))
+    metadata = no_dependencies.find('nuspec:metadata', NAMESPACE)
+    result = core.determine_dependencies(metadata, NAMESPACE)
+    assert len(result) == 0
+
+    dependencies = et.parse(os.path.join(DATA_DIR, "dependencies.nuspec"))
+    metadata = dependencies.find('nuspec:metadata', NAMESPACE)
+    result = core.determine_dependencies(metadata, NAMESPACE)
+
+    # I can't guarantee that the result is deterministic, so sort it by 'id'
+    result = sorted(result, key=lambda k: k['id'])
+    expected = [
+        {'framework': '.NETStandard2.0', 'id': 'A', 'version': '0.0.1'},
+        {'framework': '.NETStandard2.0', 'id': 'B', 'version': '0.0.2'},
+        {'framework': '.NETStandard2.0', 'id': 'C', 'version': '0.0.3'},
+        {'framework': None, 'id': 'D', 'version': '0.0.4'},
+        {'framework': None, 'id': 'E', 'version': '0.0.5'},
+    ]
+    assert result == expected

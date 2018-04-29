@@ -76,8 +76,8 @@ def determine_dependencies(metadata_element, namespace):
             logger.debug("Found dependencies not specific to any framework.")
             for dependency in dep_no_fw:
                 d = {'framework': None,
-                     'id': str(dependency['id']),
-                     'version': str(dependency['version']),
+                     'id': str(dependency.attrib['id']),
+                     'version': str(dependency.attrib['version']),
                      }
                 dependencies.append(d)
         dep_fw = dep.findall('nuspec:group', namespace)
@@ -86,9 +86,9 @@ def determine_dependencies(metadata_element, namespace):
             for group in dep_fw:
                 group_elem = group.findall('nuspec:dependency', namespace)
                 for dependency in group_elem:
-                    d = {'framework': str(group['targetFramework']),
-                         'id': str(dependency['id']),
-                         'version': str(dependency['version']),
+                    d = {'framework': str(group.attrib['targetFramework']),
+                         'id': str(dependency.attrib['id']),
+                         'version': str(dependency.attrib['version']),
                          }
                     dependencies.append(d)
     else:
