@@ -26,6 +26,7 @@ from pynuget import db
 from pynuget import core
 from pynuget import logger
 from pynuget.feedwriter import FeedWriter
+from pynuget.core import et_to_str
 
 
 FEED_CONTENT_TYPE_HEADER = 'application/atom+xml; type=feed; charset=UTF-8'
@@ -217,13 +218,6 @@ def push():
 
     # and finaly, update our database.
     logger.debug("Updating database entries.")
-
-    # Helper function
-    def et_to_str(node):
-        try:
-            return node.text
-        except AttributeError:
-            return None
 
     db.insert_or_update_package(session,
                                 package_id=id_.text,

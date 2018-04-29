@@ -36,3 +36,11 @@ def get_package_path(package_id, version):
 # XXX: Not needed?
 def url_scheme():
     raise NotImplementedError
+
+
+def et_to_str(node):
+    """Get the text value of an Element, returning None if not found."""
+    try:
+        return node.text
+    except AttributeError:
+        return None
