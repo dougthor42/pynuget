@@ -3,9 +3,12 @@
 """
 import base64
 import hashlib
-import tempfile
 import os
+import re
 import shutil
+import tempfile
+import xml.etree.ElementTree as et
+from zipfile import ZipFile
 from pathlib import Path
 from uuid import uuid4
 
@@ -136,3 +139,37 @@ def hash_and_encode_file(file, id_, version):
             logger.info("Succesfully saved package to '%s'" % local_path)
 
     return hash_, filesize
+
+
+def extract_nuspec(file):
+    """
+    Parameters
+    ----------
+    file : :class:`werkzeug.datastructures.FileStorage` object
+        The file as retrieved by Flask.
+    """
+    pkg = ZipFile(file, 'r')
+    logger.debug("Parsing uploaded file.")
+    nuspec_file = None
+    pattern = re.compile(r'^.*\.nuspec$', re.IGNORECASE)
+    nuspec_file = list(filter(pattern.search, pkg.namelist()))
+    if len(nuspec_file) > 1:
+        logger.error("Multiple NuSpec files found within the package.")
+        raise Exception("api_error: multiple nuspec files found")
+    elif len(nuspec_file) == 0:
+        logger.error("No NuSpec file found in the package.")
+        raise Exception("api_error: nuspec file not found")      # TODO
+    nuspec_file = nuspec_file[0]
+
+    with pkg.open(nuspec_file, 'r') as openf:
+        nuspec_string = openf.read()
+        logger.debug("NuSpec string:")
+        logger.debug(nuspec_string)
+
+    logger.debug("Parsing NuSpec file XML")
+    nuspec = et.fromstring(nuspec_string)
+    if not isinstance(nuspec, et.Element):
+        msg = "`nuspec` expected to be type `xml...Element`. Got {}"
+        raise TypeError(msg.format(type(nuspec)))
+
+    return nuspec

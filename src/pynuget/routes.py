@@ -91,29 +91,13 @@ def push():
         logger.error("Package file was not uploaded.")
         return "error: File not uploaded"
     file = request.files['package']
-    pkg = ZipFile(file, 'r')
 
     # Open the zip file that was sent and extract out the .nuspec file."
-    logger.debug("Parsing uploaded file.")
-    nuspec_file = None
-    pattern = re.compile(r'^.*\.nuspec$', re.IGNORECASE)
-    nuspec_file = list(filter(pattern.search, pkg.namelist()))
-    if len(nuspec_file) > 1:
-        logger.error("Multiple NuSpec files found within the package.")
-        return "api_error: multiple nuspec files found"
-    elif len(nuspec_file) == 0:
-        logger.error("No NuSpec file found in the package.")
-        return "api_error: nuspec file not found"      # TODO
-    nuspec_file = nuspec_file[0]
-
-    with pkg.open(nuspec_file, 'r') as openf:
-        nuspec_string = openf.read()
-        logger.debug("NuSpec string:")
-        logger.debug(nuspec_string)
-
-    logger.debug("Parsing NuSpec file XML")
-    nuspec = et.fromstring(nuspec_string)
-    assert isinstance(nuspec, et.Element)
+    try:
+        nuspec = core.extract_nuspec(file)
+    except Exception as err:
+        logger.error("Exception: %s" % err)
+        return "api_error: Zero or multiple nuspec files found"
 
     # The NuSpec XML file uses namespaces.
     # TODO: What if the namespace changes?
