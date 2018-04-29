@@ -16,6 +16,14 @@ from pynuget import app
 from pynuget import logger
 
 
+class PyNuGetException(Exception):
+    pass
+
+
+class ApiException(PyNuGetException):
+    pass
+
+
 # XXX: Not needed?
 def api_error():
     raise NotImplementedError
@@ -155,10 +163,10 @@ def extract_nuspec(file):
     nuspec_file = list(filter(pattern.search, pkg.namelist()))
     if len(nuspec_file) > 1:
         logger.error("Multiple NuSpec files found within the package.")
-        raise Exception("api_error: multiple nuspec files found")
+        raise ApiException("api_error: multiple nuspec files found")
     elif len(nuspec_file) == 0:
         logger.error("No NuSpec file found in the package.")
-        raise Exception("api_error: nuspec file not found")      # TODO
+        raise ApiException("api_error: nuspec file not found")      # TODO
     nuspec_file = nuspec_file[0]
 
     with pkg.open(nuspec_file, 'r') as openf:
