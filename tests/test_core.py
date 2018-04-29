@@ -1,16 +1,18 @@
 # -*- coding: utf-8 -*-
 """
 """
+import shutil
 from unittest.mock import MagicMock
 import xml.etree.ElementTree as et
 
 import os
 import pytest
+from werkzeug.datastructures import FileStorage
 
 from pynuget import core
 from pynuget import app
 
-DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "./data")
+DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 NAMESPACE = {'nuspec':
              'http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd'}
 
@@ -83,3 +85,27 @@ def test_extract_nuspec():
     good = os.path.join(DATA_DIR, "good.nupkg")
     result = core.extract_nuspec(good)
     assert isinstance(result, et.Element)
+
+
+def test_hash_and_encode_file():
+    # Overwrite our server path
+    old_server_path = app.config['SERVER_PATH']
+    old_package_dir = app.config['PACKAGE_DIR']
+    app.config['SERVER_PATH'] = DATA_DIR
+    app.config['PACKAGE_DIR'] = '.'
+    pkg_name = 'DummyPackage'
+    version = '0.0.1'
+
+    good = os.path.join(DATA_DIR, "good.nupkg")
+    with open(good, 'rb') as openf:
+        file = FileStorage(openf)
+
+        hash_, filesize = core.hash_and_encode_file(file, pkg_name, version)
+    assert isinstance(hash_, bytes)
+    assert isinstance(filesize, int)
+    assert filesize == 3255
+
+    # Cleanup
+    shutil.rmtree(os.path.join(DATA_DIR, pkg_name), ignore_errors=True)
+    app.config['SERVER_PATH'] = old_server_path
+    app.config['PACKAGE_DIR'] = old_package_dir
