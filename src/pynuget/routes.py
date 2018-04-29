@@ -144,9 +144,17 @@ def push():
         return "api_error: Package version already exists"      # TODO
 
     # Hash the uploaded file and encode the hash in Base64. For some reason.
-    hash_, filesize = core.hash_and_encode_file()
+    try:
+        hash_, filesize = core.hash_and_encode_file()
+    except Exception as err:
+        logger.error("Exception: %s" % err)
+        return "api_error: Unable to save file"
 
-    dependencies = core.determine_dependencies(metadata, ns)
+    try:
+        dependencies = core.determine_dependencies(metadata, ns)
+    except Exception as err:
+        logger.error("Exception: %s" % err)
+        return "api_error: Unable to parse dependencies."
 
     logger.debug(dependencies)
 

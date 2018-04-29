@@ -131,7 +131,7 @@ def hash_and_encode_file(file, id_, version):
             shutil.copy(temp_file, local_path)
         except Exception as err:       # TODO: specify exceptions
             logger.error("Unknown exception: %s" % err)
-            return "api_error: Unable to save file"
+            raise err
         else:
             logger.info("Succesfully saved package to '%s'" % local_path)
 
