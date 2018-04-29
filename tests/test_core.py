@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 """
+from unittest.mock import MagicMock
+import xml.etree.ElementTree as et
 
 import pytest
 
@@ -35,3 +37,10 @@ def test_get_pacakge_path():
 @pytest.mark.skip("Not Implemented")
 def test_url_scheme():
     pass
+
+
+def test_et_to_str():
+    node = MagicMock(spec=et.Element)
+    assert core.et_to_str(node) is None
+    node = MagicMock(text="Hello")
+    assert core.et_to_str(node) == "Hello"
