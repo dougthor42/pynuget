@@ -118,6 +118,32 @@ def test_push_invalid_file(client, put_header):
     assert rv.status_code == 400
 
 
+def test_push_no_nuspec(client, put_header):
+    nupkg_file = os.path.join(DATA_DIR, 'no_nuspec.nupkg')
+    with open(nupkg_file, 'rb') as openf:
+        data = {'package': (openf, 'filename.nupkg')}
+        rv = client.put(
+            '/api/v2/package/',
+            headers=put_header,
+            follow_redirects=True,
+            data=data,
+        )
+        assert rv.status_code == 400
+
+
+def test_push_multiple_nuspec(client, put_header):
+    nupkg_file = os.path.join(DATA_DIR, 'multiple_nuspec.nupkg')
+    with open(nupkg_file, 'rb') as openf:
+        data = {'package': (openf, 'filename.nupkg')}
+        rv = client.put(
+            '/api/v2/package/',
+            headers=put_header,
+            follow_redirects=True,
+            data=data,
+        )
+        assert rv.status_code == 400
+
+
 def test_count(client):
     rv = client.get('/count')
     assert rv.data == b'0'
