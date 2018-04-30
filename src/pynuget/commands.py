@@ -104,6 +104,107 @@ def clear(server_path, force=False):
     _create_db(config.DB_BACKEND, config.DB_NAME, server_path)
 
 
+def rebuild():
+    """Rebuild the package database."""
+    raise NotImplementedError
+    import config
+    # First let's get a list of all the packages in the database.
+    # TODO: create the session.
+    logger.debug("Getting database packages and versions.")
+    db_data = db.search_packages(session, include_prerelease=True)
+    db_data = _db_data_to_dict(db_data)
+
+    # Then we'll get the list of all the packages in the package directory
+    # Same data structure as the db data.
+    pkg_path = Path(config.SERVER_PATH) / Path(config.PACKAGE_DIR)
+    file_data = _get_packages_from_files(pkg_path)
+
+    _add_packages_to_db(file_data)
+    _remove_packages_from_db(file_data, db_data)
+
+
+def _db_data_to_dict(db_data):
+    """
+    Convert the result of db.search_packages into a dict of
+        {'pkg': ['vers1', 'vers2', ...]}
+    """
+    data = {}
+    for row in db_data:
+        try:
+            data[row.package.title]
+        except KeyError:
+            data[row.package.title] = []
+        data[row.package.title].append(row.version)
+
+    logger.debug("Found %d database packages." % len(data))
+    logger.debug("Found %d database versions." % sum(len(v) for v
+                                                     in data.values()))
+    return data
+
+
+def _get_packages_from_files(pkg_path):
+    """
+    Get a list of packages from the package directory.
+
+    Parameters
+    ----------
+    pkg_path : :class:`pathlib.Path` or str
+        The path to the package directory.
+
+    Returns
+    -------
+    data : dict
+        Dict of {'pkg_name': ['vers1', 'vers2', ...], ...}
+    """
+    logger.debug("Getting list of packages in package dir.")
+    if not isinstance(pkg_path, Path):
+        pkg_path = Path(pkg_path)
+
+    data = {}
+    # XXX: There's got to be a better way!
+    for root, dirs, _ in os.walk(str(pkg_path)):
+        rel_path = Path(root).relative_to(pkg_path)
+        pkg = str(rel_path.parent)
+        if pkg != '.':
+            try:
+                data[pkg]
+            except KeyError:
+                data[pkg] = []
+            data[pkg].append(rel_path.name)
+
+    logger.debug("Found %d packages." % len(data))
+    logger.debug("Found %d versions." % sum(len(v) for v in data.values()))
+
+    return data
+
+
+def _add_packages_to_db(file_data):
+    logger.debug("Adding packages to database.")
+    raise NotImplementedError
+    for pkg, versions in file_data.items():
+        # TODO
+        # Check that the package exists in the database.
+        if not package_in_db(pkg):
+            db.insert_or_update_package(session, None, pkg, versions[0])
+
+        for version in versions:
+            if not version_in_db(pkg, version):
+                db.insert_version(session, package_id=None, title=pkg,
+                                  version=version)
+
+
+def _remove_packages_from_db(file_data, db_data):
+    logger.debug("Removing packages from database.")
+    raise NotImplementedError
+    for pkg, versions in db_data.items():
+        if pkg not in file_data.keys():
+            db.delete_version(pkg)
+        else:
+            for version in versions:
+                if version not in file_data[pkg]:
+                    db.delete_version(pkg, version)
+
+
 def _check_permissions():
     """Raise PermissionError if we're not root/sudo."""
     if os.getuid() != 0:
