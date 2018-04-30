@@ -126,7 +126,19 @@ def rebuild():
 
 
 def _get_packages_from_files(pkg_path):
-    """"""
+    """
+    Get a list of packages from the package directory.
+
+    Parameters
+    ----------
+    pkg_path : :class:`pathlib.Path` or str
+        The path to the package directory.
+
+    Returns
+    -------
+    data : dict
+        Dict of {'pkg_name': ['vers1', 'vers2', ...], ...}
+    """
     logger.debug("Getting list of packages in package dir.")
     if not isinstance(pkg_path, Path):
         pkg_path = Path(pkg_path)
