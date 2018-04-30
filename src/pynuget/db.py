@@ -47,7 +47,8 @@ class Version(Base):
     __tablename__ = "version"
 
     version_id = Column(Integer, primary_key=True)
-    package_id = Column(Integer, ForeignKey("package.package_id"))
+    package_id = Column(Integer, ForeignKey("package.package_id"),
+                        nullable=False)
     title = Column(Text())
     description = Column(Text())
     created = Column(Integer)
@@ -79,7 +80,9 @@ class Version(Base):
 
     @thing.expression
     def thing(cls):
-        return cast(cls.package_id, String) + "~~" + cast(cls.version, String)
+        name = cast(cls.package_id, String)
+        version = cast(cls.version, String)
+        return name + "~~" + version
 
 
 def count_packages(session):
