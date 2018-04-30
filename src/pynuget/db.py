@@ -196,14 +196,6 @@ def find_by_id(session, package_name, version=None):
     return query.all()
 
 
-def parse_order_by():
-    raise NotImplementedError
-
-
-def do_search():
-    raise NotImplementedError
-
-
 def validate_id_and_version(session, package_name, version):
     """
     Not exactly sure what this is supposed to do, but I *think* it simply
@@ -317,8 +309,3 @@ def delete_version(session, package_name, version):
     else:
         session.delete(package)
     session.commit()
-
-
-# XXX: I don't think this is actually needed, since SQLAlchemy does it.
-def build_in_clause():
-    raise NotImplementedError

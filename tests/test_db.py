@@ -112,16 +112,6 @@ def test_find_by_id(session):
     assert result_2[0].version == "0.0.1"
 
 
-def test_parse_order_by(session):
-    with pytest.raises(NotImplementedError) as e_info:
-        db.parse_order_by()
-
-
-def test_do_search(session):
-    with pytest.raises(NotImplementedError) as e_info:
-        db.do_search()
-
-
 def test_validate_id_and_version(session):
     result_1 = db.validate_id_and_version(session, 'dummy', "0.0.1")
     assert result_1 is True
@@ -204,8 +194,3 @@ def test_delete_version(session):
     db.delete_version(session, pkg_id, '0.0.1')
     assert version_count.scalar() == 0
     assert package_count.scalar() == 0
-
-
-def test_build_in_clause(session):
-    with pytest.raises(NotImplementedError) as e_info:
-        db.build_in_clause()
