@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 """
+One thing to note: in the NuSpec XML file, 'id' is the project name
+which must be unique across the NuGet server and 'title' is the
+human-friendly title of the package.
 """
 
 import datetime as dt
@@ -28,12 +31,13 @@ class Package(Base):
     __tablename__ = "package"
 
     package_id = Column(Integer, primary_key=True)
-    title = Column(String(256), index=True)
+    name = Column(String(256), index=True, unique=True, nullable=False)
+    title = Column(String(256))
     download_count = Column(Integer, index=True, nullable=False, default=0)
     latest_version = Column(Text())
 
     def __repr__(self):
-        return "<Package({}, {})>".format(self.package_id, self.title)
+        return "<Package({}, {})>".format(self.package_id, self.name)
 
 
 class Version(Base):
@@ -67,7 +71,7 @@ class Version(Base):
     package = relationship("Package", backref="versions")
 
     def __repr__(self):
-        return "<Version({}, {})>".format(self.package.title, self.version)
+        return "<Version({}, {})>".format(self.package.name, self.version)
 
     @hybrid_property
     def thing(self):
@@ -95,8 +99,8 @@ def search_packages(session,
     if search_query is not None:
         search_query = "%" + search_query + "%"
         query = query.filter(
-            or_(Package.title.like(search_query),
-                Package.package_id.like(search_query)
+            or_(Package.name.like(search_query),
+                Package.title.like(search_query)
                 )
         )
 
@@ -135,7 +139,6 @@ def package_updates(session, packages_dict, include_prerelease=False):
     package_versions = ["{}~~{}".format(pkg, vers)
                         for pkg, vers
                         in packages_dict.items()]
-    print(package_versions)
 
     query = (session.query(Version)
              .filter(Version.version == Package.latest_version)
@@ -146,10 +149,21 @@ def package_updates(session, packages_dict, include_prerelease=False):
     return query.order_by(Version.package_id).all()
 
 
-def find_by_id(session, package_id, version=None):
-    """Find a package by ID and version. If no version given, return all."""
+def find_by_id(session, package_name, version=None):
+    """
+    Find a package by ID and version. If no version given, return all.
+
+    Parameters
+    ----------
+    session : :class:`sqlalchemy.orm.session.Session`
+    package_name : str
+        The NuGet name of the package - the "id" tag in the NuSpec file.
+    version : str
+    """
     logger.debug("db.find_by_id(...)")
-    query = session.query(Version).filter(Version.package_id == package_id)
+    query = (session.query(Version)
+             .filter(Package.name == package_name)
+             )
     if version:
         query = query.filter(Version.version == version)
     query.order_by(desc(Version.version))
@@ -165,23 +179,33 @@ def do_search():
     raise NotImplementedError
 
 
-def validate_id_and_version(session, package_id, version):
-    """Not exactly sure what this is supposed to do, but I *think* it simply
+def validate_id_and_version(session, package_name, version):
+    """
+    Not exactly sure what this is supposed to do, but I *think* it simply
     makes sure that the given pacakge_id and version exist... So that's
     what I've decided to make it do."""
     logger.debug("db.validate_id_and_version(...)")
     query = (session.query(Version)
-             .filter(Version.package_id == package_id)
+             .filter(Package.name == package_name)
              .filter(Version.version == version)
              )
     return session.query(query.exists()).scalar()
 
 
-def increment_download_count(session, package_id, version):
-    """Increment the download count for a given package version."""
+def increment_download_count(session, package_name, version):
+    """
+    Increment the download count for a given package version.
+
+    Parameters
+    ----------
+    session : :class:`sqlalchemy.orm.session.Session`
+    package_name : str
+        The NuGet name of the package - the "id" tag in the NuSpec file.
+    version : str
+    """
     logger.debug("db.increment_download_count(...)")
     obj = (session.query(Version)
-           .filter(Version.package_id == package_id)
+           .filter(Package.name == package_name)
            .filter(Version.version == version)
            ).one()
     obj.version_download_count += 1
@@ -189,15 +213,27 @@ def increment_download_count(session, package_id, version):
     session.commit()
 
 
-def insert_or_update_package(session, package_id, title, latest_version):
+def insert_or_update_package(session, package_name, title, latest_version):
+    """
+
+    Parameters
+    ----------
+    session : :class:`sqlalchemy.orm.session.Session`
+    package_name : str
+        The NuGet name of the package - the "id" tag in the NuSpec file.
+    title : str
+    latest_version : str
+    """
     logger.debug("db.insert_or_update_package(...)")
-    sql = session.query(Package).filter(Package.package_id == package_id)
+    sql = session.query(Package).filter(Package.name == package_name)
     obj = sql.one_or_none()
     if obj is None:
-        pkg = Package(title=title, latest_version=latest_version)
+        pkg = Package(name=package_name, title=title,
+                      latest_version=latest_version)
         session.add(pkg)
     else:
-        sql.update({Package.title: title,
+        sql.update({Package.name: package_name,
+                    Package.title: title,
                     Package.latest_version: latest_version})
     session.commit()
 
@@ -218,20 +254,30 @@ def insert_version(session, **kwargs):
     session.commit()
 
 
-def delete_version(session, package_id, version):
+def delete_version(session, package_name, version):
+    """
+
+    Parameters
+    ----------
+    session : :class:`sqlalchemy.orm.session.Session`
+    package_name : str
+        The NuGet name of the package - the "id" tag in the NuSpec file.
+    version : str
+    """
     logger.debug("db.delete_version(...)")
-    sql = (session.query(Version)
-            .filter(Version.package_id == package_id)
-            .filter(Version.version == version)
-            )
-    package = sql.first().package
+    sql = (session.query(Version).join(Package)
+           .filter(Package.name == package_name)
+           .filter(Version.version == version)
+           )
+    package = sql.one().package
+    logger.debug(package)
 
     session.delete(sql.one())
     session.commit()
 
     # update the Package.latest_version value, or delete the Package
     versions = (session.query(Version)
-                .filter(Version.package_id == package_id)
+                .filter(Package.name == package_name)
                 ).all()
     if len(versions) > 0:
         package.latest_version = max(v.version for v in versions)
