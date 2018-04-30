@@ -119,21 +119,7 @@ def rebuild():
     # Then we'll get the list of all the packages in the package directory
     # Same data structure as the db data.
     pkg_path = Path(config.SERVER_PATH) / Path(config.PACKAGE_DIR)
-    file_data = {}
-    # XXX: There's got to be a better way!
-    for root, dirs, _ in os.walk(str(pkg_path)):
-        rel_path = Path(root).relative_to(pkg_path)
-        pkg = str(rel_path.parent())
-        if pkg == '.':
-            # We're at a package-level item.
-            file_data[pkg] = []
-        else:
-            # We're looking at a version
-            file_data[pkg].append(rel_path.name)
-
-    logger.debug("Found %d packages." % len(file_data))
-    logger.debug("Found %d versions." % sum(len(v) for v
-                                            in file_data.values()))
+    file_data = _get_packages_from_files(pkg_path)
 
     # Add new packages to the database.
     for pkg, versions in file_data.items():
@@ -154,6 +140,29 @@ def rebuild():
             for version in versions:
                 if version not in file_data[pkg]:
                     remove_from_db(pkg, version)
+
+
+def _get_packages_from_files(pkg_path):
+    """"""
+    if not isinstance(pkg_path, Path):
+        pkg_path = Path(pkg_path)
+
+    data = {}
+    # XXX: There's got to be a better way!
+    for root, dirs, _ in os.walk(str(pkg_path)):
+        rel_path = Path(root).relative_to(pkg_path)
+        pkg = str(rel_path.parent)
+        if pkg != '.':
+            try:
+                data[pkg]
+            except KeyError:
+                data[pkg] = []
+            data[pkg].append(rel_path.name)
+
+    logger.debug("Found %d packages." % len(data))
+    logger.debug("Found %d versions." % sum(len(v) for v in data.values()))
+
+    return data
 
 
 def _check_permissions():
