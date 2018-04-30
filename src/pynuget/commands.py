@@ -106,6 +106,7 @@ def clear(server_path, force=False):
 
 def rebuild():
     """Rebuild the package database."""
+    raise NotImplementedError
     import config
     # First let's get a list of all the packages in the database.
     # TODO: create the session.
