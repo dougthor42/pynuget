@@ -110,7 +110,7 @@ def push():
 
     # Make sure both the ID and the version are provided in the .nuspec file.
     try:
-        metadata, id_, version = core.parse_nuspec(nuspec, ns)
+        metadata, pkg_name, version = core.parse_nuspec(nuspec, ns)
     except ApiException as err:
         return str(err)
     except Exception:
@@ -119,18 +119,18 @@ def push():
     valid_id = re.compile('^[A-Z0-9\.\~\+\_\-]+$', re.IGNORECASE)
 
     # Make sure that the ID and version are sane
-    if not re.match(valid_id, id_) or not re.match(valid_id, version):
+    if not re.match(valid_id, pkg_name) or not re.match(valid_id, version):
         logger.error("Invalid ID or version.")
         return "api_error: Invlaid ID or Version"      # TODO
 
     # and that we don't already have that ID+version in our database
-    if db.validate_id_and_version(session, id_, version):
-        logger.error("Package %s version %s already exists" % (id_, version))
+    if db.validate_id_and_version(session, pkg_name, version):
+        logger.error("Package %s version %s already exists" % (pkg_name, version))
         return "api_error: Package version already exists"      # TODO
 
     # Hash the uploaded file and encode the hash in Base64. For some reason.
     try:
-        hash_, filesize = core.hash_and_encode_file(file, id_, version)
+        hash_, filesize = core.hash_and_encode_file(file, pkg_name, version)
     except Exception as err:
         logger.error("Exception: %s" % err)
         return "api_error: Unable to save file"
@@ -147,7 +147,7 @@ def push():
     logger.debug("Updating database entries.")
 
     db.insert_or_update_package(session,
-                                package_id=id_,
+                                name=pkg_name,
                                 title=et_to_str(metadata.find('nuspec:title', ns)),
                                 latest_version=version)
     db.insert_version(
@@ -172,7 +172,7 @@ def push():
         version=version,
     )
 
-    logger.info("Sucessfully updated database entries for package %s version %s." % (id_, version))
+    logger.info("Sucessfully updated database entries for package %s version %s." % (pkg_name, version))
 
     resp = make_response('', 201)
     return resp
