@@ -195,23 +195,23 @@ def delete(package=None, version=None):
         return "api_error: Missing or Invalid API key"      # TODO
 
     if package is not None:
-        id_ = package
+        pkg_name = package
     else:
-        id_ = request.args.get('id')
+        pkg_name = request.args.get('id')
 
     if version is None:
         version = request.args.get('version')
-    path = core.get_package_path(id_, version)
+    path = core.get_package_path(pkg_name, version)
 
     if os.path.exists(path):
         os.remove(path)
 
     try:
-        db.delete_version(session, id_, version)
+        db.delete_version(session, pkg_name, version)
     except NoResultFound:
-        raise ApiException("Package %s version %s not found." % (id_, version))
+        raise ApiException("Package %s version %s not found." % (pkg_name, version))
 
-    logger.info("Sucessfully deleted package %s version %s." % (id_, version))
+    logger.info("Sucessfully deleted package %s version %s." % (pkg_name, version))
 
 
 @app.route('/download', methods=['GET'])
