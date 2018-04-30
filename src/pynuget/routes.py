@@ -217,12 +217,12 @@ def delete(package=None, version=None):
 @app.route('/download', methods=['GET'])
 def download():
     logger.debug("Route: /download")
-    id_ = request.args.get('id')
+    pkg_name = request.args.get('id')
     version = request.args.get('version')
 
-    path = core.get_package_path(id_, version)
-    db.increment_download_count(session, id_, version)
-    filename = "{}.{}.nupkg".format(id_, version)
+    path = core.get_package_path(pkg_name, version)
+    db.increment_download_count(session, pkg_name, version)
+    filename = "{}.{}.nupkg".format(pkg_name, version)
 
     resp = make_response()
     resp.headers[''] = 'application/zip'
