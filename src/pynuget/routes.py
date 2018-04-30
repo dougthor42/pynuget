@@ -150,6 +150,7 @@ def push():
                                 name=pkg_name,
                                 title=et_to_str(metadata.find('nuspec:title', ns)),
                                 latest_version=version)
+    pkg_id = session.query(db.Package).filter(name=pkg_name).one()
     db.insert_version(
         session,
         authors=et_to_str(metadata.find('nuspec:authors', ns)),
@@ -163,7 +164,7 @@ def push():
         is_prerelease='-' in version,
         license_url=et_to_str(metadata.find('nuspec:licenseUrl', ns)),
         owners=et_to_str(metadata.find('nuspec:owners', ns)),
-        package_id=id_,
+        package_id=pkg_id,
         project_url=et_to_str(metadata.find('nuspec:projectUrl', ns)),
         release_notes=et_to_str(metadata.find('nuspec:releaseNotes', ns)),
         require_license_acceptance=et_to_str(metadata.find('nuspec:requireLicenseAcceptance', ns)) == 'true',
