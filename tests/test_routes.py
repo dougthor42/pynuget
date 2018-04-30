@@ -35,8 +35,11 @@ def test_push():
     pass
 
 
+@pytest.mark.skip("Need to clean out the database first.")
 def test_count(client):
-    pass
+    rv = client.get('/count')
+    assert rv.data == b'0'
+    assert rv.headers['Content-Type'] == 'text/plain; charset=utf-8'
 
 
 def test_delete(client):
