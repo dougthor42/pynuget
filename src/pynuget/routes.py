@@ -18,6 +18,7 @@ from flask import request
 from flask import make_response
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm.exc import NoResultFound
 
 from werkzeug.local import LocalProxy
 
@@ -204,7 +205,10 @@ def delete(package=None, version=None):
     if os.path.exists(path):
         os.remove(path)
 
-    db.delete_version(session, id_, version)
+    try:
+        db.delete_version(session, id_, version)
+    except NoResultFound:
+        raise ApiException("Package %s version %s not found." % (id_, version))
 
     logger.info("Sucessfully deleted package %s version %s." % id_, version)
 
