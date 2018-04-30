@@ -147,7 +147,7 @@ def push():
     logger.debug("Updating database entries.")
 
     db.insert_or_update_package(session,
-                                name=pkg_name,
+                                package_name=pkg_name,
                                 title=et_to_str(metadata.find('nuspec:title', ns)),
                                 latest_version=version)
     pkg_id = (session.query(db.Package)
