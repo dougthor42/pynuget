@@ -158,6 +158,10 @@ def test_push_fail_parse_dependencies(client, put_header):
     #assert rv.status_code == 400
 
 
+def test_push_ok(client, put_header):
+    check_push(201, client, put_header, 'good.nupkg')
+
+
 def test_count(client):
     rv = client.get('/count')
     assert rv.data == b'0'
