@@ -86,7 +86,17 @@ class Version(Base):
 
 
 def count_packages(session):
-    """Count the number of packages on the server."""
+    """
+    Count the number of packages on the server.
+
+    Parameters
+    ----------
+    session : :class:`sqlalchemy.orm.session.Session`
+
+    Returns
+    -------
+    int
+    """
     logger.debug("db.count_packages()")
     return session.query(func.count(Package.package_id)).scalar()
 
@@ -96,6 +106,16 @@ def search_packages(session,
                     order_by=desc(Version.version_download_count),
                     filter_=None,
                     search_query=None):
+    """
+    Parameters
+    ----------
+    session : :class:`sqlalchemy.orm.session.Session`
+    include_prerelease : bool
+    order_by : :class:`sqlalchemy.sql.operators.ColumnOperators`
+    filder_ : str
+        One of ('is_absolute_latest_version', 'is_latest_version').
+    search_query : str
+    """
     logger.debug("db.search_packages(...)")
     query = session.query(Version).join(Package)
 
@@ -135,8 +155,10 @@ def package_updates(session, packages_dict, include_prerelease=False):
 
     Parameters
     ----------
+    session : :class:`sqlalchemy.orm.session.Session`
     packages_dict : dict
-        Dict of {package_id, version}.
+        Dict of {package.name, version}.
+    include_prerelease : bool
     """
     logger.debug("db.package_updates(...)")
     package_versions = ["{}~~{}".format(pkg, vers)
@@ -186,7 +208,15 @@ def validate_id_and_version(session, package_name, version):
     """
     Not exactly sure what this is supposed to do, but I *think* it simply
     makes sure that the given pacakge_id and version exist... So that's
-    what I've decided to make it do."""
+    what I've decided to make it do.
+
+    Parameters
+    ----------
+    session : :class:`sqlalchemy.orm.session.Session`
+    package_name : str
+        The NuGet name of the package - the "id" tag in the NuSpec file.
+    version : str
+    """
     logger.debug("db.validate_id_and_version(...)")
     query = (session.query(Version)
              .filter(Package.name == package_name)
