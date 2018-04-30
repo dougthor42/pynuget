@@ -127,6 +127,7 @@ def rebuild():
 
 def _get_packages_from_files(pkg_path):
     """"""
+    logger.debug("Getting list of packages in package dir.")
     if not isinstance(pkg_path, Path):
         pkg_path = Path(pkg_path)
 
@@ -149,6 +150,7 @@ def _get_packages_from_files(pkg_path):
 
 
 def _add_packages_to_db(file_data):
+    logger.debug("Adding packages to database.")
     raise NotImplementedError
     for pkg, versions in file_data.items():
         # TODO
@@ -162,6 +164,7 @@ def _add_packages_to_db(file_data):
 
 
 def _remove_packages_from_db(file_data, db_data):
+    logger.debug("Removing packages from database.")
     raise NotImplementedError
     for pkg, versions in db_data.items():
         if pkg not in file_data.keys():
