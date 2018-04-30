@@ -235,10 +235,10 @@ def download():
 @app.route('/find_by_id', methods=['GET'])
 def find_by_id():
     logger.debug("Route: /find_by_id")
-    id_ = request.args.get('id')
+    pkg_name = request.args.get('id')
     version = request.args.get('version', default=None)
 
-    results = db.find_by_id(id_, version)
+    results = db.find_by_id(pkg_name, version)
     feed = FeedWriter('FindPackagesById')
     resp = make_response(feed.write_to_output(results))
     resp.headers['Content-Type']
