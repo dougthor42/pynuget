@@ -141,6 +141,11 @@ def test_push_invalid_pkg_version(client, put_header):
     check_push(400, client, put_header, 'invalid_version.nupkg')
 
 
+def test_push_duplicate_pkg_version(client, put_header):
+    check_push(201, client, put_header, 'good.nupkg')
+    check_push(409, client, put_header, 'good.nupkg')
+
+
 def test_count(client):
     rv = client.get('/count')
     assert rv.data == b'0'
