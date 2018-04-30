@@ -33,3 +33,27 @@ def test_index_post(client):
 
 def test_push():
     pass
+
+
+def test_count(client):
+    pass
+
+
+def test_delete(client):
+    pass
+
+
+def test_download(client):
+    pass
+
+
+def test_find_by_id(client):
+    pass
+
+
+def test_search(client):
+    pass
+
+
+def test_updates(client):
+    pass
