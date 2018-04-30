@@ -97,13 +97,13 @@ def determine_dependencies(metadata_element, namespace):
     return dependencies
 
 
-def hash_and_encode_file(file, id_, version):
+def hash_and_encode_file(file, pkg_name, version):
     """
     Parameters
     ----------
     file : :class:`werkzeug.datastructures.FileStorage` object
         The file as retrieved by Flask.
-    id_ : str
+    pkg_name : str
     version : str
     """
     logger.debug("Hashing and encoding uploaded file.")
@@ -127,7 +127,7 @@ def hash_and_encode_file(file, id_, version):
         # just been floating around in magic Flask land.
         local_path = Path(app.config['SERVER_PATH']) / Path(app.config['PACKAGE_DIR'])
         local_path = os.path.join(str(local_path),
-                                  id_,
+                                  pkg_name,
                                   version + ".nupkg",
                                   )
 
