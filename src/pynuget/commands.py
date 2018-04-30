@@ -131,10 +131,10 @@ def _db_data_to_dict(db_data):
     data = {}
     for row in db_data:
         try:
-            data[row.package.title]
+            data[row.package.name]
         except KeyError:
-            data[row.package.title] = []
-        data[row.package.title].append(row.version)
+            data[row.package.name] = []
+        data[row.package.name].append(row.version)
 
     logger.debug("Found %d database packages." % len(data))
     logger.debug("Found %d database versions." % sum(len(v) for v
