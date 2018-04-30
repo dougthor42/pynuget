@@ -168,8 +168,15 @@ def test_count(client):
     assert rv.headers['Content-Type'] == 'text/plain; charset=utf-8'
 
 
-def test_delete(client):
-    pass
+def test_delete(client, put_header):
+    check_push(201, client, put_header, 'good.nupkg')
+    rv = client.delete(
+        '/api/v2/package/NuGetTest/0.0.1',
+        headers=put_header,
+        follow_redirects=True,
+        data=None,
+    )
+    assert rv.status_code == 204
 
 
 def test_download(client):
