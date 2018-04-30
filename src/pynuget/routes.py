@@ -210,7 +210,7 @@ def delete(package=None, version=None):
     except NoResultFound:
         raise ApiException("Package %s version %s not found." % (id_, version))
 
-    logger.info("Sucessfully deleted package %s version %s." % id_, version)
+    logger.info("Sucessfully deleted package %s version %s." % (id_, version))
 
 
 @app.route('/download', methods=['GET'])
