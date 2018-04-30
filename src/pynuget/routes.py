@@ -244,9 +244,10 @@ def download():
 def find_by_id():
     logger.debug("Route: /find_by_id")
     pkg_name = request.args.get('id')
-    version = request.args.get('version', default=None)
+    version = request.args.get('semVerLevel', default=None)
 
-    results = db.find_by_pkg_name(pkg_name, version)
+    results = db.find_by_pkg_name(session, pkg_name, version)
+    logger.debug(results)
     feed = FeedWriter('FindPackagesById')
     resp = make_response(feed.write_to_output(results))
     resp.headers['Content-Type']
