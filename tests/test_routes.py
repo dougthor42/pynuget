@@ -1,18 +1,35 @@
 # -*- coding: utf-8 -*-
 """
 """
+import os
 
 import pytest
 
 from pynuget import app
 from pynuget import routes
+from pynuget import commands
+
+
+DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
 
 @pytest.fixture
 def client():
+    # override the default paths
+    old_server_path = app.config['SERVER_PATH']
+    old_package_dir = app.config['PACKAGE_DIR']
+    app.config['SERVER_PATH'] = DATA_DIR
+    app.config['PACKAGE_DIR'] = '.'
+    commands._create_directories(app.config['SERVER_PATH'],
+                                 app.config['PACKAGE_DIR'])
+    commands._create_db(app.config['DB_BACKEND'],
+                        app.config['DB_NAME'],
+                        app.config['SERVER_PATH'])
 
     client = app.test_client()
     yield client
+    app.config['SERVER_PATH'] = old_server_path
+    app.config['PACKAGE_DIR'] = old_package_dir
 
 
 def test_root_get(client):
@@ -35,7 +52,6 @@ def test_push():
     pass
 
 
-@pytest.mark.skip("Need to clean out the database first.")
 def test_count(client):
     rv = client.get('/count')
     assert rv.data == b'0'
