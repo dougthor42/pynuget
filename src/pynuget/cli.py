@@ -140,4 +140,4 @@ def run_clear(args):
 
 
 def run_rebuild(args):
-    pass
+    commands.rebuild()
