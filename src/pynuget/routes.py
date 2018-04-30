@@ -238,7 +238,7 @@ def find_by_id():
     pkg_name = request.args.get('id')
     version = request.args.get('version', default=None)
 
-    results = db.find_by_id(pkg_name, version)
+    results = db.find_by_pkg_name(pkg_name, version)
     feed = FeedWriter('FindPackagesById')
     resp = make_response(feed.write_to_output(results))
     resp.headers['Content-Type']
