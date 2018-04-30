@@ -121,25 +121,8 @@ def rebuild():
     pkg_path = Path(config.SERVER_PATH) / Path(config.PACKAGE_DIR)
     file_data = _get_packages_from_files(pkg_path)
 
-    # Add new packages to the database.
-    for pkg, versions in file_data.items():
-        # TODO
-        # Check that the package exists in the database.
-        if not package_in_db(pkg):
-            add_to_db(pkg)
-
-        for version in versions:
-            if not version_in_db(pkg, version):
-                add_to_db(pkg, version)
-
-    # Remove missing packages from the database.
-    for pkg, versions in db_data.items():
-        if pkg not in file_data.keys():
-            remove_from_db(pkg):
-        else:
-            for version in versions:
-                if version not in file_data[pkg]:
-                    remove_from_db(pkg, version)
+    _add_packages_to_db(file_data)
+    _remove_packages_from_db(file_data, db_data)
 
 
 def _get_packages_from_files(pkg_path):
@@ -163,6 +146,30 @@ def _get_packages_from_files(pkg_path):
     logger.debug("Found %d versions." % sum(len(v) for v in data.values()))
 
     return data
+
+
+def _add_packages_to_db(file_data):
+    raise NotImplementedError
+    for pkg, versions in file_data.items():
+        # TODO
+        # Check that the package exists in the database.
+        if not package_in_db(pkg):
+            db.insert_or_update_package(session, None, pkg, versions[0])
+
+        for version in versions:
+            if not version_in_db(pkg, version):
+                db.insert_version(session, package_id=None, pkg, version)
+
+
+def _remove_packages_from_db(file_data, db_data):
+    raise NotImplementedError
+    for pkg, versions in db_data.items():
+        if pkg not in file_data.keys():
+            db.delete_version(pkg)
+        else:
+            for version in versions:
+                if version not in file_data[pkg]:
+                    db.delete_version(pkg, version)
 
 
 def _check_permissions():
