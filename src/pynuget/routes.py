@@ -110,7 +110,7 @@ def push():
 
     # Make sure both the ID and the version are provided in the .nuspec file.
     try:
-        metadata, id_, version = core.parse_nuspec(nuspec, ns)
+        metadata, pkg_name, version = core.parse_nuspec(nuspec, ns)
     except ApiException as err:
         return str(err)
     except Exception:
@@ -119,18 +119,18 @@ def push():
     valid_id = re.compile('^[A-Z0-9\.\~\+\_\-]+$', re.IGNORECASE)
 
     # Make sure that the ID and version are sane
-    if not re.match(valid_id, id_) or not re.match(valid_id, version):
+    if not re.match(valid_id, pkg_name) or not re.match(valid_id, version):
         logger.error("Invalid ID or version.")
         return "api_error: Invlaid ID or Version"      # TODO
 
     # and that we don't already have that ID+version in our database
-    if db.validate_id_and_version(session, id_, version):
-        logger.error("Package %s version %s already exists" % (id_, version))
+    if db.validate_id_and_version(session, pkg_name, version):
+        logger.error("Package %s version %s already exists" % (pkg_name, version))
         return "api_error: Package version already exists"      # TODO
 
     # Hash the uploaded file and encode the hash in Base64. For some reason.
     try:
-        hash_, filesize = core.hash_and_encode_file(file, id_, version)
+        hash_, filesize = core.hash_and_encode_file(file, pkg_name, version)
     except Exception as err:
         logger.error("Exception: %s" % err)
         return "api_error: Unable to save file"
@@ -147,9 +147,10 @@ def push():
     logger.debug("Updating database entries.")
 
     db.insert_or_update_package(session,
-                                package_id=id_,
+                                name=pkg_name,
                                 title=et_to_str(metadata.find('nuspec:title', ns)),
                                 latest_version=version)
+    pkg_id = session.query(db.Package).filter(name=pkg_name).one()
     db.insert_version(
         session,
         authors=et_to_str(metadata.find('nuspec:authors', ns)),
@@ -163,7 +164,7 @@ def push():
         is_prerelease='-' in version,
         license_url=et_to_str(metadata.find('nuspec:licenseUrl', ns)),
         owners=et_to_str(metadata.find('nuspec:owners', ns)),
-        package_id=id_,
+        package_id=pkg_id,
         project_url=et_to_str(metadata.find('nuspec:projectUrl', ns)),
         release_notes=et_to_str(metadata.find('nuspec:releaseNotes', ns)),
         require_license_acceptance=et_to_str(metadata.find('nuspec:requireLicenseAcceptance', ns)) == 'true',
@@ -172,7 +173,7 @@ def push():
         version=version,
     )
 
-    logger.info("Sucessfully updated database entries for package %s version %s." % (id_, version))
+    logger.info("Sucessfully updated database entries for package %s version %s." % (pkg_name, version))
 
     resp = make_response('', 201)
     return resp
@@ -194,34 +195,34 @@ def delete(package=None, version=None):
         return "api_error: Missing or Invalid API key"      # TODO
 
     if package is not None:
-        id_ = package
+        pkg_name = package
     else:
-        id_ = request.args.get('id')
+        pkg_name = request.args.get('id')
 
     if version is None:
         version = request.args.get('version')
-    path = core.get_package_path(id_, version)
+    path = core.get_package_path(pkg_name, version)
 
     if os.path.exists(path):
         os.remove(path)
 
     try:
-        db.delete_version(session, id_, version)
+        db.delete_version(session, pkg_name, version)
     except NoResultFound:
-        raise ApiException("Package %s version %s not found." % (id_, version))
+        raise ApiException("Package %s version %s not found." % (pkg_name, version))
 
-    logger.info("Sucessfully deleted package %s version %s." % (id_, version))
+    logger.info("Sucessfully deleted package %s version %s." % (pkg_name, version))
 
 
 @app.route('/download', methods=['GET'])
 def download():
     logger.debug("Route: /download")
-    id_ = request.args.get('id')
+    pkg_name = request.args.get('id')
     version = request.args.get('version')
 
-    path = core.get_package_path(id_, version)
-    db.increment_download_count(session, id_, version)
-    filename = "{}.{}.nupkg".format(id_, version)
+    path = core.get_package_path(pkg_name, version)
+    db.increment_download_count(session, pkg_name, version)
+    filename = "{}.{}.nupkg".format(pkg_name, version)
 
     resp = make_response()
     resp.headers[''] = 'application/zip'
@@ -234,10 +235,10 @@ def download():
 @app.route('/find_by_id', methods=['GET'])
 def find_by_id():
     logger.debug("Route: /find_by_id")
-    id_ = request.args.get('id')
+    pkg_name = request.args.get('id')
     version = request.args.get('version', default=None)
 
-    results = db.find_by_id(id_, version)
+    results = db.find_by_pkg_name(pkg_name, version)
     feed = FeedWriter('FindPackagesById')
     resp = make_response(feed.write_to_output(results))
     resp.headers['Content-Type']

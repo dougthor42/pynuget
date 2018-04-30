@@ -25,9 +25,9 @@ ADO_METADATA_URL = ADO_BASE_URL + "/metadata"
 
 class FeedWriter(object):
 
-    def __init__(self, id_):
+    def __init__(self, feed_name):
         logger.debug("Initializing FeedWriter")
-        self.feed_id = id_
+        self.feed_name = feed_name
         self.base_url = 'TBD'
 
     def write(self, results):
@@ -46,12 +46,12 @@ class FeedWriter(object):
         logger.debug("FeedWriter.begin_feed()")
         self.feed = et.fromstring(BASE)
         node = et.Element('id')
-        node.text = self.base_url + str(self.feed_id)
+        node.text = self.base_url + str(self.feed_name)
         self.feed.append(node)
         self.add_with_attributes(
             self.feed,
             'title',
-            self.feed_id,
+            self.feed_name,
             {'type': 'text'},
         )
         node = et.Element('updated')
@@ -61,7 +61,7 @@ class FeedWriter(object):
             self.feed,
             'link',
             None,
-            {'rel': 'self', 'title': self.feed_id, 'href': self.feed_id},
+            {'rel': 'self', 'title': self.feed_name, 'href': self.feed_name},
         )
 
     def add_entry(self, row):

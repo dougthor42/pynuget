@@ -174,9 +174,9 @@ def package_updates(session, packages_dict, include_prerelease=False):
     return query.order_by(Version.package_id).all()
 
 
-def find_by_id(session, package_name, version=None):
+def find_by_pkg_name(session, package_name, version=None):
     """
-    Find a package by ID and version. If no version given, return all.
+    Find a package by name and version. If no version given, return all.
 
     Parameters
     ----------

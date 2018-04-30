@@ -102,12 +102,12 @@ def test_package_updates(session):
     assert len(result) == 0
 
 
-def test_find_by_id(session):
-    result_1 = db.find_by_id(session, 'dummy')
+def test_find_by_pkg_name(session):
+    result_1 = db.find_by_pkg_name(session, 'dummy')
     assert type(result_1) == list
     assert len(result_1) == 3
     assert type(result_1[0]) == db.Version
-    result_2 = db.find_by_id(session, 'dummy', "0.0.1")
+    result_2 = db.find_by_pkg_name(session, 'dummy', "0.0.1")
     assert len(result_2) == 1
     assert result_2[0].version == "0.0.1"
 
