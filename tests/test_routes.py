@@ -58,6 +58,28 @@ def put_header():
     return header
 
 
+def check_push(expected_code, client, header, file=None):
+    data = None
+    if file:
+        nupkg_file = os.path.join(DATA_DIR, file)
+        openf = open(nupkg_file, 'rb')
+        data = {'package': (openf, 'filename.nupkg')}
+
+    rv = client.put(
+        '/api/v2/package/',
+        headers=header,
+        follow_redirects=True,
+        data=data,
+    )
+
+    try:
+        openf.close()
+    except Exception:
+        pass
+
+    assert rv.status_code == expected_code
+
+
 def test_root_get(client):
     rv = client.get('/web')
     assert b'Hello World!' in rv.data
@@ -80,31 +102,16 @@ def test_push():
 
 def test_push_no_auth(client, put_header):
     put_header.pop('X-Nuget-ApiKey')
-    rv = client.put(
-        '/api/v2/package/',
-        headers=put_header,
-        follow_redirects=True,
-    )
-    assert rv.status_code == 401
+    check_push(401, client, put_header)
 
 
 def test_push_invalid_auth(client, put_header):
     app.config['API_KEYS'] = ""
-    rv = client.put(
-        '/api/v2/package/',
-        headers=put_header,
-        follow_redirects=True,
-    )
-    assert rv.status_code == 401
+    check_push(401, client, put_header)
 
 
 def test_push_no_file(client, put_header):
-    rv = client.put(
-        '/api/v2/package/',
-        headers=put_header,
-        follow_redirects=True,
-    )
-    assert rv.status_code == 409
+    check_push(409, client, put_header)
 
 
 def test_push_invalid_file(client, put_header):
@@ -119,56 +126,19 @@ def test_push_invalid_file(client, put_header):
 
 
 def test_push_no_nuspec(client, put_header):
-    nupkg_file = os.path.join(DATA_DIR, 'no_nuspec.nupkg')
-    with open(nupkg_file, 'rb') as openf:
-        data = {'package': (openf, 'filename.nupkg')}
-        rv = client.put(
-            '/api/v2/package/',
-            headers=put_header,
-            follow_redirects=True,
-            data=data,
-        )
-        assert rv.status_code == 400
+    check_push(400, client, put_header, 'no_nuspec.nupkg')
 
 
 def test_push_multiple_nuspec(client, put_header):
-    nupkg_file = os.path.join(DATA_DIR, 'multiple_nuspec.nupkg')
-    with open(nupkg_file, 'rb') as openf:
-        data = {'package': (openf, 'filename.nupkg')}
-        rv = client.put(
-            '/api/v2/package/',
-            headers=put_header,
-            follow_redirects=True,
-            data=data,
-        )
-        assert rv.status_code == 400
+    check_push(400, client, put_header, 'multiple_nuspec.nupkg')
 
 
 def test_push_invalid_pkg_name(client, put_header):
-    nupkg_file = os.path.join(DATA_DIR, 'invalid_name.nupkg')
-    with open(nupkg_file, 'rb') as openf:
-        data = {'package': (openf, 'filename.nupkg')}
-        rv = client.put(
-            '/api/v2/package/',
-            headers=put_header,
-            follow_redirects=True,
-            data=data,
-        )
-        assert rv.status_code == 400
+    check_push(400, client, put_header, 'invalid_name.nupkg')
 
 
 def test_push_invalid_pkg_version(client, put_header):
-    nupkg_file = os.path.join(DATA_DIR, 'invalid_version.nupkg')
-    with open(nupkg_file, 'rb') as openf:
-        data = {'package': (openf, 'filename.nupkg')}
-        rv = client.put(
-            '/api/v2/package/',
-            headers=put_header,
-            follow_redirects=True,
-            data=data,
-        )
-        assert rv.status_code == 400
-
+    check_push(400, client, put_header, 'invalid_version.nupkg')
 
 
 def test_count(client):
