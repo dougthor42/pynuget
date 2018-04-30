@@ -106,6 +106,7 @@ def clear(server_path, force=False):
 
 def rebuild():
     """Rebuild the package database."""
+    import config
     # First let's get a list of all the packages in the database.
     # TODO: create the session.
     logger.debug("Getting database packages and versions.")
@@ -132,7 +133,7 @@ def _db_data_to_dict(db_data):
             data[row.package.title]
         except KeyError:
             data[row.package.title] = []
-        data[row.package.title].append(row.version.version)
+        data[row.package.title].append(row.version)
 
     logger.debug("Found %d database packages." % len(data))
     logger.debug("Found %d database versions." % sum(len(v) for v
@@ -187,7 +188,8 @@ def _add_packages_to_db(file_data):
 
         for version in versions:
             if not version_in_db(pkg, version):
-                db.insert_version(session, package_id=None, pkg, version)
+                db.insert_version(session, package_id=None, title=pkg,
+                                  version=version)
 
 
 def _remove_packages_from_db(file_data, db_data):
