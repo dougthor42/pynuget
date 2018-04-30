@@ -240,6 +240,7 @@ def download():
 
 
 @app.route('/find_by_id', methods=['GET'])
+@app.route('/FindPackagesById()', methods=['GET'])
 def find_by_id():
     logger.debug("Route: /find_by_id")
     pkg_name = request.args.get('id')
