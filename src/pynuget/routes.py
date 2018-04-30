@@ -15,7 +15,7 @@ from zipfile import ZipFile
 # Third-Party
 from flask import g
 from flask import request
-from flask import Response
+from flask import make_response
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -78,7 +78,9 @@ def index():
     if request.method == 'PUT':
         return push()
 
-    resp = Response("<?xml version='1.0' encoding='utf-8' standalone='yes'?>")
+    resp = make_response(
+        "<?xml version='1.0' encoding='utf-8' standalone='yes'?>",
+    )
     resp.headers['Content-Type'] = 'text/plain; charset=utf-8'
     return resp
 
@@ -171,15 +173,14 @@ def push():
 
     logger.info("Sucessfully updated database entries for package %s version %s." % (id_, version))
 
-    resp = Response()
-    resp.status = 201
+    resp = make_response('', 201)
     return resp
 
 
 @app.route('/count', methods=['GET'])
 def count():
     logger.debug("Route: /count")
-    resp = Response(str(db.count_packages(session)))
+    resp = make_response(str(db.count_packages(session)))
     resp.headers['Content-Type'] = 'text/plain; charset=utf-8'
     return resp
 
@@ -218,7 +219,7 @@ def download():
     db.increment_download_count(session, id_, version)
     filename = "{}.{}.nupkg".format(id_, version)
 
-    resp = Response()
+    resp = make_response()
     resp.headers[''] = 'application/zip'
     resp.headers['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
     resp.headers['X-Accel-Redirect'] = path
@@ -234,7 +235,7 @@ def find_by_id():
 
     results = db.find_by_id(id_, version)
     feed = FeedWriter('FindPackagesById')
-    resp = Response(feed.write_to_output(results))
+    resp = make_response(feed.write_to_output(results))
     resp.headers['Content-Type']
     return resp
 
@@ -255,7 +256,7 @@ def search():
                                  )
 
     feed = FeedWriter('Search')
-    resp = Response(feed.write_to_output(results))
+    resp = make_response(feed.write_to_output(results))
     resp.headers['Content-Type'] = FEED_CONTENT_TYPE_HEADER
     return resp
 
@@ -271,6 +272,6 @@ def updates():
     results = db.package_updates(session, pkg_to_vers, include_prerelease)
 
     feed = FeedWriter('GetUpdates')
-    resp = Response(feed.write_to_output(results))
+    resp = make_response(feed.write_to_output(results))
     resp.headers['Content-Type'] = FEED_CONTENT_TYPE_HEADER
     return resp
