@@ -185,7 +185,7 @@ def find_by_pkg_name(session, package_name, version=None):
         The NuGet name of the package - the "id" tag in the NuSpec file.
     version : str
     """
-    logger.debug("db.find_by_id(...)")
+    logger.debug("db.find_by_pkg_name(...)")
     query = (session.query(Version)
              .filter(Package.name == package_name)
              )
