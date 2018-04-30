@@ -289,7 +289,8 @@ def delete_version(session, package_name, version):
         The NuGet name of the package - the "id" tag in the NuSpec file.
     version : str
     """
-    logger.debug("db.delete_version(...)")
+    msg = "db.delete_version({}, {})"
+    logger.debug(msg.format(package_name, version))
     sql = (session.query(Version).join(Package)
            .filter(Package.name == package_name)
            .filter(Version.version == version)

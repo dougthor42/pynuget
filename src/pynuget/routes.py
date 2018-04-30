@@ -150,7 +150,10 @@ def push():
                                 name=pkg_name,
                                 title=et_to_str(metadata.find('nuspec:title', ns)),
                                 latest_version=version)
-    pkg_id = session.query(db.Package).filter(name=pkg_name).one()
+    pkg_id = (session.query(db.Package)
+              .filter(db.Package.name == pkg_name).one()
+              ).package_id
+    logger.debug("package_id = %d" % pkg_id)
     db.insert_version(
         session,
         authors=et_to_str(metadata.find('nuspec:authors', ns)),
