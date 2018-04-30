@@ -212,9 +212,12 @@ def delete(package=None, version=None):
     try:
         db.delete_version(session, pkg_name, version)
     except NoResultFound:
-        raise ApiException("Package %s version %s not found." % (pkg_name, version))
+        msg = "Version '{}' of Package '{}' was not found."
+        return msg.format(pkg_name, version), 404
 
     logger.info("Sucessfully deleted package %s version %s." % (pkg_name, version))
+
+    return '', 204
 
 
 @app.route('/download', methods=['GET'])
