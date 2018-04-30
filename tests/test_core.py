@@ -67,9 +67,9 @@ def test_parse_nuspec():
         core.parse_nuspec(no_version, NAMESPACE)
 
     good = et.parse(os.path.join(DATA_DIR, "good.nuspec"))
-    nuspec, id_, version = core.parse_nuspec(good, NAMESPACE)
+    nuspec, pkg_name, version = core.parse_nuspec(good, NAMESPACE)
     assert isinstance(nuspec, et.Element)
-    assert id_ == 'NuGetTest'
+    assert pkg_name == 'NuGetTest'
     assert version == '0.0.1'
 
 
