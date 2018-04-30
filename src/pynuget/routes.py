@@ -89,12 +89,12 @@ def index():
 def push():
     logger.debug("push()")
     if not core.require_auth(request.headers):
-        return "api_error: Missing or Invalid API key"      # TODO
+        return "api_error: Missing or Invalid API key", 401
 
     logger.debug("Checking for uploaded file.")
     if 'package' not in request.files:
         logger.error("Package file was not uploaded.")
-        return "error: File not uploaded"
+        return "error: File not uploaded", 409
     file = request.files['package']
 
     # Open the zip file that was sent and extract out the .nuspec file."
@@ -102,7 +102,7 @@ def push():
         nuspec = core.extract_nuspec(file)
     except Exception as err:
         logger.error("Exception: %s" % err)
-        return "api_error: Zero or multiple nuspec files found"
+        return "api_error: Zero or multiple nuspec files found", 400
 
     # The NuSpec XML file uses namespaces.
     # TODO: What if the namespace changes?
@@ -112,34 +112,35 @@ def push():
     try:
         metadata, pkg_name, version = core.parse_nuspec(nuspec, ns)
     except ApiException as err:
-        return str(err)
-    except Exception:
-        raise
+        return str(err), 400
+    except Exception as err:
+        logger.error(err)
+        return str(err), 400
 
     valid_id = re.compile('^[A-Z0-9\.\~\+\_\-]+$', re.IGNORECASE)
 
     # Make sure that the ID and version are sane
     if not re.match(valid_id, pkg_name) or not re.match(valid_id, version):
         logger.error("Invalid ID or version.")
-        return "api_error: Invlaid ID or Version"      # TODO
+        return "api_error: Invlaid ID or Version", 400
 
     # and that we don't already have that ID+version in our database
     if db.validate_id_and_version(session, pkg_name, version):
         logger.error("Package %s version %s already exists" % (pkg_name, version))
-        return "api_error: Package version already exists"      # TODO
+        return "api_error: Package version already exists", 409
 
     # Hash the uploaded file and encode the hash in Base64. For some reason.
     try:
         hash_, filesize = core.hash_and_encode_file(file, pkg_name, version)
     except Exception as err:
         logger.error("Exception: %s" % err)
-        return "api_error: Unable to save file"
+        return "api_error: Unable to save file", 500
 
     try:
         dependencies = core.determine_dependencies(metadata, ns)
     except Exception as err:
         logger.error("Exception: %s" % err)
-        return "api_error: Unable to parse dependencies."
+        return "api_error: Unable to parse dependencies.", 400
 
     logger.debug(dependencies)
 
