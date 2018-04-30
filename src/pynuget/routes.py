@@ -72,6 +72,7 @@ def root():
 
 @app.route('/', methods=['GET', 'PUT', 'DELETE'])
 @app.route('/index', methods=['GET', 'PUT', 'DELETE'])
+@app.route('/api/v2/package/', methods=['GET', 'PUT', 'DELETE'])
 def index():
     logger.debug("Route: /index")
     if request.method == 'PUT':
@@ -184,13 +185,19 @@ def count():
 
 
 @app.route('/delete', methods=['DELETE'])
-def delete():
+@app.route('/api/v2/package/<package>/<version>', methods=['DELETE'])
+def delete(package=None, version=None):
     logger.debug("Route: /delete")
     if not core.require_auth(request.headers):
         return "api_error: Missing or Invalid API key"      # TODO
 
-    id_ = request.args.get('id')
-    version = request.args.get('version')
+    if package is not None:
+        id_ = package
+    else:
+        id_ = request.args.get('id')
+
+    if version is None:
+        version = request.args.get('version')
     path = core.get_package_path(id_, version)
 
     if os.path.exists(path):
