@@ -110,11 +110,7 @@ def rebuild():
     # TODO: create the session.
     logger.debug("Getting database packages and versions.")
     db_data = db.search_packages(session, include_prerelease=True)
-    # TODO: munge the data
-    # A dict of {'pkg_name': ['vers1', 'vers2']} should work pretty well
-    logger.debug("Found %d database packages." % len(db_data))
-    logger.debug("Found %d database versions." % sum(len(v) for v
-                                                     in db_data.values()))
+    db_data = _db_data_to_dict(db_data)
 
     # Then we'll get the list of all the packages in the package directory
     # Same data structure as the db data.
@@ -123,6 +119,25 @@ def rebuild():
 
     _add_packages_to_db(file_data)
     _remove_packages_from_db(file_data, db_data)
+
+
+def _db_data_to_dict(db_data):
+    """
+    Convert the result of db.search_packages into a dict of
+        {'pkg': ['vers1', 'vers2', ...]}
+    """
+    data = {}
+    for row in db_data:
+        try:
+            data[row.package.title]
+        except KeyError:
+            data[row.package.title] = []
+        data[row.package.title].append(row.version.version)
+
+    logger.debug("Found %d database packages." % len(data))
+    logger.debug("Found %d database versions." % sum(len(v) for v
+                                                     in data.values()))
+    return data
 
 
 def _get_packages_from_files(pkg_path):
