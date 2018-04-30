@@ -195,7 +195,7 @@ def parse_nuspec(nuspec, ns=None):
     Returns
     -------
     metadata : :class:`xml.etree.ElementTree.Element`
-    id_ : str
+    pkg_name : str
     version : str
     """
     metadata = nuspec.find('nuspec:metadata', ns)
@@ -205,10 +205,10 @@ def parse_nuspec(nuspec, ns=None):
         raise ApiException(msg)
 
     # TODO: I think I need different error handling around `.text`.
-    id_ = metadata.find('nuspec:id', ns)
+    pkg_name = metadata.find('nuspec:id', ns)
     version = metadata.find('nuspec:version', ns)
-    if id_ is None or version is None:
+    if pkg_name is None or version is None:
         logger.error("ID or version missing from NuSpec file.")
         raise ApiException("api_error: ID or version missing")        # TODO
 
-    return metadata, id_.text, version.text
+    return metadata, pkg_name.text, version.text
