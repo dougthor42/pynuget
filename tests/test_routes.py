@@ -146,6 +146,18 @@ def test_push_duplicate_pkg_version(client, put_header):
     check_push(409, client, put_header, 'good.nupkg')
 
 
+@pytest.mark.skip("Gotta figure this one out...")
+def test_push_fail_to_save_file(client, put_header):
+    pass
+    #assert rv.status_code == 500
+
+
+@pytest.mark.skip("Gotta figure this one out...")
+def test_push_fail_parse_dependencies(client, put_header):
+    pass
+    #assert rv.status_code == 400
+
+
 def test_count(client):
     rv = client.get('/count')
     assert rv.data == b'0'
