@@ -27,7 +27,8 @@ class ApiException(PyNuGetException):
 
 class NuGetResponse(object):
 
-    def to_json(self):
+    @property
+    def json(self):
         """Return the object as JSON to send to NuGet"""
         return json.dumps(self.json_mapping(), sort_keys=True)
 

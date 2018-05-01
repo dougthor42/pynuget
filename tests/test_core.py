@@ -188,7 +188,7 @@ class TestNuGetResponse():
 
         expected = ('{"@id": "https://api.nuget.org/v3-flatcontainer/",'
                     ' "@type": "PackageBaseAddress/3.0.0"}')
-        assert obj.to_json() == expected
+        assert obj.json == expected
 
         obj = core.ServiceIndexResourceResponse(
             url="https://api.nuget.org/v3-flatcontainer/",
@@ -203,4 +203,4 @@ class TestNuGetResponse():
             ' "comment": "foo"'
             '}'
         )
-        assert obj.to_json() == expected
+        assert obj.json == expected
