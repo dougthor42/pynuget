@@ -31,7 +31,7 @@ class NuGetResponse(object):
         pass
 
 
-class ServiceIndex(NuGetResponse):
+class ServiceIndexResponse(NuGetResponse):
 
     def __init__(self, version, resources):
         """
@@ -49,7 +49,7 @@ class ServiceIndex(NuGetResponse):
         return mapping
 
 
-class ServiceIndexResource(NuGetResponse):
+class ServiceIndexResourceResponse(NuGetResponse):
 
     def __init__(self, url, resource_type, comment=None):
         """
