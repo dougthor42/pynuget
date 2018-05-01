@@ -35,6 +35,30 @@ class ServiceIndex(NuGetResponse):
     pass
 
 
+class ServiceIndexResource(NuGetResponse):
+
+    def __init__(self, url, resource_type, comment=None):
+        """
+        url : str
+        resource_type : str
+        comment : str, optional
+        """
+        self.url = url
+        self.resource_type = resource_type
+        self.comment = comment
+
+    def json_mapping(self):
+        """Defines how the python objects map to JSON"""
+        mapping = {
+            "@id": self.url,
+            "@type": self.resource_type,
+        }
+        if self.comment is not None:
+            mapping['comment'] = self.comment
+
+        return mapping
+
+
 class SearchResponse(NuGetResponse):
     pass
 
