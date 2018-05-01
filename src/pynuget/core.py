@@ -30,7 +30,22 @@ class NuGetResponse(object):
     @property
     def json(self):
         """Return the object as JSON to send to NuGet"""
-        return json.dumps(self.json_mapping(), sort_keys=True)
+        encoder = json.JSONEncoder(sort_keys=True, default=self._map_json)
+        return encoder.encode(self.__dict__)
+
+    def _map_json(self, obj):
+        # TODO: recursion
+        for key in obj.keys():
+            # Remove keys that have None values.
+            if obj[key] is None:
+                obj.pop(key)
+                continue
+            # Rename ones that need to be renamed
+            if hasattr(self, 'json_map') and key in self.json_map.keys():
+                new_key = self.json_map[key]
+                obj[new_key] = obj[key]
+                obj.pop(key)
+        return obj
 
 
 class ServiceIndexResponse(NuGetResponse):
@@ -38,20 +53,25 @@ class ServiceIndexResponse(NuGetResponse):
     def __init__(self, version, resources):
         """
         version : str
-        resources : list of :class:`ServiceIndexResource`
+        resources : list of :class:`ServiceIndexResourceResponse`
         """
         self.version = version
         self.resources = resources
 
-    def json_mapping(self):
-        mapping = {
-            "version": self.version,
-            "resources": self.resources,
-        }
-        return mapping
+#    def json_mapping(self):
+#        mapping = {
+#            "version": self.version,
+#            "resources": [r.json for r in self.resources],
+#        }
+#        return mapping
 
 
 class ServiceIndexResourceResponse(NuGetResponse):
+
+    json_map = {
+        "url": "@id",
+        "resouce_type": "@type"
+    }
 
     def __init__(self, url, resource_type, comment=None):
         """
@@ -63,16 +83,16 @@ class ServiceIndexResourceResponse(NuGetResponse):
         self.resource_type = resource_type
         self.comment = comment
 
-    def json_mapping(self):
-        """Defines how the python objects map to JSON"""
-        mapping = {
-            "@id": self.url,
-            "@type": self.resource_type,
-        }
-        if self.comment is not None:
-            mapping['comment'] = self.comment
-
-        return mapping
+#    def json_mapping(self):
+#        """Defines how the python objects map to JSON"""
+#        mapping = {
+#            "@id": self.url,
+#            "@type": self.resource_type,
+#        }
+#        if self.comment is not None:
+#            mapping['comment'] = self.comment
+#
+#        return mapping
 
 
 class SearchResponse(NuGetResponse):
