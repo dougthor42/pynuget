@@ -212,3 +212,7 @@ def parse_nuspec(nuspec, ns=None):
         raise ApiException("api_error: ID or version missing")        # TODO
 
     return metadata, pkg_name.text, version.text
+
+
+def jsonify_search_results():
+    pass

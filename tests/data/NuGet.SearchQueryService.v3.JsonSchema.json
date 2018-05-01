@@ -1,0 +1,58 @@
+{
+    "$schema": "http://json-schema.org/schema#",
+    "id": "NuGet.SearchQueryService.v3.json",
+
+    "definitions": {
+        "str_or_array_of_str": {
+            "anyOf": [
+                { "type": "string" },
+                { "type": "array", "items": { "type": "string" } }
+            ]
+        },
+
+        "version_data": {
+            "type": "object",
+            "properties": {
+                "id": { "type": "string" },
+                "version": { "type": "string" },
+                "downloads": { "type": "integer" }
+            },
+            "required": ["@id", "version", "downloads"]
+        },
+
+        "pkg_data": {
+            "type": "object",
+            "properties": {
+                "id": { "type": "string" },
+                "version": { "type": "string" },
+                "description": { "type": "string" },
+                "versions": {
+                    "type": "array",
+                    "items": { "$ref": "#/definitions/version_data" }
+                },
+                "authors": { "$ref": "#/definitions/str_or_array_of_str" },
+                "iconUrl": { "type": "string" },
+                "licenseUrl": { "type": "string" },
+                "owners": { "$ref": "#/definitions/str_or_array_of_str" },
+                "projectUrl": { "type": "string" },
+                "registration": { "type": "string" },
+                "summary": { "type": "string" },
+                "tags": { "$ref": "#/definitions/str_or_array_of_str" },
+                "title": { "type": "string" },
+                "totalDownloads": { "type": "integer" },
+                "verified": { "type": "boolean" }
+            },
+            "required": [ "id", "version", "versions" ]
+        }
+    },
+
+    "type": "object",
+    "properties": {
+        "totalHits": { "type": "integer" },
+        "data": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/pkg_data" }
+        }
+    },
+    "required": [ "totalHits", "data" ]
+}
