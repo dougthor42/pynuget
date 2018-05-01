@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/schema#",
-    "id": "NuGet.SearchQueryService.v3.json",
+    "id": "NuGet.Api.v3.SearchQueryService.json",
 
     "definitions": {
         "str_or_array_of_str": {
