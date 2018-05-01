@@ -32,7 +32,21 @@ class NuGetResponse(object):
 
 
 class ServiceIndex(NuGetResponse):
-    pass
+
+    def __init__(self, version, resources):
+        """
+        version : str
+        resources : list of :class:`ServiceIndexResource`
+        """
+        self.version = version
+        self.resources = resources
+
+    def json_mapping(self):
+        mapping = {
+            "version": self.version,
+            "resources": self.resources,
+        }
+        return mapping
 
 
 class ServiceIndexResource(NuGetResponse):
