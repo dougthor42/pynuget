@@ -24,6 +24,33 @@ class ApiException(PyNuGetException):
     pass
 
 
+class NuGetResponse(object):
+
+    def to_json(self):
+        """Return the object as JSON to send to NuGet"""
+        pass
+
+
+class ServiceIndex(NuGetResponse):
+    pass
+
+
+class SearchResponse(NuGetResponse):
+    pass
+
+
+class MetadataResponse(NuGetResponse):
+    pass
+
+
+class ContentResponse(NuGetResponse):
+    pass
+
+
+class CatalogResponse(NuGetResponse):
+    pass
+
+
 # XXX: Not needed?
 def api_error():
     raise NotImplementedError
