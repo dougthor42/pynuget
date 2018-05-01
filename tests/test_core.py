@@ -1,16 +1,20 @@
 # -*- coding: utf-8 -*-
 """
 """
+import json
 import shutil
 from unittest.mock import MagicMock
 import xml.etree.ElementTree as et
 
 import os
 import pytest
+from jsonschema import validate
+from jsonschema.exceptions import ValidationError
 from werkzeug.datastructures import FileStorage
 
 from pynuget import core
 from pynuget import app
+from pynuget import db
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 NAMESPACE = {'nuspec':
@@ -131,3 +135,44 @@ def test_determine_dependencies():
         {'framework': None, 'id': 'E', 'version': '0.0.5'},
     ]
     assert result == expected
+
+
+@pytest.mark.temp
+def test_jsonify_search_results():
+    search_results = [
+        db.Version(),
+        db.Version(),
+        db.Version(),
+    ]
+
+    schema_file = os.path.join(
+        DATA_DIR,
+        "NuGet.SearchQueryService.v3.JsonSchema.json",
+    )
+    with open(schema_file, 'r') as openf:
+        schema = json.load(openf)
+#    results = core.jsonify_search_results(search_results)
+    results = {
+        "totalHits": 1,
+        "data": [
+            {
+                "@id": "some_url",
+                "@type": "Package",
+                "registration": "some_url",
+                "id": "NuGet.Versioning",
+                "version": "4.4.0",
+                "versions": [
+                    {
+                         "version": "4.4.0",
+                         "downloads": 617,
+                         "@id": "some_url"
+                     }
+                 ]
+            }
+        ]
+    }
+
+    try:
+        validate(results, schema)
+    except ValidationError:
+        pytest.fail("Invalid JSON")
