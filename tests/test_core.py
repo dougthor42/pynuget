@@ -137,7 +137,7 @@ def test_determine_dependencies():
     assert result == expected
 
 
-@pytest.mark.temp
+@pytest.mark.skip("I moved the file")
 def test_jsonify_search_results():
     search_results = [
         db.Version(),
