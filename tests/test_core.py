@@ -204,3 +204,25 @@ class TestNuGetResponse():
             '}'
         )
         assert obj.json == expected
+
+    def test_to_json_ServiceIndexResponse(self):
+        resources = [
+            core.ServiceIndexResourceResponse("a", "b"),
+            core.ServiceIndexResourceResponse("c", "d", "e"),
+        ]
+        obj = core.ServiceIndexResponse(
+            version="3.0.0",
+            resources=resources,
+        )
+
+        expected = (
+            '{'
+            '"resources": ['
+            '{"@id": "a", "@type": "b"},'
+            '{"@id": "a", "@type": "b", "comment": "c"}'
+            '], "version": "3.0.0"'
+            '}'
+        )
+        assert obj.json == expected
+        print(obj.json_mapping())
+        pytest.fail()
