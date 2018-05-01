@@ -275,6 +275,28 @@ def search():
     return resp
 
 
+@app.route('/search_v3', methods=['GET'])
+def search_v3():
+    logger.debug("Route: /search_v3")
+    q = request.args.get('q', default=None)
+    skip = request.args.get('skip', default=0)
+    take = request.args.get('take', default=None)
+    include_prerelease = request.args.get('prerelease', default=False)
+    sem_ver_level = request.args.get('semVerLevel', default=None)
+
+    results = db.search_packages(session,
+                                 include_prerelease,
+                                 filter_=None,
+                                 search_query=None,
+                                 )
+
+    # jsonify the results.
+    data = ""
+
+    return data, 200
+
+
+
 @app.route('/updates', methods=['GET'])
 def updates():
     logger.debug("Route: /updates")
