@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>NuGetTest</id>
+    <version>0.0.1</version>
+    <authors>Douglas Thor</authors>
+    <owners>Douglas Thor</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Package Description</description>
+    <dependencies>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="A" version="0.0.1" />
+        <dependency id="B" version="0.0.2" />
+        <dependency id="C" version="0.0.3" />
+      </group>
+      <dependency id="D" version="0.0.4" />
+      <dependency id="E" version="0.0.5" />
+    </dependencies>
+  </metadata>
+</package>
