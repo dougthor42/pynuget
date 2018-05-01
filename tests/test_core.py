@@ -176,3 +176,31 @@ def test_jsonify_search_results():
         validate(results, schema)
     except ValidationError:
         pytest.fail("Invalid JSON")
+
+
+class TestNuGetResponse():
+
+    def test_to_json_ServiceIndexResourceResponse(self):
+        obj = core.ServiceIndexResourceResponse(
+            url="https://api.nuget.org/v3-flatcontainer/",
+            resource_type="PackageBaseAddress/3.0.0",
+        )
+
+        expected = ('{"@id": "https://api.nuget.org/v3-flatcontainer/",'
+                    ' "@type": "PackageBaseAddress/3.0.0"}')
+        assert obj.to_json() == expected
+
+        obj = core.ServiceIndexResourceResponse(
+            url="https://api.nuget.org/v3-flatcontainer/",
+            resource_type="PackageBaseAddress/3.0.0",
+            comment="foo",
+        )
+
+        expected = (
+            '{'
+            '"@id": "https://api.nuget.org/v3-flatcontainer/",'
+            ' "@type": "PackageBaseAddress/3.0.0",'
+            ' "comment": "foo"'
+            '}'
+        )
+        assert obj.to_json() == expected
