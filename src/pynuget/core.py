@@ -3,6 +3,7 @@
 """
 import base64
 import hashlib
+import json
 import os
 import re
 import shutil
@@ -28,7 +29,7 @@ class NuGetResponse(object):
 
     def to_json(self):
         """Return the object as JSON to send to NuGet"""
-        pass
+        return json.dumps(self.json_mapping(), sort_keys=True)
 
 
 class ServiceIndexResponse(NuGetResponse):
