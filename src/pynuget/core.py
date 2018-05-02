@@ -30,22 +30,45 @@ class NuGetResponse(object):
     @property
     def json(self):
         """Return the object as JSON to send to NuGet"""
-        encoder = json.JSONEncoder(sort_keys=True, default=self._map_json)
-        return encoder.encode(self.__dict__)
+        logger.debug("in json property")
+        encoder = json.JSONEncoder(sort_keys=True, default=self._rename_keys)
+        logger.debug("set encoder. Obj: {}".format(self))
+        return encoder.encode(self)
 
-    def _map_json(self, obj):
-        # TODO: recursion
-        for key in obj.keys():
-            # Remove keys that have None values.
-            if obj[key] is None:
-                obj.pop(key)
-                continue
-            # Rename ones that need to be renamed
-            if hasattr(self, 'json_map') and key in self.json_map.keys():
-                new_key = self.json_map[key]
-                obj[new_key] = obj[key]
-                obj.pop(key)
-        return obj
+    def _rename_keys(self, obj):
+        logger.debug("renaming keys for {}".format(obj))
+
+        if hasattr(obj, '__dict__'):
+            logger.debug("has __dict__ = {}".format(obj.__dict__))
+            if hasattr(obj, 'json_key_map'):
+                logger.debug("has json_key_map")
+                d = obj.__dict__
+
+                # wrap in list() because we're going to be modifying things
+                items = list(d.items())
+                logger.debug(items)
+                for key, value in items:
+                    # Delete items with no value
+                    if value is None:
+                        logger.debug("deleting key '{}' with value `{}`".format(key, value))
+                        del d[key]
+                        continue
+
+                    # Map our python names to the NuGet API names.
+                    if key in obj.json_key_map.keys():
+                        new_key = obj.json_key_map[key]
+                        logger.debug("renaming key `{}` to `{}`".format(key, new_key))
+                        d[new_key] = d[key]
+                        del d[key]
+                return d
+            else:
+                logger.debug("does not have json_key_map")
+                # Return the dict of the item we're processing. It will then
+                # continue on through the Encoder. When another unencodable
+                # object is reached, _rename_keys() will be called again.
+                return obj.__dict__
+        else:
+            raise PyNuGetException("Doug, fix this")
 
 
 class ServiceIndexResponse(NuGetResponse):
@@ -58,19 +81,12 @@ class ServiceIndexResponse(NuGetResponse):
         self.version = version
         self.resources = resources
 
-#    def json_mapping(self):
-#        mapping = {
-#            "version": self.version,
-#            "resources": [r.json for r in self.resources],
-#        }
-#        return mapping
-
 
 class ServiceIndexResourceResponse(NuGetResponse):
 
-    json_map = {
+    json_key_map = {
         "url": "@id",
-        "resouce_type": "@type"
+        "resource_type": "@type"
     }
 
     def __init__(self, url, resource_type, comment=None):
@@ -82,17 +98,6 @@ class ServiceIndexResourceResponse(NuGetResponse):
         self.url = url
         self.resource_type = resource_type
         self.comment = comment
-
-#    def json_mapping(self):
-#        """Defines how the python objects map to JSON"""
-#        mapping = {
-#            "@id": self.url,
-#            "@type": self.resource_type,
-#        }
-#        if self.comment is not None:
-#            mapping['comment'] = self.comment
-#
-#        return mapping
 
 
 class SearchResponse(NuGetResponse):

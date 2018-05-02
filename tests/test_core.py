@@ -213,16 +213,15 @@ class TestNuGetResponse():
         obj = core.ServiceIndexResponse(
             version="3.0.0",
             resources=resources,
+#            resources=None,
         )
 
         expected = (
             '{'
             '"resources": ['
             '{"@id": "a", "@type": "b"},'
-            '{"@id": "a", "@type": "b", "comment": "c"}'
+            ' {"@id": "c", "@type": "d", "comment": "e"}'
             '], "version": "3.0.0"'
             '}'
         )
         assert obj.json == expected
-        print(obj.json_mapping())
-        pytest.fail()
