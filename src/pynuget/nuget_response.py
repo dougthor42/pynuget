@@ -118,31 +118,25 @@ class CatalogResponse(NuGetResponse):
 
 
 def _rename_keys(obj):
-    if issubclass(type(obj), NuGetResponse):
-        if hasattr(obj, 'json_key_map'):
-            d = obj.__dict__
+    if hasattr(obj, 'json_key_map'):
+        d = obj.__dict__
 
-            # wrap in list() because we're going to be modifying things
-            items = list(d.items())
-            for key, value in items:
-                # Delete items with no value
-                if value is None:
-                    del d[key]
-                    continue
+        # wrap in list() because we're going to be modifying things
+        items = list(d.items())
+        for key, value in items:
+            # Delete items with no value
+            if value is None:
+                del d[key]
+                continue
 
-                # Map our python names to the NuGet API names.
-                if key in obj.json_key_map.keys():
-                    new_key = obj.json_key_map[key]
-                    d[new_key] = d[key]
-                    del d[key]
-            return d
-        else:
-            # Return the dict of the item we're processing. It will then
-            # continue on through the Encoder. When another unencodable
-            # object is reached, _rename_keys() will be called again.
-            return obj.__dict__
+            # Map our python names to the NuGet API names.
+            if key in obj.json_key_map.keys():
+                new_key = obj.json_key_map[key]
+                d[new_key] = d[key]
+                del d[key]
+        return d
     else:
-        logger.error("{} is not a subclass of NuGetResponse and is not"
-                     " encodable as JSON (if it were, this function"
-                     " would not have been called).")
-        raise PyNuGetException("Doug, fix this")
+        # Return the dict of the item we're processing. It will then
+        # continue on through the Encoder. When another unencodable
+        # object is reached, _rename_keys() will be called again.
+        return obj.__dict__
