@@ -224,3 +224,35 @@ class TestNuGetResponse():
             '}'
         )
         assert obj.json == expected
+
+    def test_json_SearchResponse(self):
+
+        versions_a = [
+            core.SearchResultVersionResponse("a", "b", 100),
+            core.SearchResultVersionResponse("c", "d", 50),
+        ]
+        versions_b = [
+            core.SearchResultVersionResponse("e", "f", 150),
+            core.SearchResultVersionResponse("g", "h", 250),
+        ]
+
+        data = [
+            core.SearchResultResponse(1, 2, versions_a),
+            core.SearchResultResponse(4, 5, versions_b),
+        ]
+        obj = core.SearchResponse(
+            total_hits=561,
+            data=data,
+        )
+
+        expected = (
+            '{"data":'
+            ' [{"id": 1, "version": 2, "versions":'
+            ' [{"@id": "a", "downloads": 100, "version": "b"},'
+            ' {"@id": "c", "downloads": 50, "version": "d"}]},'
+            ' {"id": 4, "version": 5, "versions":'
+            ' [{"@id": "e", "downloads": 150, "version": "f"},'
+            ' {"@id": "g", "downloads": 250, "version": "h"}]}],'
+            ' "totalHits": 561}'
+        )
+        assert obj.json == expected
