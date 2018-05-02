@@ -104,6 +104,14 @@ class SearchResponse(NuGetResponse):
     pass
 
 
+class SearchResultResponse(NuGetResponse):
+    pass
+
+
+class SearchResultVersionResponse(NuGetResponse):
+    pass
+
+
 class MetadataResponse(NuGetResponse):
     pass
 
