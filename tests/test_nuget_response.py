@@ -1,10 +1,63 @@
 # -*- coding: utf-8 -*-
 """
 """
-
+import json
 import pytest
 
 from pynuget import nuget_response as nr
+
+
+@pytest.mark.temp
+def test__rename_keys():
+
+    # Normal serializable objects should not even call this function, and so
+    # and error should be raised.
+    obj = {"a": "b"}
+    with pytest.raises(AttributeError):
+        nr._rename_keys(obj)
+
+    # The function acceptes all items that inherit from Object. If they do
+    # not define `json_key_map` at the class level, then they are unchanged.
+    class Temp(object):
+        def __init__(self, a, b):
+            self.a = a
+            self.b = b
+    obj = Temp("a", 5)
+    result = nr._rename_keys(obj)
+    assert result == {"a": "a", "b": 5}
+
+    # Any object that defines "json_key_map" should be modified
+    class Temp(object):
+        json_key_map = {"b": "@type"}
+        def __init__(self, a, b):
+            self.a = a
+            self.b = b
+    obj = Temp("a", 5)
+    result = nr._rename_keys(obj)
+    assert result == {"a": "a", "@type": 5}
+
+
+@pytest.mark.temp
+def test__rename_keys_encoder():
+
+    # Nested objects should work too, but only when we run the function
+    # via the encoder (since that handles the recursion).
+    class Temp(object):
+        json_key_map = {"b": "@type"}
+        def __init__(self, a, b):
+            self.a = a
+            self.b = b
+
+    class Parent(object):
+        def __init__(self, a, b):
+            self.a = a
+            self.b = b
+
+    obj = Parent(Temp("a", 5), 10)
+    encoded = json.JSONEncoder(sort_keys=True,
+                               default=nr._rename_keys).encode(obj)
+    result = json.loads(encoded)
+    assert result == {"a": {"@type": 5, "a": "a"}, "b": 10}
 
 
 @pytest.mark.temp
