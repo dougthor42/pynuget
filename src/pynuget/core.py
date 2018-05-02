@@ -30,39 +30,29 @@ class NuGetResponse(object):
     @property
     def json(self):
         """Return the object as JSON to send to NuGet"""
-        logger.debug("in json property")
         encoder = json.JSONEncoder(sort_keys=True, default=self._rename_keys)
-        logger.debug("set encoder. Obj: {}".format(self))
         return encoder.encode(self)
 
     def _rename_keys(self, obj):
-        logger.debug("renaming keys for {}".format(obj))
-
         if hasattr(obj, '__dict__'):
-            logger.debug("has __dict__ = {}".format(obj.__dict__))
             if hasattr(obj, 'json_key_map'):
-                logger.debug("has json_key_map")
                 d = obj.__dict__
 
                 # wrap in list() because we're going to be modifying things
                 items = list(d.items())
-                logger.debug(items)
                 for key, value in items:
                     # Delete items with no value
                     if value is None:
-                        logger.debug("deleting key '{}' with value `{}`".format(key, value))
                         del d[key]
                         continue
 
                     # Map our python names to the NuGet API names.
                     if key in obj.json_key_map.keys():
                         new_key = obj.json_key_map[key]
-                        logger.debug("renaming key `{}` to `{}`".format(key, new_key))
                         d[new_key] = d[key]
                         del d[key]
                 return d
             else:
-                logger.debug("does not have json_key_map")
                 # Return the dict of the item we're processing. It will then
                 # continue on through the Encoder. When another unencodable
                 # object is reached, _rename_keys() will be called again.
