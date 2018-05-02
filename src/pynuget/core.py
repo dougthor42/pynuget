@@ -101,15 +101,59 @@ class ServiceIndexResourceResponse(NuGetResponse):
 
 
 class SearchResponse(NuGetResponse):
-    pass
+
+    json_key_map = {
+        "total_hits": "totalHits",
+    }
+
+    def __init__(self, total_hits, data):
+        """
+        total_hits : int
+        data : list of :class:`SearchResultResponse`
+        """
+        self.total_hits = total_hits
+        self.data = data
 
 
 class SearchResultResponse(NuGetResponse):
-    pass
+
+    json_key_map = {
+        "id_": "id",
+        "icon_url": "iconUrl",
+        "license_url": "licenseUrl",
+        "project_url": "projectUrl",
+        "total_downloads:": "totalDownloads",
+    }
+
+    def __init__(self, id_, version, versions, **kwargs):
+        """
+        id_ : str
+        version : str
+        versions : list of :class:`SearchResultVersionResponse`
+        """
+        # description, authors,
+        # icon_url, license_url, owners, project_url, registration,
+        # summary, tags, title, total_downloads, verified
+        self.id_ = id_
+        self.version = version
+        self.versions = versions
 
 
 class SearchResultVersionResponse(NuGetResponse):
-    pass
+
+    json_key_map = {
+        "id_": "@id",
+    }
+
+    def __init__(self, id_, version, downloads):
+        """
+        id_ : str
+        version : str
+        downloads : int
+        """
+        self.id_ = id_
+        self.version = version
+        self.downloads = downloads
 
 
 class MetadataResponse(NuGetResponse):
