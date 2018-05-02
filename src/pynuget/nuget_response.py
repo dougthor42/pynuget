@@ -4,6 +4,7 @@
 
 import json
 
+from pynuget import logger
 from pynuget.core import PyNuGetException
 
 
@@ -16,7 +17,7 @@ class NuGetResponse(object):
         return encoder.encode(self)
 
     def _rename_keys(self, obj):
-        if hasattr(obj, '__dict__'):
+        if issubclass(type(obj), NuGetResponse):
             if hasattr(obj, 'json_key_map'):
                 d = obj.__dict__
 
@@ -40,6 +41,9 @@ class NuGetResponse(object):
                 # object is reached, _rename_keys() will be called again.
                 return obj.__dict__
         else:
+            logger.error("{} is not a subclass of NuGetResponse and is not"
+                         " encodable as JSON (if it were, this function"
+                         " would not have been called).")
             raise PyNuGetException("Doug, fix this")
 
 
