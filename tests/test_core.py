@@ -178,31 +178,25 @@ def test_jsonify_search_results():
         pytest.fail("Invalid JSON")
 
 
+@pytest.mark.temp
 class TestNuGetResponse():
 
     def test_to_json_ServiceIndexResourceResponse(self):
         obj = core.ServiceIndexResourceResponse(
-            url="https://api.nuget.org/v3-flatcontainer/",
-            resource_type="PackageBaseAddress/3.0.0",
+            url="aaa",
+            resource_type="bbb",
         )
 
-        expected = ('{"@id": "https://api.nuget.org/v3-flatcontainer/",'
-                    ' "@type": "PackageBaseAddress/3.0.0"}')
+        expected = '{"@id": "aaa", "@type": "bbb"}'
         assert obj.json == expected
 
         obj = core.ServiceIndexResourceResponse(
-            url="https://api.nuget.org/v3-flatcontainer/",
-            resource_type="PackageBaseAddress/3.0.0",
+            url="ccc",
+            resource_type="ddd",
             comment="foo",
         )
 
-        expected = (
-            '{'
-            '"@id": "https://api.nuget.org/v3-flatcontainer/",'
-            ' "@type": "PackageBaseAddress/3.0.0",'
-            ' "comment": "foo"'
-            '}'
-        )
+        expected = '{"@id": "ccc", "@type": "ddd", "comment": "foo"}'
         assert obj.json == expected
 
     def test_to_json_ServiceIndexResponse(self):
