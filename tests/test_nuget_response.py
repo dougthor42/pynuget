@@ -36,6 +36,16 @@ def test__rename_keys():
     result = nr._rename_keys(obj)
     assert result == {"a": "a", "@type": 5}
 
+    # Items with a value of "None" get removed.
+    class Temp(object):
+        json_key_map = {"b": "@type"}
+        def __init__(self, a, b):
+            self.a = a
+            self.b = b
+    obj = Temp(None, 5)
+    result = nr._rename_keys(obj)
+    assert result == {"@type": 5}
+
 
 @pytest.mark.temp
 def test__rename_keys_encoder():
