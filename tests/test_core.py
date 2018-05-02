@@ -213,7 +213,6 @@ class TestNuGetResponse():
         obj = core.ServiceIndexResponse(
             version="3.0.0",
             resources=resources,
-#            resources=None,
         )
 
         expected = (
