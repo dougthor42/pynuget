@@ -8,43 +8,16 @@ from pynuget import logger
 from pynuget.core import PyNuGetException
 
 
+
+
+
 class NuGetResponse(object):
 
     @property
     def json(self):
         """Return the object as JSON to send to NuGet"""
-        encoder = json.JSONEncoder(sort_keys=True, default=self._rename_keys)
+        encoder = json.JSONEncoder(sort_keys=True, default=_rename_keys)
         return encoder.encode(self)
-
-    def _rename_keys(self, obj):
-        if issubclass(type(obj), NuGetResponse):
-            if hasattr(obj, 'json_key_map'):
-                d = obj.__dict__
-
-                # wrap in list() because we're going to be modifying things
-                items = list(d.items())
-                for key, value in items:
-                    # Delete items with no value
-                    if value is None:
-                        del d[key]
-                        continue
-
-                    # Map our python names to the NuGet API names.
-                    if key in obj.json_key_map.keys():
-                        new_key = obj.json_key_map[key]
-                        d[new_key] = d[key]
-                        del d[key]
-                return d
-            else:
-                # Return the dict of the item we're processing. It will then
-                # continue on through the Encoder. When another unencodable
-                # object is reached, _rename_keys() will be called again.
-                return obj.__dict__
-        else:
-            logger.error("{} is not a subclass of NuGetResponse and is not"
-                         " encodable as JSON (if it were, this function"
-                         " would not have been called).")
-            raise PyNuGetException("Doug, fix this")
 
 
 class ServiceIndexResponse(NuGetResponse):
@@ -142,3 +115,34 @@ class ContentResponse(NuGetResponse):
 
 class CatalogResponse(NuGetResponse):
     pass
+
+
+def _rename_keys(obj):
+    if issubclass(type(obj), NuGetResponse):
+        if hasattr(obj, 'json_key_map'):
+            d = obj.__dict__
+
+            # wrap in list() because we're going to be modifying things
+            items = list(d.items())
+            for key, value in items:
+                # Delete items with no value
+                if value is None:
+                    del d[key]
+                    continue
+
+                # Map our python names to the NuGet API names.
+                if key in obj.json_key_map.keys():
+                    new_key = obj.json_key_map[key]
+                    d[new_key] = d[key]
+                    del d[key]
+            return d
+        else:
+            # Return the dict of the item we're processing. It will then
+            # continue on through the Encoder. When another unencodable
+            # object is reached, _rename_keys() will be called again.
+            return obj.__dict__
+    else:
+        logger.error("{} is not a subclass of NuGetResponse and is not"
+                     " encodable as JSON (if it were, this function"
+                     " would not have been called).")
+        raise PyNuGetException("Doug, fix this")
