@@ -123,7 +123,7 @@ def test_json_SearchResponse():
 
     data = [
         nr.SearchResultResponse(1, 2, versions_a),
-        nr.SearchResultResponse(4, 5, versions_b),
+        nr.SearchResultResponse(4, 5, versions_b, project_url="http://no"),
     ]
     obj = nr.SearchResponse(
         total_hits=561,
@@ -135,7 +135,7 @@ def test_json_SearchResponse():
         ' [{"id": 1, "version": 2, "versions":'
         ' [{"@id": "a", "downloads": 100, "version": "b"},'
         ' {"@id": "c", "downloads": 50, "version": "d"}]},'
-        ' {"id": 4, "version": 5, "versions":'
+        ' {"id": 4, "projectUrl": "http://no", "version": 5, "versions":'
         ' [{"@id": "e", "downloads": 150, "version": "f"},'
         ' {"@id": "g", "downloads": 250, "version": "h"}]}],'
         ' "totalHits": 561}'

@@ -87,6 +87,9 @@ class SearchResultResponse(NuGetResponse):
         self.version = version
         self.versions = versions
 
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
 
 class SearchResultVersionResponse(NuGetResponse):
 
