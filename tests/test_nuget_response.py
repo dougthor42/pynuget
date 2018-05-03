@@ -70,7 +70,7 @@ def test__rename_keys_encoder():
     assert result == {"a": {"@type": 5, "a": "a"}, "b": 10}
 
 
-def test_to_json_ServiceIndexResourceResponse(self):
+def test_json_ServiceIndexResourceResponse(self):
     obj = nr.ServiceIndexResourceResponse(
         url="aaa",
         resource_type="bbb",
@@ -89,7 +89,7 @@ def test_to_json_ServiceIndexResourceResponse(self):
     assert obj.json == expected
 
 
-def test_to_json_ServiceIndexResponse(self):
+def test_json_ServiceIndexResponse(self):
     resources = [
         nr.ServiceIndexResourceResponse("a", "b"),
         nr.ServiceIndexResourceResponse("c", "d", "e"),
