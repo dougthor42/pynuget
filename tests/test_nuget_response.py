@@ -141,3 +141,16 @@ def test_json_SearchResponse():
         ' "totalHits": 561}'
     )
     assert obj.json == expected
+
+
+def test_json_ContentResponse():
+
+    versions = [
+        "a",
+        "b",
+        "version1",
+        "0.1.5",
+    ]
+    obj = nr.ContentResponse(versions)
+    expected = '{"versions": ["a", "b", "version1", "0.1.5"]}'
+    assert obj.json == expected
