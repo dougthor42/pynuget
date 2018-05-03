@@ -70,7 +70,7 @@ def test__rename_keys_encoder():
     assert result == {"a": {"@type": 5, "a": "a"}, "b": 10}
 
 
-def test_json_ServiceIndexResourceResponse(self):
+def test_json_ServiceIndexResourceResponse():
     obj = nr.ServiceIndexResourceResponse(
         url="aaa",
         resource_type="bbb",
@@ -89,7 +89,7 @@ def test_json_ServiceIndexResourceResponse(self):
     assert obj.json == expected
 
 
-def test_json_ServiceIndexResponse(self):
+def test_json_ServiceIndexResponse():
     resources = [
         nr.ServiceIndexResourceResponse("a", "b"),
         nr.ServiceIndexResourceResponse("c", "d", "e"),
@@ -110,7 +110,7 @@ def test_json_ServiceIndexResponse(self):
     assert obj.json == expected
 
 
-def test_json_SearchResponse(self):
+def test_json_SearchResponse():
 
     versions_a = [
         nr.SearchResultVersionResponse("a", "b", 100),
@@ -121,23 +121,23 @@ def test_json_SearchResponse(self):
         nr.SearchResultVersionResponse("g", "h", 250),
     ]
 
-        data = [
-            nr.SearchResultResponse(1, 2, versions_a),
-            nr.SearchResultResponse(4, 5, versions_b),
-        ]
-        obj = nr.SearchResponse(
-            total_hits=561,
-            data=data,
-        )
+    data = [
+        nr.SearchResultResponse(1, 2, versions_a),
+        nr.SearchResultResponse(4, 5, versions_b),
+    ]
+    obj = nr.SearchResponse(
+        total_hits=561,
+        data=data,
+    )
 
-        expected = (
-            '{"data":'
-            ' [{"id": 1, "version": 2, "versions":'
-            ' [{"@id": "a", "downloads": 100, "version": "b"},'
-            ' {"@id": "c", "downloads": 50, "version": "d"}]},'
-            ' {"id": 4, "version": 5, "versions":'
-            ' [{"@id": "e", "downloads": 150, "version": "f"},'
-            ' {"@id": "g", "downloads": 250, "version": "h"}]}],'
-            ' "totalHits": 561}'
-        )
-        assert obj.json == expected
+    expected = (
+        '{"data":'
+        ' [{"id": 1, "version": 2, "versions":'
+        ' [{"@id": "a", "downloads": 100, "version": "b"},'
+        ' {"@id": "c", "downloads": 50, "version": "d"}]},'
+        ' {"id": 4, "version": 5, "versions":'
+        ' [{"@id": "e", "downloads": 150, "version": "f"},'
+        ' {"@id": "g", "downloads": 250, "version": "h"}]}],'
+        ' "totalHits": 561}'
+    )
+    assert obj.json == expected
