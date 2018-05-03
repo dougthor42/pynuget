@@ -70,57 +70,56 @@ def test__rename_keys_encoder():
     assert result == {"a": {"@type": 5, "a": "a"}, "b": 10}
 
 
-@pytest.mark.temp
-class TestNuGetResponse():
+def test_to_json_ServiceIndexResourceResponse(self):
+    obj = nr.ServiceIndexResourceResponse(
+        url="aaa",
+        resource_type="bbb",
+    )
 
-    def test_to_json_ServiceIndexResourceResponse(self):
-        obj = nr.ServiceIndexResourceResponse(
-            url="aaa",
-            resource_type="bbb",
-        )
+    expected = '{"@id": "aaa", "@type": "bbb"}'
+    assert obj.json == expected
 
-        expected = '{"@id": "aaa", "@type": "bbb"}'
-        assert obj.json == expected
+    obj = nr.ServiceIndexResourceResponse(
+        url="ccc",
+        resource_type="ddd",
+        comment="foo",
+    )
 
-        obj = nr.ServiceIndexResourceResponse(
-            url="ccc",
-            resource_type="ddd",
-            comment="foo",
-        )
+    expected = '{"@id": "ccc", "@type": "ddd", "comment": "foo"}'
+    assert obj.json == expected
 
-        expected = '{"@id": "ccc", "@type": "ddd", "comment": "foo"}'
-        assert obj.json == expected
 
-    def test_to_json_ServiceIndexResponse(self):
-        resources = [
-            nr.ServiceIndexResourceResponse("a", "b"),
-            nr.ServiceIndexResourceResponse("c", "d", "e"),
-        ]
-        obj = nr.ServiceIndexResponse(
-            version="3.0.0",
-            resources=resources,
-        )
+def test_to_json_ServiceIndexResponse(self):
+    resources = [
+        nr.ServiceIndexResourceResponse("a", "b"),
+        nr.ServiceIndexResourceResponse("c", "d", "e"),
+    ]
+    obj = nr.ServiceIndexResponse(
+        version="3.0.0",
+        resources=resources,
+    )
 
-        expected = (
-            '{'
-            '"resources": ['
-            '{"@id": "a", "@type": "b"},'
-            ' {"@id": "c", "@type": "d", "comment": "e"}'
-            '], "version": "3.0.0"'
-            '}'
-        )
-        assert obj.json == expected
+    expected = (
+        '{'
+        '"resources": ['
+        '{"@id": "a", "@type": "b"},'
+        ' {"@id": "c", "@type": "d", "comment": "e"}'
+        '], "version": "3.0.0"'
+        '}'
+    )
+    assert obj.json == expected
 
-    def test_json_SearchResponse(self):
 
-        versions_a = [
-            nr.SearchResultVersionResponse("a", "b", 100),
-            nr.SearchResultVersionResponse("c", "d", 50),
-        ]
-        versions_b = [
-            nr.SearchResultVersionResponse("e", "f", 150),
-            nr.SearchResultVersionResponse("g", "h", 250),
-        ]
+def test_json_SearchResponse(self):
+
+    versions_a = [
+        nr.SearchResultVersionResponse("a", "b", 100),
+        nr.SearchResultVersionResponse("c", "d", 50),
+    ]
+    versions_b = [
+        nr.SearchResultVersionResponse("e", "f", 150),
+        nr.SearchResultVersionResponse("g", "h", 250),
+    ]
 
         data = [
             nr.SearchResultResponse(1, 2, versions_a),
