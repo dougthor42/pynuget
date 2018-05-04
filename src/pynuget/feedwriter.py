@@ -38,6 +38,9 @@ class FeedWriter(object):
         return et.tostring(self.feed)
 
     def write_to_output(self, results):
+        """
+        results : list of dicts, I think.
+        """
         logger.debug("FeedWriter.write_to_output(%d)" % len(results))
         # TODO: header line
         return self.write(results)
