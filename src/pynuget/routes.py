@@ -88,6 +88,8 @@ def index():
 
 def push():
     logger.debug("push()")
+    logger.debug("  args: {}".format(request.args))
+    logger.debug("  header: {}".format(request.headers))
     if not core.require_auth(request.headers):
         return "api_error: Missing or Invalid API key", 401
 
@@ -243,6 +245,8 @@ def download():
 @app.route('/FindPackagesById()', methods=['GET'])
 def find_by_id():
     logger.debug("Route: /find_by_id")
+    logger.debug("  args: {}".format(request.args))
+    logger.debug("  header: {}".format(request.headers))
     pkg_name = request.args.get('id')
     version = request.args.get('semVerLevel', default=None)
 
