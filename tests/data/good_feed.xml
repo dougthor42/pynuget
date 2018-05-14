@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xml:base="http://localhost:40221/nuget" xmlns="http://www.w3.org/2005/Atom" xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices" xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" xmlns:georss="http://www.georss.org/georss" xmlns:gml="http://www.opengis.net/gml">
+  <id>http://schemas.datacontract.org/2004/07/</id>
+  <title />
+  <updated>2018-05-14T15:36:17Z</updated>
+  <link rel="self" href="http://localhost:40221/nuget/Packages" />
+  <entry>
+    <id>http://localhost:40221/nuget/Packages(Id='NuGetTest',Version='0.0.1')</id>
+    <category term="NuGet.Server.Core.DataServices.ODataPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme" />
+    <link rel="edit" href="http://localhost:40221/nuget/Packages(Id='NuGetTest',Version='0.0.1')" />
+    <link rel="self" href="http://localhost:40221/nuget/Packages(Id='NuGetTest',Version='0.0.1')" />
+    <title type="text">NuGetTest</title>
+    <published>2018-05-08T16:00:01Z</published>
+    <updated>2018-05-08T16:00:01Z</updated>
+    <author>
+      <name>Douglas Thor</name>
+    </author>
+    <m:action metadata="http://localhost:40221/nuget/$metadata#Container.Download" title="Download" target="http://localhost:40221/nuget/Packages(Id='NuGetTest',Version='0.0.1')/Download" />
+    <content type="application/zip" src="http://localhost:40221/nuget/Packages(Id='NuGetTest',Version='0.0.1')/Download" />
+    <m:properties>
+      <d:Id>NuGetTest</d:Id>
+      <d:Version>0.0.1</d:Version>
+      <d:NormalizedVersion>0.0.1</d:NormalizedVersion>
+      <d:IsPrerelease m:type="Edm.Boolean">false</d:IsPrerelease>
+      <d:Title m:null="true" />
+      <d:Authors>Douglas Thor</d:Authors>
+      <d:Owners>Douglas Thor</d:Owners>
+      <d:IconUrl m:null="true" />
+      <d:LicenseUrl m:null="true" />
+      <d:ProjectUrl m:null="true" />
+      <d:DownloadCount m:type="Edm.Int32">-1</d:DownloadCount>
+      <d:RequireLicenseAcceptance m:type="Edm.Boolean">false</d:RequireLicenseAcceptance>
+      <d:DevelopmentDependency m:type="Edm.Boolean">false</d:DevelopmentDependency>
+      <d:Description>Package Description</d:Description>
+      <d:Summary m:null="true" />
+      <d:ReleaseNotes m:null="true" />
+      <d:Published m:type="Edm.DateTime">2018-05-08T16:00:01.0021654Z</d:Published>
+      <d:LastUpdated m:type="Edm.DateTime">2018-05-08T16:00:01.0026656Z</d:LastUpdated>
+      <d:Dependencies>::netstandard2.0</d:Dependencies>
+      <d:PackageHash>PkefoSGnsZ+fXu2jl9N55R/28Fbak7wF2o0MKgmWp5Z6/sZ4ohEv1It7Ehi7i3ZVWtJWCLs0b0OYefPpg8BULA==</d:PackageHash>
+      <d:PackageHashAlgorithm>SHA512</d:PackageHashAlgorithm>
+      <d:PackageSize m:type="Edm.Int64">3255</d:PackageSize>
+      <d:Copyright m:null="true" />
+      <d:Tags m:null="true" />
+      <d:IsAbsoluteLatestVersion m:type="Edm.Boolean">true</d:IsAbsoluteLatestVersion>
+      <d:IsLatestVersion m:type="Edm.Boolean">true</d:IsLatestVersion>
+      <d:Listed m:type="Edm.Boolean">true</d:Listed>
+      <d:VersionDownloadCount m:type="Edm.Int32">-1</d:VersionDownloadCount>
+      <d:MinClientVersion m:null="true" />
+      <d:Language m:null="true" />
+    </m:properties>
+  </entry>
+</feed>
