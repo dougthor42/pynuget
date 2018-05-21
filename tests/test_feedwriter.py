@@ -112,13 +112,10 @@ def test_begin_feed(feedwriter):
     result = et.tostring(feedwriter.feed)
     assert isinstance(result, bytes)
     print(result)
-    assert b'ns0:feed' in result
-    assert b'xmlns:ns0="http://www.w3.org/2005/Atom"' in result
+    assert b'xmlns="http://www.w3.org/2005/Atom"' in result
     assert b'xml:base="https://www.nuget.org/api/v2/"' in result
-
-    # These two will only show up if there are elements that use them!
-#    assert b'http://schemas.microsoft.com/ado/2007/08/dataservices' in result
-#    assert b'microsoft.com/ado/2007/08/dataservices/metadata' in result
+    assert b'http://schemas.microsoft.com/ado/2007/08/dataservices' in result
+    assert b'microsoft.com/ado/2007/08/dataservices/metadata' in result
 
 
 @pytest.mark.xfail
