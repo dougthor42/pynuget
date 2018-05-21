@@ -259,6 +259,7 @@ def find_by_id():
 
 
 @app.route('/search', methods=['GET'])
+@app.route('/nuget/Search()', methods=['GET'])
 def search():
     logger.debug("Route: /search")
     # TODO: Cleanup this and db.search_pacakges call sig.
