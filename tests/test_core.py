@@ -68,7 +68,7 @@ def test_parse_nuspec():
 
     good = et.parse(os.path.join(DATA_DIR, "good.nuspec"))
     nuspec, pkg_name, version = core.parse_nuspec(good, NAMESPACE)
-    assert isinstance(nuspec, et.Element)
+    assert et.iselement(nuspec)
     assert pkg_name == 'NuGetTest'
     assert version == '0.0.1'
 
@@ -84,7 +84,7 @@ def test_extract_nuspec():
 
     good = os.path.join(DATA_DIR, "good.nupkg")
     result = core.extract_nuspec(good)
-    assert isinstance(result, et.Element)
+    assert et.iselement(result)
 
 
 def test_hash_and_encode_file():

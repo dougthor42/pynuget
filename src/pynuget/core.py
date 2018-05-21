@@ -69,7 +69,7 @@ def determine_dependencies(metadata_element, namespace):
     logger.debug("Parsing dependencies.")
     dependencies = []
     dep = metadata_element.find('nuspec:dependencies', namespace)
-    if dep:
+    if et.iselement(dep):
         logger.debug("Found dependencies.")
         dep_no_fw = dep.findall('nuspec:dependency', namespace)
         if dep_no_fw:
@@ -181,7 +181,7 @@ def extract_nuspec(file):
 
     logger.debug("Parsing NuSpec file XML")
     nuspec = et.fromstring(nuspec_string)
-    if not isinstance(nuspec, et.Element):
+    if not et.iselement(nuspec):
         msg = "`nuspec` expected to be type `xml...Element`. Got {}"
         raise TypeError(msg.format(type(nuspec)))
 
