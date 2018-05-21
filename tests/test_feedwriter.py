@@ -14,7 +14,7 @@ from pynuget import db
 
 @pytest.fixture
 def feedwriter():
-    return fw.FeedWriter(1)
+    return fw.FeedWriter("NoName")
 
 
 @pytest.fixture
