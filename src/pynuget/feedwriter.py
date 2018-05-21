@@ -196,8 +196,11 @@ class FeedWriter(object):
         return {'value': str(value), 'type': 'Edm.Boolean'}
 
     def format_date(self, value):
-        #  return value.isoformat(timespec='seconds')      # Py3.6+
-        return value.isoformat()
+        logger.debug("{}: {}".format(value, type(value)))
+        if isinstance(value, dt.datetime):
+            #  return value.isoformat(timespec='seconds')      # Py3.6+
+            return value.isoformat()
+        return value
 
     def render_dependencies(self, raw):
         logger.debug("FeedWriter.render_dependencies(%s)" % raw)
