@@ -194,7 +194,15 @@ def test_add_meta(feedwriter):
     type_ = 'Edm.Int32'
 
     # I think this is what we're expecting...
-    expected_1 = b'<root><SomeName type="Edm.Int32">SomeValue</SomeName></root>'
+    expected_1 = (
+        b'<root>'
+        b'<d:SomeName'
+        b' xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices"'
+        b' xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata"'
+        b' xmlns="http://www.w3.org/2005/Atom"'
+        b' type="Edm.Int32">SomeValue</d:SomeName>'
+        b'</root>'
+    )
 
     # add_meta doesn't return anything, but modifies `node`.
     feedwriter.add_meta(node, name, value, type_)
@@ -203,6 +211,15 @@ def test_add_meta(feedwriter):
     # Create a new node
     node = et.Element('root')
     value = None
-    expected_2 = b'<root><SomeName type="Edm.Int32" null="true"/></root>'
+    expected_2 = (
+        b'<root>'
+        b'<d:SomeName'
+        b' xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices"'
+        b' xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata"'
+        b' xmlns="http://www.w3.org/2005/Atom"'
+        b' type="Edm.Int32"'
+        b' null="true"/>'
+        b'</root>'
+    )
     feedwriter.add_meta(node, name, value, type_)
     assert et.tostring(node) == expected_2
