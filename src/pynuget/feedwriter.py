@@ -245,7 +245,6 @@ class FeedWriter(object):
         attributes :
             Dict, I think.
         """
-        logger.debug("FeedWriter.add_with_attributes(...)")
         child = et.Element(name)
         child.text = str(value)
         entry.append(child)
@@ -253,7 +252,6 @@ class FeedWriter(object):
             child.set(attr_name, str(attr_value))
 
     def add_meta(self, entry, name, value, type_=None):
-        logger.debug("FeedWriter.add_meta(...)")
         child = et.Element(name)
         child.text = value
         entry.append(child)
