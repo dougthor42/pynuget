@@ -108,10 +108,17 @@ def test_write_to_output(feedwriter, version_row):
 
 
 def test_begin_feed(feedwriter):
-    try:
-        feedwriter.begin_feed()
-    except Exception as ex:
-        pytest.fail("Unexpected Error: {}".format(ex))
+    feedwriter.begin_feed()
+    result = et.tostring(feedwriter.feed)
+    assert isinstance(result, bytes)
+    print(result)
+    assert b'ns0:feed' in result
+    assert b'xmlns:ns0="http://www.w3.org/2005/Atom"' in result
+    assert b'xml:base="https://www.nuget.org/api/v2/"' in result
+
+    # These two will only show up if there are elements that use them!
+#    assert b'http://schemas.microsoft.com/ado/2007/08/dataservices' in result
+#    assert b'microsoft.com/ado/2007/08/dataservices/metadata' in result
 
 
 @pytest.mark.xfail
