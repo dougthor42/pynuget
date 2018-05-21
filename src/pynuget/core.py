@@ -192,14 +192,14 @@ def parse_nuspec(nuspec, ns=None):
     """
     Parameters
     ----------
-    nuspec : :class:`xml.etree.ElementTree.Element` object
+    nuspec : :class:`lxml.etree.Element` object
         The parsed nuspec data.
     ns : string
         The namespace to search.
 
     Returns
     -------
-    metadata : :class:`xml.etree.ElementTree.Element`
+    metadata : :class:`lxml.etree.Element`
     pkg_name : str
     version : str
     """
