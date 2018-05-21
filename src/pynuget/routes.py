@@ -275,6 +275,9 @@ def search():
     feed = FeedWriter('Search')
     resp = make_response(feed.write_to_output(results))
     resp.headers['Content-Type'] = FEED_CONTENT_TYPE_HEADER
+
+    logger.debug(resp.data.decode('utf-8').replace('><',' >\n<'))
+
     return resp
 
 
