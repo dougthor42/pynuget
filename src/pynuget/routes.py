@@ -71,6 +71,11 @@ def root():
     return "Hello World!"
 
 
+@app.route('/nuget/$metadata')
+def meta():
+    return "metadata file"
+
+
 @app.route('/', methods=['GET', 'PUT', 'DELETE'])
 @app.route('/index', methods=['GET', 'PUT', 'DELETE'])
 @app.route('/api/v2/package/', methods=['GET', 'PUT', 'DELETE'])
