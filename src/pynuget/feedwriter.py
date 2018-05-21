@@ -19,6 +19,15 @@ BASE = b"""<?xml version="1.0" encoding="utf-8" ?>
 >
 </feed>
 """
+NS_D = "{http://schemas.microsoft.com/ado/2007/08/dataservices}"
+NS_M = "{http://schemas.microsoft.com/ado/2007/08/dataservices/metadata}"
+NS_DEFAULT = "{http://www.w3.org/2005/Atom}"
+NSMAP = {
+    None: NS_DEFAULT.strip("{}"),
+    'd': NS_D.strip("{}"),
+    'm': NS_M.strip("{}"),
+}
+
 ADO_BASE_URL = "http://schemas.microsoft.com/ado/2007/08/dataservices"
 ADO_SCHEMA_URL = ADO_BASE_URL + "/scheme"
 ADO_METADATA_URL = ADO_BASE_URL + "/metadata"
@@ -140,7 +149,7 @@ class FeedWriter(object):
             SQLAlchemy result set object
         """
         logger.debug("FeedWriter.add_entry_meta(%s, %s)" % (entry, row))
-        properties = et.Element('properties')
+        properties = et.Element(NS_M + 'properties', nsmap=NSMAP)
         entry.append(properties)
 
         gallery_details_url = "{}details/{}/{}".format(self.base_url,
@@ -253,7 +262,8 @@ class FeedWriter(object):
             child.set(attr_name, str(attr_value))
 
     def add_meta(self, entry, name, value, type_=None):
-        child = et.Element(name)
+
+        child = et.Element(NS_D + name, nsmap=NSMAP)
         child.text = value
         entry.append(child)
 
