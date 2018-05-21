@@ -5,7 +5,7 @@
 import datetime as dt
 import json
 import re
-import xml.etree.ElementTree as et
+from lxml import etree as et
 
 from pynuget import logger
 

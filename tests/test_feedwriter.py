@@ -4,7 +4,7 @@
 
 import datetime as dt
 import json
-import xml.etree.ElementTree as et
+from lxml import etree as et
 
 import pytest
 
