@@ -31,10 +31,12 @@ class FeedWriter(object):
         self.base_url = 'TBD'
 
     def write(self, results):
-        logger.debug("FeedWriter.write(%d)" % len(results))
         self.begin_feed()
-        for result in results:
-            self.add_entry(result)
+        try:
+            for result in results:
+                self.add_entry(result)
+        except TypeError:
+            pass
         return et.tostring(self.feed)
 
     def write_to_output(self, results):
