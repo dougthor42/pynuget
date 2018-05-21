@@ -96,7 +96,7 @@ def version_row_xml():
 
 
 def test_write(feedwriter, version_row):
-    result = feedwriter.write([version_row])
+    result = feedwriter.write(None)
     assert isinstance(result, bytes)
 
 
