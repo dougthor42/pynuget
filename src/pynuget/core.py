@@ -7,10 +7,11 @@ import os
 import re
 import shutil
 import tempfile
-from lxml import etree as et
 from zipfile import ZipFile
 from pathlib import Path
 from uuid import uuid4
+
+from lxml import etree as et
 
 from pynuget import app
 from pynuget import logger

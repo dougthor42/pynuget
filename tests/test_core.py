@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """
 """
+import os
 import shutil
 from unittest.mock import MagicMock
-from lxml import etree as et
 
-import os
 import pytest
+from lxml import etree as et
 from werkzeug.datastructures import FileStorage
 
 from pynuget import core

@@ -3,10 +3,9 @@
 """
 
 import datetime as dt
-import json
-from lxml import etree as et
 
 import pytest
+from lxml import etree as et
 
 from pynuget import feedwriter as fw
 from pynuget import db

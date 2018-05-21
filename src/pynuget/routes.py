@@ -1,16 +1,9 @@
 # -*- coding: utf-8 -*-
 """
 """
-import base64
-import hashlib
 import os
 import re
-import shutil
-import tempfile
-from lxml import etree as et
 from pathlib import Path
-from uuid import uuid4
-from zipfile import ZipFile
 
 # Third-Party
 from flask import g
