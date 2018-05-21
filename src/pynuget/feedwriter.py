@@ -256,7 +256,7 @@ class FeedWriter(object):
         entry.append(child)
 
         if type_:
-            child.set('m:type', type_)
+            child.set('type', type_)
 
         if value is None:
-            child.set('m:null', 'true')
+            child.set('null', 'true')
