@@ -101,7 +101,7 @@ def test_hash_and_encode_file():
         file = FileStorage(openf)
 
         hash_, filesize = core.hash_and_encode_file(file, pkg_name, version)
-    assert isinstance(hash_, bytes)
+    assert isinstance(hash_, str)
     assert isinstance(filesize, int)
     assert filesize == 3255
 
