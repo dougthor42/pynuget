@@ -195,7 +195,7 @@ def test_add_meta(feedwriter):
     type_ = 'Edm.Int32'
 
     # I think this is what we're expecting...
-    expected_1 = b'<root><SomeName m:type="Edm.Int32">SomeValue</SomeName></root>'
+    expected_1 = b'<root><SomeName type="Edm.Int32">SomeValue</SomeName></root>'
 
     # add_meta doesn't return anything, but modifies `node`.
     feedwriter.add_meta(node, name, value, type_)
@@ -204,6 +204,6 @@ def test_add_meta(feedwriter):
     # Create a new node
     node = et.Element('root')
     value = None
-    expected_2 = b'<root><SomeName m:null="true" m:type="Edm.Int32" /></root>'
+    expected_2 = b'<root><SomeName type="Edm.Int32" null="true"/></root>'
     feedwriter.add_meta(node, name, value, type_)
     assert et.tostring(node) == expected_2
