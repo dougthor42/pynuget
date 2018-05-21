@@ -3,7 +3,7 @@
 """
 import shutil
 from unittest.mock import MagicMock
-import xml.etree.ElementTree as et
+from lxml import etree as et
 
 import os
 import pytest

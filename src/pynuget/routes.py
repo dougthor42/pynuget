@@ -7,7 +7,7 @@ import os
 import re
 import shutil
 import tempfile
-import xml.etree.ElementTree as et
+from lxml import etree as et
 from pathlib import Path
 from uuid import uuid4
 from zipfile import ZipFile
