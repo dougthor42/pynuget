@@ -105,6 +105,11 @@ def hash_and_encode_file(file, pkg_name, version):
         The file as retrieved by Flask.
     pkg_name : str
     version : str
+
+    Returns:
+    --------
+    hash_ : bytes
+    filesize : int
     """
     logger.debug("Hashing and encoding uploaded file.")
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -146,7 +151,7 @@ def hash_and_encode_file(file, pkg_name, version):
         else:
             logger.info("Succesfully saved package to '%s'" % local_path)
 
-    return hash_, filesize
+    return hash_.decode('utf-8'), filesize
 
 
 def extract_nuspec(file):
