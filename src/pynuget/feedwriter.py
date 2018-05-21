@@ -9,7 +9,7 @@ from lxml import etree as et
 
 from pynuget import logger
 
-BASE = """<?xml version="1.0" encoding="utf-8" ?>
+BASE = b"""<?xml version="1.0" encoding="utf-8" ?>
 <feed
   xml:base="https://www.nuget.org/api/v2/"
   xmlns="http://www.w3.org/2005/Atom"
