@@ -193,3 +193,21 @@ def test_search(client):
 
 def test_updates(client):
     pass
+
+
+@pytest.mark.integration
+def test_list(client, put_header):
+    """ List is just the same as Search with no search term. """
+
+    # First we need to populate some Packages
+    # TODO: make this just DB calls instead of full API
+    check_push(201, client, put_header, 'good.nupkg')
+
+
+    rv = client.get(
+        "/Search()?$orderby=Id&searchTerm=''&targetFramework=''&includePrerelease=true&$skip=0&$top=30&semVerLevel=2.0.0",
+        follow_redirects=True,
+    )
+
+    assert b"Douglas Thor" in rv.data
+    assert b"<d:Id>NuGetTest</d:Id>" in rv.data
