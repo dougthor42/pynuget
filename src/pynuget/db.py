@@ -141,7 +141,10 @@ def search_packages(session,
     if order_by is not None:
         query = query.order_by(order_by)
 
-    return query.all()
+    results = query.all()
+    logger.debug("Found %d results." % len(results))
+
+    return results
 
 
 def package_updates(session, packages_dict, include_prerelease=False):
