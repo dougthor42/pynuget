@@ -261,16 +261,26 @@ def find_by_id():
 @app.route('/Search()', methods=['GET'])
 def search():
     logger.debug("Route: /search")
+    logger.debug(request.args)
     # TODO: Cleanup this and db.search_pacakges call sig.
-    include_prerelease = request.args.get('includeprerelease', default=False)
-    order_by = request.args.get('orderby', default=None)
-    filter_ = request.args.get('filter', default=None)
-    search_query = request.args.get('searchQuery', default=None)
+    include_prerelease = request.args.get('includePrerelease', default=False)
+    order_by = request.args.get('$orderBy', default='Id')
+    filter_ = request.args.get('$filter', default=None)
+    top = request.args.get('$top', default=30)
+    skip = request.args.get('$skip', default=0)
+    sem_ver_level = request.args.get('semVerLevel', default='2.0.0')
+    search_query = request.args.get('searchTerm', default=None)
+    target_framework = request.args.get('targetFramework', default='')
+
+    # Some of the terms have quotes surrounding them
+    search_query = search_query.strip("'")
+    target_framework = target_framework.strip("'")
+
     results = db.search_packages(session,
-                                 include_prerelease,
-                                 #order_by
-                                 filter_,
-                                 search_query,
+                                 include_prerelease=include_prerelease,
+                                 #order_by=order_by,
+                                 filter_=filter_,
+                                 search_query=search_query,
                                  )
 
     feed = FeedWriter('Search')
