@@ -256,6 +256,9 @@ def find_by_id():
     feed = FeedWriter('FindPackagesById')
     resp = make_response(feed.write_to_output([result]))
     resp.headers['Content-Type']
+
+    logger.debug(resp.data.decode('utf-8').replace('><',' >\n<'))
+
     return resp
 
 
