@@ -96,8 +96,8 @@ def test_index_post(client):
     pass
 
 
-def test_push():
-    pass
+def test_push_ok(client, put_header):
+    check_push(201, client, put_header, 'good.nupkg')
 
 
 def test_push_no_auth(client, put_header):
@@ -156,10 +156,6 @@ def test_push_fail_to_save_file(client, put_header):
 def test_push_fail_parse_dependencies(client, put_header):
     pass
     #assert rv.status_code == 400
-
-
-def test_push_ok(client, put_header):
-    check_push(201, client, put_header, 'good.nupkg')
 
 
 def test_count(client):
