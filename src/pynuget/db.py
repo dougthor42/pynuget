@@ -205,6 +205,18 @@ def find_by_pkg_name(session, package_name, version=None):
     return result
 
 
+def find_pkg_by_id(session, package_id):
+    query = (session.query(Package)
+             .filter(Package.package_id == package_id)
+             )
+
+    # TODO: Error handling
+    result = query.one()
+    logger.debug(result)
+
+    return result
+
+
 def validate_id_and_version(session, package_name, version):
     """
     Not exactly sure what this is supposed to do, but I *think* it simply
