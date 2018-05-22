@@ -105,6 +105,7 @@ def test_index_post(client):
     pass
 
 
+@pytest.mark.integration
 def test_push_ok(client, put_header):
     check_push(201, client, put_header, 'good.nupkg')
 
@@ -173,6 +174,7 @@ def test_count(client):
     assert rv.headers['Content-Type'] == 'text/plain; charset=utf-8'
 
 
+@pytest.mark.integration
 def test_delete(client, put_header):
     check_push(201, client, put_header, 'good.nupkg')
     rv = client.delete(
