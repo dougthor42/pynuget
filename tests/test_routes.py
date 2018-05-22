@@ -139,6 +139,10 @@ def test_push_no_nuspec(client, put_header):
     check_push(400, client, put_header, 'no_nuspec.nupkg')
 
 
+def test_push_invalid_nuspec(client, put_header):
+    check_push(400, client, put_header, 'invalid_nuspec.nupkg')
+
+
 def test_push_multiple_nuspec(client, put_header):
     check_push(400, client, put_header, 'multiple_nuspec.nupkg')
 
