@@ -157,6 +157,7 @@ class FeedWriter(object):
                                                        row.version)
 
         meta = {
+            'Id': row.title,
             'Version': row.version,
             'NormalizedVersion': row.version,
             'Copyright': row.copyright_,

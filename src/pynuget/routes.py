@@ -173,7 +173,7 @@ def push():
         release_notes=et_to_str(metadata.find('nuspec:releaseNotes', ns)),
         require_license_acceptance=et_to_str(metadata.find('nuspec:requireLicenseAcceptance', ns)) == 'true',
         tags=et_to_str(metadata.find('nuspec:tags', ns)),
-        title=et_to_str(metadata.find('nuspec:title', ns)),
+        title=et_to_str(metadata.find('nuspec:id', ns)),
         version=version,
     )
 
