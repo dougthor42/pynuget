@@ -183,8 +183,32 @@ def test_find_by_id(client):
     pass
 
 
-def test_search(client):
-    pass
+def test_search(client, put_header):
+    # First we need to populate some Packages
+    # TODO: make this just DB calls instead of full API
+    check_push(201, client, put_header, 'good.nupkg')
+
+    rv = client.get(
+        "/Search()?$orderby=Id&searchTerm='NuGetTest'&targetFramework=''&includePrerelease=true&$skip=0&$top=30&semVerLevel=2.0.0",
+        follow_redirects=True,
+    )
+
+    assert b"Douglas Thor" in rv.data
+    assert b"<d:Id>NuGetTest</d:Id>" in rv.data
+
+
+def test_search_not_found(client, put_header):
+    # First we need to populate some Packages
+    # TODO: make this just DB calls instead of full API
+    check_push(201, client, put_header, 'good.nupkg')
+
+    rv = client.get(
+        "/Search()?$orderby=Id&searchTerm='aaa'&targetFramework=''&includePrerelease=true&$skip=0&$top=30&semVerLevel=2.0.0",
+        follow_redirects=True,
+    )
+
+    assert b"Douglas Thor" not in rv.data
+    assert b"<d:Id>NuGetTest</d:Id>" not in rv.data
 
 
 def test_updates(client):
