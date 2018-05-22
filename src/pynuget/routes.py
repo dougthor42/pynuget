@@ -196,7 +196,7 @@ def count():
 def delete(package=None, version=None):
     logger.debug("Route: /delete")
     if not core.require_auth(request.headers):
-        return "api_error: Missing or Invalid API key"      # TODO
+        return "api_error: Missing or Invalid API key", 401      # TODO
 
     if package is not None:
         pkg_name = package

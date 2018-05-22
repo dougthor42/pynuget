@@ -186,6 +186,28 @@ def test_delete(client, put_header):
     assert rv.status_code == 204
 
 
+def test_delete_no_auth(populated_db, put_header):
+    put_header.pop('X-Nuget-ApiKey')
+    rv = populated_db.delete(
+        '/api/v2/package/NuGetTest/0.0.1',
+        headers=put_header,
+        follow_redirects=True,
+        data=None,
+    )
+    assert rv.status_code == 401
+
+
+def test_delete_invalid_auth(populated_db, put_header):
+    app.config['API_KEYS'] = ""
+    rv = populated_db.delete(
+        '/api/v2/package/NuGetTest/0.0.1',
+        headers=put_header,
+        follow_redirects=True,
+        data=None,
+    )
+    assert rv.status_code == 401
+
+
 @pytest.mark.skip("Test not written")
 def test_download(client):
     pass
