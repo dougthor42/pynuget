@@ -24,18 +24,18 @@ PyNuGet server.
 param (
     [switch] $list,
     [switch] $delete,
-    [switch] $push
+    [switch] $push,
+    [string] $file = ".\NuGetTest.0.0.1.nupkg"
 )
 
 $key = "ChangeThisKey"
-$file = ".\NuGetTest.0.0.1.nupkg"
 $pkg = "NuGetTest"
 $vers = "0.0.1"
 $source = "http://localhost:5000"
 
 if ($list) {
     Write-Host "Listing!"
-    nuget.exe list -Source $source -Verbosity detailed
+    nuget.exe list -Source $source -Verbosity detailed -AllVersions -Prerelease
 }
 
 if ($delete) {
