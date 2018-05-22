@@ -197,7 +197,12 @@ def find_by_pkg_name(session, package_name, version=None):
         query = query.filter(Version.version == version)
     query.order_by(desc(Version.version))
 
-    return query.all()
+    results = query.all()
+    logger.info("Found %d results." % len(results))
+    result = results[0]
+    logger.info("Returning %s." % result)
+
+    return result
 
 
 def validate_id_and_version(session, package_name, version):
