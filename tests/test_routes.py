@@ -208,6 +208,36 @@ def test_delete_invalid_auth(populated_db, put_header):
     assert rv.status_code == 401
 
 
+def test_delete_package_not_found(populated_db, put_header):
+    rv = populated_db.delete(
+        '/api/v2/package/aaa/0.0.1',
+        headers=put_header,
+        follow_redirects=True,
+        data=None,
+    )
+    assert rv.status_code == 404
+
+
+def test_delete_version_not_found(populated_db, put_header):
+    rv = populated_db.delete(
+        '/api/v2/package/NuGetTest/9.9.9',
+        headers=put_header,
+        follow_redirects=True,
+        data=None,
+    )
+    assert rv.status_code == 404
+
+
+def test_delete_alternate_url(populated_db, put_header):
+    rv = populated_db.delete(
+        '/delete?id=NuGetTest&version=0.0.1',
+        headers=put_header,
+        follow_redirects=True,
+        data=None,
+    )
+    assert rv.status_code == 204
+
+
 @pytest.mark.skip("Test not written")
 def test_download(client):
     pass
