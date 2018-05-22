@@ -277,6 +277,7 @@ def insert_version(session, **kwargs):
     version = Version(**kwargs)
     session.add(version)
     session.commit()
+    logger.debug(version)
 
 
 def delete_version(session, package_name, version):
