@@ -191,9 +191,16 @@ def test_download(client):
     pass
 
 
-@pytest.mark.skip("Test not written")
-def test_find_by_id(client):
-    pass
+def test_find_by_id(populated_db):
+    client = populated_db
+
+    rv = client.get(
+        "/FindPackagesById()?id='NuGetTest'&semVerLevel=2.0.0",
+        follow_redirects=True,
+    )
+
+    assert b"Douglas Thor" in rv.data
+    assert b"<d:Id>NuGetTest</d:Id>" in rv.data
 
 
 def test_search(populated_db):
