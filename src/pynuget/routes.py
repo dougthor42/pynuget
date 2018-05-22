@@ -246,12 +246,12 @@ def find_by_id():
     logger.debug("  args: {}".format(request.args))
     logger.debug("  header: {}".format(request.headers))
     pkg_name = request.args.get('id')
-    version = request.args.get('semVerLevel', default=None)
+    sem_ver_level = request.args.get('semVerLevel', default=None)
 
     # Some terms are quoted
     pkg_name = pkg_name.strip("'")
 
-    result = db.find_by_pkg_name(session, pkg_name, version)
+    result = db.find_by_pkg_name(session, pkg_name)
     logger.debug(result)
     feed = FeedWriter('FindPackagesById')
     resp = make_response(feed.write_to_output([result]))
