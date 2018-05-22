@@ -100,6 +100,7 @@ def test_index_get(client):
     assert rv.headers['Content-Type'] == 'text/plain; charset=utf-8'
 
 
+@pytest.mark.skip("Test not written")
 def test_index_post(client):
     pass
 
@@ -183,10 +184,12 @@ def test_delete(client, put_header):
     assert rv.status_code == 204
 
 
+@pytest.mark.skip("Test not written")
 def test_download(client):
     pass
 
 
+@pytest.mark.skip("Test not written")
 def test_find_by_id(client):
     pass
 
@@ -215,6 +218,7 @@ def test_search_not_found(populated_db):
     assert b"<d:Id>NuGetTest</d:Id>" not in rv.data
 
 
+@pytest.mark.skip("Test not written")
 def test_updates(client):
     pass
 
