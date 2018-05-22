@@ -92,7 +92,7 @@ class FeedWriter(object):
         entry = et.Element('entry')
         self.feed.append(entry)
         node = et.Element('id')
-        node.text = 'https://www.nuget.org/api/v2/' + entry_id
+        node.text = self.base_url + entry_id
         entry.append(node)
         self.add_with_attributes(
             entry,
