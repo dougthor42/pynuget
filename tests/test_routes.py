@@ -58,6 +58,14 @@ def put_header():
     return header
 
 
+@pytest.fixture
+def populated_db(client, put_header):
+    """Build up a dummy database of NuGet packages."""
+    # TODO: make this just DB calls instead of full API
+    check_push(201, client, put_header, 'good.nupkg')
+    yield client
+
+
 def check_push(expected_code, client, header, file=None):
     data = None
     if file:
@@ -92,12 +100,14 @@ def test_index_get(client):
     assert rv.headers['Content-Type'] == 'text/plain; charset=utf-8'
 
 
+@pytest.mark.skip("Test not written")
 def test_index_post(client):
     pass
 
 
-def test_push():
-    pass
+@pytest.mark.integration
+def test_push_ok(client, put_header):
+    check_push(201, client, put_header, 'good.nupkg')
 
 
 def test_push_no_auth(client, put_header):
@@ -129,6 +139,10 @@ def test_push_no_nuspec(client, put_header):
     check_push(400, client, put_header, 'no_nuspec.nupkg')
 
 
+def test_push_invalid_nuspec(client, put_header):
+    check_push(400, client, put_header, 'invalid_nuspec.nupkg')
+
+
 def test_push_multiple_nuspec(client, put_header):
     check_push(400, client, put_header, 'multiple_nuspec.nupkg')
 
@@ -158,16 +172,13 @@ def test_push_fail_parse_dependencies(client, put_header):
     #assert rv.status_code == 400
 
 
-def test_push_ok(client, put_header):
-    check_push(201, client, put_header, 'good.nupkg')
-
-
 def test_count(client):
     rv = client.get('/count')
     assert rv.data == b'0'
     assert rv.headers['Content-Type'] == 'text/plain; charset=utf-8'
 
 
+@pytest.mark.integration
 def test_delete(client, put_header):
     check_push(201, client, put_header, 'good.nupkg')
     rv = client.delete(
@@ -179,17 +190,113 @@ def test_delete(client, put_header):
     assert rv.status_code == 204
 
 
+def test_delete_no_auth(populated_db, put_header):
+    put_header.pop('X-Nuget-ApiKey')
+    rv = populated_db.delete(
+        '/api/v2/package/NuGetTest/0.0.1',
+        headers=put_header,
+        follow_redirects=True,
+        data=None,
+    )
+    assert rv.status_code == 401
+
+
+def test_delete_invalid_auth(populated_db, put_header):
+    app.config['API_KEYS'] = ""
+    rv = populated_db.delete(
+        '/api/v2/package/NuGetTest/0.0.1',
+        headers=put_header,
+        follow_redirects=True,
+        data=None,
+    )
+    assert rv.status_code == 401
+
+
+def test_delete_package_not_found(populated_db, put_header):
+    rv = populated_db.delete(
+        '/api/v2/package/aaa/0.0.1',
+        headers=put_header,
+        follow_redirects=True,
+        data=None,
+    )
+    assert rv.status_code == 404
+
+
+def test_delete_version_not_found(populated_db, put_header):
+    rv = populated_db.delete(
+        '/api/v2/package/NuGetTest/9.9.9',
+        headers=put_header,
+        follow_redirects=True,
+        data=None,
+    )
+    assert rv.status_code == 404
+
+
+def test_delete_alternate_url(populated_db, put_header):
+    rv = populated_db.delete(
+        '/delete?id=NuGetTest&version=0.0.1',
+        headers=put_header,
+        follow_redirects=True,
+        data=None,
+    )
+    assert rv.status_code == 204
+
+
+@pytest.mark.skip("Test not written")
 def test_download(client):
     pass
 
 
-def test_find_by_id(client):
-    pass
+def test_find_by_id(populated_db):
+    client = populated_db
+
+    rv = client.get(
+        "/FindPackagesById()?id='NuGetTest'&semVerLevel=2.0.0",
+        follow_redirects=True,
+    )
+
+    assert b"Douglas Thor" in rv.data
+    assert b"<d:Id>NuGetTest</d:Id>" in rv.data
 
 
-def test_search(client):
-    pass
+def test_search(populated_db):
+    client = populated_db
+
+    rv = client.get(
+        "/Search()?$orderby=Id&searchTerm='NuGetTest'&targetFramework=''&includePrerelease=true&$skip=0&$top=30&semVerLevel=2.0.0",
+        follow_redirects=True,
+    )
+
+    assert b"Douglas Thor" in rv.data
+    assert b"<d:Id>NuGetTest</d:Id>" in rv.data
 
 
+def test_search_not_found(populated_db):
+    client = populated_db
+
+    rv = client.get(
+        "/Search()?$orderby=Id&searchTerm='aaa'&targetFramework=''&includePrerelease=true&$skip=0&$top=30&semVerLevel=2.0.0",
+        follow_redirects=True,
+    )
+
+    assert b"Douglas Thor" not in rv.data
+    assert b"<d:Id>NuGetTest</d:Id>" not in rv.data
+
+
+@pytest.mark.skip("Test not written")
 def test_updates(client):
     pass
+
+
+@pytest.mark.integration
+def test_list(populated_db):
+    """ List is just the same as Search with no search term. """
+    client = populated_db
+
+    rv = client.get(
+        "/Search()?$orderby=Id&searchTerm=''&targetFramework=''&includePrerelease=true&$skip=0&$top=30&semVerLevel=2.0.0",
+        follow_redirects=True,
+    )
+
+    assert b"Douglas Thor" in rv.data
+    assert b"<d:Id>NuGetTest</d:Id>" in rv.data
