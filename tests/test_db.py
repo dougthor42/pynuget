@@ -62,7 +62,7 @@ def test_search_packages(session):
 
     # Test with a filter.
     result = db.search_packages(session,
-                                filter_='is_latest_version',
+                                filter_='IsLatestVersion',
                                 search_query='%dummy%')
     assert len(result) == 1
     assert result[0].version == "0.0.3"
