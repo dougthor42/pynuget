@@ -58,6 +58,14 @@ def put_header():
     return header
 
 
+@pytest.fixture
+def populated_db(client, put_header):
+    """Build up a dummy database of NuGet packages."""
+    # TODO: make this just DB calls instead of full API
+    check_push(201, client, put_header, 'good.nupkg')
+    yield client
+
+
 def check_push(expected_code, client, header, file=None):
     data = None
     if file:
@@ -183,10 +191,8 @@ def test_find_by_id(client):
     pass
 
 
-def test_search(client, put_header):
-    # First we need to populate some Packages
-    # TODO: make this just DB calls instead of full API
-    check_push(201, client, put_header, 'good.nupkg')
+def test_search(populated_db):
+    client = populated_db
 
     rv = client.get(
         "/Search()?$orderby=Id&searchTerm='NuGetTest'&targetFramework=''&includePrerelease=true&$skip=0&$top=30&semVerLevel=2.0.0",
@@ -197,10 +203,8 @@ def test_search(client, put_header):
     assert b"<d:Id>NuGetTest</d:Id>" in rv.data
 
 
-def test_search_not_found(client, put_header):
-    # First we need to populate some Packages
-    # TODO: make this just DB calls instead of full API
-    check_push(201, client, put_header, 'good.nupkg')
+def test_search_not_found(populated_db):
+    client = populated_db
 
     rv = client.get(
         "/Search()?$orderby=Id&searchTerm='aaa'&targetFramework=''&includePrerelease=true&$skip=0&$top=30&semVerLevel=2.0.0",
@@ -216,13 +220,9 @@ def test_updates(client):
 
 
 @pytest.mark.integration
-def test_list(client, put_header):
+def test_list(populated_db):
     """ List is just the same as Search with no search term. """
-
-    # First we need to populate some Packages
-    # TODO: make this just DB calls instead of full API
-    check_push(201, client, put_header, 'good.nupkg')
-
+    client = populated_db
 
     rv = client.get(
         "/Search()?$orderby=Id&searchTerm=''&targetFramework=''&includePrerelease=true&$skip=0&$top=30&semVerLevel=2.0.0",
