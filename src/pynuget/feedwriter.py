@@ -38,7 +38,7 @@ class FeedWriter(object):
     def __init__(self, feed_name):
         logger.debug("Initializing FeedWriter")
         self.feed_name = feed_name
-        self.base_url = 'TBD'
+        self.base_url = 'http://localhost:5000/'         # TODO: not hard-code
 
     def write(self, results):
         self.begin_feed()
