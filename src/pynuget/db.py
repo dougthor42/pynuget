@@ -130,7 +130,7 @@ def search_packages(session,
     if not include_prerelease:
         query = query.filter(Version.is_prerelease.isnot(True))
 
-    known_filters = ('is_absolute_latest_version', 'is_latest_version')
+    known_filters = ('is_absolute_latest_version', 'IsLatestVersion')
     if filter_ is None:
         pass
     elif filter_ in known_filters:
