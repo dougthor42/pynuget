@@ -61,9 +61,7 @@ def get_package_path(package_id, version):
     :class:`pathlib.Path`
         Relative path to the package file.
     """
-    #TODO: custom package path
-    pkg_dir = Path('./packagefiles')
-    result = pkg_dir / package_id / (version  + '.nupkg')
+    result = Path(package_id) / (version  + '.nupkg')
     return result
 
 

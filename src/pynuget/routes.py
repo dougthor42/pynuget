@@ -205,6 +205,7 @@ def delete(package=None, version=None):
     if version is None:
         version = request.args.get('version')
     path = core.get_package_path(pkg_name, version)
+    path = Path(app.config['SERVER_PATH']) / app.config['PACKAGE_DIR'] / path
 
     if path.exists():
         path.unlink()
@@ -233,6 +234,11 @@ def download(pkg_id=None, version=None):
     pkg_name = db.find_pkg_by_id(session, pkg_id).name
 
     path = core.get_package_path(pkg_name, version)
+
+    # Make sure we're trying to download from our package direcory
+    path = Path(app.config['SERVER_PATH']) / app.config['PACKAGE_DIR'] / path
+
+    logger.debug("root path: %s" % app.root_path)
     logger.debug("Created package path: %s" % path)
     db.increment_download_count(session, pkg_name, version)
     filename = "{}.{}.nupkg".format(pkg_name, version)
