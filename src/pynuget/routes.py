@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 """
-import os
 import re
 from pathlib import Path
 
@@ -207,8 +206,8 @@ def delete(package=None, version=None):
         version = request.args.get('version')
     path = core.get_package_path(pkg_name, version)
 
-    if os.path.exists(path):
-        os.remove(path)
+    if path.exists():
+        path.unlink()
 
     try:
         db.delete_version(session, pkg_name, version)
@@ -242,7 +241,7 @@ def download(pkg_id=None, version=None):
     resp = make_response()
     resp.headers[''] = 'application/zip'
     resp.headers['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
-    resp.headers['X-Accel-Redirect'] = path
+    resp.headers['X-Accel-Redirect'] = str(path)
 
     return resp
 

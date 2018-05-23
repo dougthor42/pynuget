@@ -3,6 +3,7 @@
 """
 import os
 import shutil
+from pathlib import Path
 from unittest.mock import MagicMock
 
 import pytest
@@ -38,7 +39,9 @@ def test_request_method():
 
 
 def test_get_pacakge_path():
-    assert core.get_package_path(1, '0.0.1') == './packagefiles/1/0.0.1.nupkg'
+    result = core.get_package_path('pkg_name', '0.0.1')
+    assert isinstance(result, Path)
+    assert str(result) == 'packagefiles/pkg_name/0.0.1.nupkg'
 
 
 @pytest.mark.skip("Not Implemented")
