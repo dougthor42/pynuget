@@ -250,6 +250,15 @@ def download(pkg_id=None, version=None):
 @app.route('/find_by_id', methods=['GET'])
 @app.route('/FindPackagesById()', methods=['GET'])
 def find_by_id():
+    """
+    It looks like the NuGet client expects this to send back a list of all
+    versions for the package, and then the client handles extraction of
+    an individual version.
+
+    Note that this is different from the newer API
+        /Packages(Id='pkg_name',Version='0.1.3')
+    which appears to move the version selection to server-side.
+    """
     logger.debug("Route: /find_by_id")
     logger.debug("  args: {}".format(request.args))
     logger.debug("  header: {}".format(request.headers))
@@ -259,10 +268,10 @@ def find_by_id():
     # Some terms are quoted
     pkg_name = pkg_name.strip("'")
 
-    result = db.find_by_pkg_name(session, pkg_name)
-    logger.debug(result)
+    results = db.find_by_pkg_name(session, pkg_name)
+    logger.debug(results)
     feed = FeedWriter('FindPackagesById')
-    resp = make_response(feed.write_to_output([result]))
+    resp = make_response(feed.write_to_output(results))
     resp.headers['Content-Type']
 
     logger.debug(resp.data.decode('utf-8').replace('><',' >\n<'))
