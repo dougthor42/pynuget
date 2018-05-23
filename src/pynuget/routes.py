@@ -231,7 +231,7 @@ def download(pkg_id=None, version=None):
     if version is None:
         version = request.args.get('Version')
 
-    pkg_name = db.find_pkg_by_id(session, pkg_id)
+    pkg_name = db.find_pkg_by_id(session, pkg_id).name
 
     path = core.get_package_path(pkg_name, version)
     logger.debug("Created package path: %s" % path)
