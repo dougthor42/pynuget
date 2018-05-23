@@ -7,6 +7,7 @@ from pathlib import Path
 # Third-Party
 from flask import g
 from flask import request
+from flask import send_file
 from flask import make_response
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -244,12 +245,15 @@ def download(pkg_id=None, version=None):
     filename = "{}.{}.nupkg".format(pkg_name, version)
     logger.debug("File name: %s" % filename)
 
-    resp = make_response()
-    resp.headers[''] = 'application/zip'
-    resp.headers['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
-    resp.headers['X-Accel-Redirect'] = str(path)
+    logger.debug("sending file")
+    result = send_file(str(path),
+                       mimetype="application/zip",
+                       as_attachment=True,
+                       attachment_filename=filename)
 
-    return resp
+    header_str = str(result.headers).replace("\r\n", "\r\n  ").strip()
+    logger.debug("Header: \n  {}".format(header_str))
+    return result
 
 
 @app.route('/find_by_id', methods=['GET'])
