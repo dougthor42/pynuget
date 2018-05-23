@@ -14,6 +14,7 @@ from sqlalchemy import func
 from sqlalchemy import desc
 from sqlalchemy import or_
 from sqlalchemy import cast
+from sqlalchemy.dialects import sqlite
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
@@ -191,14 +192,21 @@ def find_by_pkg_name(session, package_name, version=None):
     logger.debug("db.find_by_pkg_name('%s', version='%s')" % (package_name,
                                                               version))
     query = (session.query(Version)
+             .join(Package)
              .filter(Package.name == package_name)
              )
+
+    stmt = query.statement.compile(dialect=sqlite.dialect(),
+                                   compile_kwargs={"literal_binds": True})
+    logger.debug(stmt)
+
     if version:
         query = query.filter(Version.version == version)
     query.order_by(desc(Version.version))
 
     results = query.all()
     logger.info("Found %d results." % len(results))
+    logger.debug(results)
     result = results[0]
     logger.info("Returning %s." % result)
 
