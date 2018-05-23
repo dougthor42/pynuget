@@ -180,7 +180,7 @@ def package_updates(session, packages_dict, include_prerelease=False):
 
 def find_by_pkg_name(session, package_name, version=None):
     """
-    Find a package by name and version. If no version given, return all.
+    Find a package by name. If version is `None`, return the highest version.
 
     Parameters
     ----------
@@ -188,6 +188,12 @@ def find_by_pkg_name(session, package_name, version=None):
     package_name : str
         The NuGet name of the package - the "id" tag in the NuSpec file.
     version : str
+        The version of the package to download. If `None`, then return the
+        most recent (highest) version.
+
+    Returns
+    -------
+    result : :class:`Version`
     """
     logger.debug("db.find_by_pkg_name('%s', version='%s')" % (package_name,
                                                               version))
