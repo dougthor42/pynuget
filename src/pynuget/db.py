@@ -261,7 +261,8 @@ def increment_download_count(session, package_name, version):
         The NuGet name of the package - the "id" tag in the NuSpec file.
     version : str
     """
-    logger.debug("db.increment_download_count(...)")
+    msg = "db.increment_download_count(%s, %s)"
+    logger.debug(msg % (package_name, version))
     obj = (session.query(Version)
            .filter(Package.name == package_name)
            .filter(Version.version == version)
