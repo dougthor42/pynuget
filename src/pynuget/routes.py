@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 """
 """
-import os
 import re
 from pathlib import Path
 
 # Third-Party
 from flask import g
 from flask import request
+from flask import send_file
 from flask import make_response
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -206,9 +206,10 @@ def delete(package=None, version=None):
     if version is None:
         version = request.args.get('version')
     path = core.get_package_path(pkg_name, version)
+    path = Path(app.config['SERVER_PATH']) / app.config['PACKAGE_DIR'] / path
 
-    if os.path.exists(path):
-        os.remove(path)
+    if path.exists():
+        path.unlink()
 
     try:
         db.delete_version(session, pkg_name, version)
@@ -222,26 +223,51 @@ def delete(package=None, version=None):
 
 
 @app.route('/download', methods=['GET'])
-def download():
+@app.route('/download/<pkg_id>/<version>', methods=['GET'])
+def download(pkg_id=None, version=None):
     logger.debug("Route: /download")
-    pkg_name = request.args.get('id')
-    version = request.args.get('version')
+
+    if pkg_id is None:
+        pkg_id = request.args.get('Id')
+    if version is None:
+        version = request.args.get('Version')
+
+    pkg_name = db.find_pkg_by_id(session, pkg_id).name
 
     path = core.get_package_path(pkg_name, version)
+
+    # Make sure we're trying to download from our package direcory
+    path = Path(app.config['SERVER_PATH']) / app.config['PACKAGE_DIR'] / path
+
+    logger.debug("root path: %s" % app.root_path)
+    logger.debug("Created package path: %s" % path)
     db.increment_download_count(session, pkg_name, version)
     filename = "{}.{}.nupkg".format(pkg_name, version)
+    logger.debug("File name: %s" % filename)
 
-    resp = make_response()
-    resp.headers[''] = 'application/zip'
-    resp.headers['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
-    resp.headers['X-Accel-Redirect'] = path
+    logger.debug("sending file")
+    result = send_file(str(path),
+                       mimetype="application/zip",
+                       as_attachment=True,
+                       attachment_filename=filename)
 
-    return resp
+    header_str = str(result.headers).replace("\r\n", "\r\n  ").strip()
+    logger.debug("Header: \n  {}".format(header_str))
+    return result
 
 
 @app.route('/find_by_id', methods=['GET'])
 @app.route('/FindPackagesById()', methods=['GET'])
 def find_by_id():
+    """
+    It looks like the NuGet client expects this to send back a list of all
+    versions for the package, and then the client handles extraction of
+    an individual version.
+
+    Note that this is different from the newer API
+        /Packages(Id='pkg_name',Version='0.1.3')
+    which appears to move the version selection to server-side.
+    """
     logger.debug("Route: /find_by_id")
     logger.debug("  args: {}".format(request.args))
     logger.debug("  header: {}".format(request.headers))
@@ -251,10 +277,10 @@ def find_by_id():
     # Some terms are quoted
     pkg_name = pkg_name.strip("'")
 
-    result = db.find_by_pkg_name(session, pkg_name)
-    logger.debug(result)
+    results = db.find_by_pkg_name(session, pkg_name)
+    logger.debug(results)
     feed = FeedWriter('FindPackagesById')
-    resp = make_response(feed.write_to_output([result]))
+    resp = make_response(feed.write_to_output(results))
     resp.headers['Content-Type']
 
     logger.debug(resp.data.decode('utf-8').replace('><',' >\n<'))

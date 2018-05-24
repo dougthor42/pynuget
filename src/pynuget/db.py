@@ -14,6 +14,7 @@ from sqlalchemy import func
 from sqlalchemy import desc
 from sqlalchemy import or_
 from sqlalchemy import cast
+from sqlalchemy.dialects import sqlite
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
@@ -179,7 +180,7 @@ def package_updates(session, packages_dict, include_prerelease=False):
 
 def find_by_pkg_name(session, package_name, version=None):
     """
-    Find a package by name and version. If no version given, return all.
+    Find a package by name. If version is `None`, returns all versions.
 
     Parameters
     ----------
@@ -187,20 +188,43 @@ def find_by_pkg_name(session, package_name, version=None):
     package_name : str
         The NuGet name of the package - the "id" tag in the NuSpec file.
     version : str
+        The version of the package to download. If `None`, then return all
+        versions.
+
+    Returns
+    -------
+    results : list of :class:`Version`
     """
     logger.debug("db.find_by_pkg_name('%s', version='%s')" % (package_name,
                                                               version))
     query = (session.query(Version)
+             .join(Package)
              .filter(Package.name == package_name)
              )
+
+    stmt = query.statement.compile(dialect=sqlite.dialect(),
+                                   compile_kwargs={"literal_binds": True})
+    logger.debug(stmt)
+
     if version:
         query = query.filter(Version.version == version)
     query.order_by(desc(Version.version))
 
     results = query.all()
     logger.info("Found %d results." % len(results))
-    result = results[0]
-    logger.info("Returning %s." % result)
+    logger.debug(results)
+
+    return results
+
+
+def find_pkg_by_id(session, package_id):
+    query = (session.query(Package)
+             .filter(Package.package_id == package_id)
+             )
+
+    # TODO: Error handling
+    result = query.one()
+    logger.debug(result)
 
     return result
 
@@ -237,7 +261,8 @@ def increment_download_count(session, package_name, version):
         The NuGet name of the package - the "id" tag in the NuSpec file.
     version : str
     """
-    logger.debug("db.increment_download_count(...)")
+    msg = "db.increment_download_count(%s, %s)"
+    logger.debug(msg % (package_name, version))
     obj = (session.query(Version)
            .filter(Package.name == package_name)
            .filter(Version.version == version)

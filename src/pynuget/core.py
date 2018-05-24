@@ -46,9 +46,23 @@ def request_method():
 
 
 def get_package_path(package_id, version):
-    """Get the file path for the specified pkg version."""
-    #TODO: custom package path
-    return './packagefiles/' + str(package_id) + '/' + version + '.nupkg'
+    """
+    Get the file path for the specified pkg version.
+
+    Parameters
+    ----------
+    package_id : str
+        The name of the package
+    version : str
+        The package version
+
+    Returns
+    -------
+    :class:`pathlib.Path`
+        Relative path to the package file.
+    """
+    result = Path(package_id) / (version  + '.nupkg')
+    return result
 
 
 # XXX: Not needed?
