@@ -301,7 +301,8 @@ def _save_config(**kwargs):
     logger.info("Saving configuration.")
 
     # Open the default config file.
-    with open('default_config.py', 'r') as openf:
+    default_config_file = Path(__file__).parent / "default_config.py"
+    with open(str(default_config_file), 'r') as openf:
         raw = openf.read()
 
         for variable, new_value in kwargs.items():
@@ -322,3 +323,5 @@ def _save_config(**kwargs):
     config_path = Path(kwargs['server_path']) / Path('config.py')
     with open(str(config_path), 'w') as openf:
         openf.write(raw)
+
+    logger.debug("Configuration saved to `%s`" % config_path.as_posix())
