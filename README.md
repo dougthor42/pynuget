@@ -23,3 +23,32 @@ don't know PHP or Nginx. Runs on Flask and Apache. Python 3.5+
     2. (On Windows or via Mono) `nuget.exe setApiKey -Source http://your.server.com
        yourApiKey` and then `nuget.exe push Foo.nupkg -Source
        http://your.server.com`
+
+
+## Testing
+
+### Prerequisites:
+
+This has been tested on Ubuntu 16.04.4 and Windows 10 WSL (Ubuntu 16.04)
+
+The Ubuntu repo for Mono has v4.2.1. We want a higher version of Mono.
+
+1.  Follow directions
+    [here](http://www.mono-project.com/download/stable/#download-lin) but
+    remove the `:80` from the keyserver URL.
+2.  Install Mono-complete: `sudo apt install mono-complete`
+3.  Download NuGet: `wget https://dist.nuget.org/win-x86-commandline/v4.6.2/nuget.exe`
+4.  Check things: `mono /path/to/nuget.exe`
+
+
+### Running Tests:
+
+Clone the repo and install the development requirements:
+
+1.  `git clone git@github.com:dougthor42/pynuget.git`
+2.  `cd pynuget`
+3.  `python -m venv .venv`
+4.  `. .venv/bin/activate`
+5.  `pip install -r requirements.txt`
+6.  `pip install -r requirements-dev.txt`
+7.  `pytest`
