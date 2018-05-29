@@ -233,7 +233,7 @@ def _create_directories(server_path, package_dir):
 
     logger.debug("Creating '%s'" % package_dir)
     os.makedirs(str(package_dir), mode=0o2775, exist_ok=True)
-    shutil.chown(str(package_dir), 'www-data', 'www-data')
+#    shutil.chown(str(package_dir), 'www-data', 'www-data')
 
 
 def _create_db(db_backend, db_name, server_path):
@@ -255,7 +255,7 @@ def _create_db(db_backend, db_name, server_path):
             # create the sqlite file and database.
             engine = create_engine(url, echo=False)
             db.Base.metadata.create_all(engine)
-            shutil.chown(str(db_name), 'www-data', 'www-data')
+#            shutil.chown(str(db_name), 'www-data', 'www-data')
             os.chmod(str(db_name), 0o0664)
     elif db_backend in ('mysql', 'postgresql'):
         msg = "The backend '%s' is not yet implmented" % db_backend
