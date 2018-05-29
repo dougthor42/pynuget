@@ -208,7 +208,7 @@ def _remove_packages_from_db(file_data, db_data):
 def _check_permissions():
     """Raise PermissionError if we're not root/sudo."""
     if os.getuid() != 0:
-        raise PermissionError("This script must be run using `sudo`. Sorry!")
+        logger.warn("This script probably needs `sudo`. Trying anyway.")
 
 
 def _create_directories(server_path, package_dir):
