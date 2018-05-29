@@ -218,11 +218,12 @@ def _create_directories(server_path, package_dir):
     package_dir = Path(package_dir)
 
     if not server_path.is_absolute():
-        raise OSError("'server_path' must be absolue")
+        server_path = Path.cwd() / server_path
+        logger.warn("'server_path' is not absolute, setting to %s" % server_path)
 
     if not package_dir.is_absolute():
         package_dir = server_path / package_dir
-        logger.debug("'package_dir' is not absolue, setting to %s" % package_dir)
+        logger.warn("'package_dir' is not absolue, setting to %s" % package_dir)
 
     # os.makedirs will not change permissions of existing directories
     logger.debug("Creating '%s'" % server_path)
