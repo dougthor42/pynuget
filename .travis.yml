@@ -1,0 +1,26 @@
+language: python
+
+sudo: false
+
+python:
+  - "3.5"
+  - "3.6"
+  - "3.7-dev"
+
+notifications:
+  email: false
+
+addons:
+  apt:
+    souces:
+      - mono
+    packages:
+      - mono-complete
+
+install:
+  - pip install -r requirements.txt
+  - pip install -r requirements-dev.txt
+  - pip install -e .
+
+script:
+  - pytest
