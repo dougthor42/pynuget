@@ -208,7 +208,7 @@ def _remove_packages_from_db(file_data, db_data):
 def _check_permissions():
     """Raise PermissionError if we're not root/sudo."""
     if os.getuid() != 0:
-        raise PermissionError("This script must be run using `sudo`. Sorry!")
+        logger.warn("This script probably needs `sudo`. Trying anyway.")
 
 
 def _create_directories(server_path, package_dir):
@@ -218,11 +218,12 @@ def _create_directories(server_path, package_dir):
     package_dir = Path(package_dir)
 
     if not server_path.is_absolute():
-        raise OSError("'server_path' must be absolue")
+        server_path = Path.cwd() / server_path
+        logger.warn("'server_path' is not absolute, setting to %s" % server_path)
 
     if not package_dir.is_absolute():
         package_dir = server_path / package_dir
-        logger.debug("'package_dir' is not absolue, setting to %s" % package_dir)
+        logger.warn("'package_dir' is not absolue, setting to %s" % package_dir)
 
     # os.makedirs will not change permissions of existing directories
     logger.debug("Creating '%s'" % server_path)
@@ -232,7 +233,7 @@ def _create_directories(server_path, package_dir):
 
     logger.debug("Creating '%s'" % package_dir)
     os.makedirs(str(package_dir), mode=0o2775, exist_ok=True)
-    shutil.chown(str(package_dir), 'www-data', 'www-data')
+#    shutil.chown(str(package_dir), 'www-data', 'www-data')
 
 
 def _create_db(db_backend, db_name, server_path):
@@ -254,7 +255,7 @@ def _create_db(db_backend, db_name, server_path):
             # create the sqlite file and database.
             engine = create_engine(url, echo=False)
             db.Base.metadata.create_all(engine)
-            shutil.chown(str(db_name), 'www-data', 'www-data')
+#            shutil.chown(str(db_name), 'www-data', 'www-data')
             os.chmod(str(db_name), 0o0664)
     elif db_backend in ('mysql', 'postgresql'):
         msg = "The backend '%s' is not yet implmented" % db_backend
@@ -301,7 +302,8 @@ def _save_config(**kwargs):
     logger.info("Saving configuration.")
 
     # Open the default config file.
-    with open('default_config.py', 'r') as openf:
+    default_config_file = Path(__file__).parent / "default_config.py"
+    with open(str(default_config_file), 'r') as openf:
         raw = openf.read()
 
         for variable, new_value in kwargs.items():
@@ -322,3 +324,5 @@ def _save_config(**kwargs):
     config_path = Path(kwargs['server_path']) / Path('config.py')
     with open(str(config_path), 'w') as openf:
         openf.write(raw)
+
+    logger.debug("Configuration saved to `%s`" % config_path.as_posix())

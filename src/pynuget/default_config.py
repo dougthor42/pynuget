@@ -6,7 +6,7 @@ import sys
 
 # Log file location. Log rotations/archives will be put in LOG_DIR.
 LOG_FILE = 'pynuget.log'
-LOG_DIR = "/var/log/pynuget"
+LOG_DIR = "./log/pynuget"
 if sys.platform == 'win32':
     LOG_DIR = 'C:/Logs/pynuget'
 LOG_PATH = os.path.normpath(os.path.join(LOG_DIR, LOG_FILE))
@@ -22,7 +22,7 @@ DB_NAME = "nuget_packages.sqlite"
 # Must be asolute.
 ### XXX DO NOT CHANGE THIS XXX ###
 # I haven't spent the time needed in order to have a custom install dir...
-SERVER_PATH = "/var/www/pynuget"
+SERVER_PATH = "./server"
 ### XXXXXXXXXXXXXXXXXXXXXXXXXX ###
 
 # Where nuget packages will be saved to and sourced from.
