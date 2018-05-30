@@ -94,10 +94,8 @@ def test_root_get(client):
 
 
 def test_index_get(client):
-    rv = client.get('/')
-    expected = b"<?xml version='1.0' encoding='utf-8' standalone='yes'?>"
-    assert rv.data == expected
-    assert rv.headers['Content-Type'] == 'text/plain; charset=utf-8'
+    rv = client.get('/index')
+    assert rv.status_code == 200
 
 
 @pytest.mark.skip("Test not written")
