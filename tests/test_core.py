@@ -71,6 +71,15 @@ def test_hash_file():
     assert in_hex.startswith("3e479fa121a7b19f9f5eed")
 
 
+def test_encode_file():
+    good = os.path.join(DATA_DIR, "good.nupkg")
+
+    hash_, filesize = core.encode_file(good, b"aaa")
+    assert isinstance(hash_, str)
+    assert isinstance(filesize, int)
+    assert filesize == 3255
+
+
 def test_parse_nuspec():
     no_metadata = et.parse(os.path.join(DATA_DIR, "no_metadata.nuspec"))
     with pytest.raises(core.ApiException):
