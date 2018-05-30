@@ -112,6 +112,20 @@ def determine_dependencies(metadata_element, namespace):
     return dependencies
 
 
+def hash_and_encode_file(file):
+    """
+    Parameters
+    ----------
+    file : :class:`pathlib.Path` object
+
+    Returns:
+    --------
+    hash_ : bytes
+    filesize : int
+    """
+    return encode_file(file, hash_file(file, hashlib.sha512))
+
+
 def hash_file(file, algorithm=hashlib.md5):
     """
     Parameters

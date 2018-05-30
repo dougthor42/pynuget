@@ -121,11 +121,10 @@ def test_hash_and_encode_file():
     app.config['SERVER_PATH'] = DATA_DIR
     app.config['PACKAGE_DIR'] = '.'
     pkg_name = 'DummyPackage'
-    version = '0.0.1'
 
     good = os.path.join(DATA_DIR, "good.nupkg")
 
-    hash_, filesize = core.hash_and_encode_file(good, pkg_name, version)
+    hash_, filesize = core.hash_and_encode_file(good)
     assert isinstance(hash_, str)
     assert isinstance(filesize, int)
     assert filesize == 3255
