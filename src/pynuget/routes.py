@@ -250,7 +250,7 @@ def download(pkg_id=None, version=None):
     path = Path(app.config['SERVER_PATH']) / app.config['PACKAGE_DIR'] / path
     abs_path = Path.cwd() / path
 
-    logger.debug("Created package path: %s" % abs_path)
+    logger.debug("Path to package: %s" % abs_path)
     db.increment_download_count(session, pkg_name, version)
     filename = "{}.{}.nupkg".format(pkg_name, version)
     logger.debug("File name: %s" % filename)
