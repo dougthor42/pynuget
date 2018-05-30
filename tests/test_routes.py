@@ -114,7 +114,7 @@ def test_push_no_auth(client, put_header):
 
 
 def test_push_invalid_auth(client, put_header):
-    app.config['API_KEYS'] = ""
+    put_header['X-Nuget-ApiKey'] = "the wrong key"
     check_push(401, client, put_header)
 
 
@@ -216,7 +216,7 @@ def test_delete_no_auth(populated_db, put_header):
 
 
 def test_delete_invalid_auth(populated_db, put_header):
-    app.config['API_KEYS'] = ""
+    put_header['X-Nuget-ApiKey'] = "the wrong key"
     rv = populated_db.delete(
         '/api/v2/package/NuGetTest/0.0.1',
         headers=put_header,
