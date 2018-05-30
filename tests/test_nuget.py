@@ -40,3 +40,9 @@ def test_nuget_install(populated_db):
     # GET http://localhost:5000/Packages(Id='NuGetTest',Version='0.0.2')
     # GET http://localhost:5000/FindPackagesById()?id='NuGetTest'&semVerLevel=2.0.0
     pass
+
+
+@pytest.mark.integration
+def test_nuget_update(populated_db):
+    # GET http://localhost:5000/FindPackagesById()?id='MSTest.TestFramework'&semVerLevel=2.0.0
+    pass
