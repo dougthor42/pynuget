@@ -288,7 +288,6 @@ def download(pkg_id=None, version=None):
     return result, 200
 
 
-@app.route('/find_by_id', methods=['GET'])
 @app.route('/FindPackagesById()', methods=['GET'])
 def find_by_id():
     """
