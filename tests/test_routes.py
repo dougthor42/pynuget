@@ -242,9 +242,15 @@ def test_delete_alternate_url(populated_db, put_header):
     assert rv.status_code == 204
 
 
-@pytest.mark.skip("Test not written")
-def test_download(client):
-    pass
+def test_download(populated_db):
+    client = populated_db
+
+    rv = client.get(
+        "download/1/0.0.1",
+        follow_redirects=True,
+    )
+
+    assert rv.status_code == 200
 
 
 def test_find_by_id(populated_db):

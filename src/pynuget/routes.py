@@ -263,7 +263,7 @@ def download(pkg_id=None, version=None):
 
     header_str = str(result.headers).replace("\r\n", "\r\n  ").strip()
     logger.debug("Header: \n  {}".format(header_str))
-    return result
+    return result, 200
 
 
 @app.route('/find_by_id', methods=['GET'])
