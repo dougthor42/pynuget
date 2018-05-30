@@ -85,24 +85,17 @@ def meta():
     return resp
 
 
-@app.route('/', methods=['GET', 'PUT', 'DELETE'])
-@app.route('/index', methods=['GET', 'PUT', 'DELETE'])
-@app.route('/api/v2/package/', methods=['GET', 'PUT', 'DELETE'])
+@app.route('/', methods=['GET'])
+@app.route('/index', methods=['GET'])
 def index():
     """
     Used for web interface.
     """
     logger.debug("Route: /index")
-    if request.method == 'PUT':
-        return push()
-
-    resp = make_response(
-        "<?xml version='1.0' encoding='utf-8' standalone='yes'?>",
-    )
-    resp.headers['Content-Type'] = 'text/plain; charset=utf-8'
-    return resp
+    return "index page"
 
 
+@app.route('/api/v2/package/', methods=['PUT'])
 def push():
     """
     Used by `nuget push`.
