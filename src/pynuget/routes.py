@@ -319,9 +319,9 @@ def find_by_id(func_args=None):
             logger.error(msg.format(func_args))
             return msg.format(func_args), 500
 
-        name = match.group('name')
+        pkg_name = match.group('name')
         version = match.group('version')
-        logger.debug("{}, {}".format(name, version))
+        logger.debug("{}, {}".format(pkg_name, version))
     else:
         # old API
         pkg_name = request.args.get('id')
