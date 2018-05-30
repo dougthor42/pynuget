@@ -286,7 +286,8 @@ def download(pkg_id=None, version=None):
 
 
 @pages.route('/FindPackagesById()', methods=['GET'])
-def find_by_id():
+@pages.route('/Packages(<func_args>)', methods=['GET'])
+def find_by_id(func_args=None):
     """
     Used by `nuget install`.
 
@@ -301,13 +302,36 @@ def find_by_id():
     logger.debug("Route: /find_by_id")
     logger.debug("  args: {}".format(request.args))
     logger.debug("  header: {}".format(request.headers))
-    pkg_name = request.args.get('id')
-    sem_ver_level = request.args.get('semVerLevel', default=None)
+
+    if func_args is not None:
+        # Using the newer API
+        logger.debug(func_args)
+        # Parse the args. From what I can tell, the only things sent here are:
+        #   'Id': the name of the package
+        #   'Version': the version string.
+        # Looks like:
+        #   "Id='NuGetTest',Version='0.0.2'"
+        # Naive implementation
+        regex = re.compile(r"^Id='(?P<name>.+)',Version='(?P<version>.+)'$")
+        match = regex.search(func_args)
+        if match is None:
+            msg = "Unable to parse the arg string `{}`!"
+            logger.error(msg.format(func_args))
+            return msg.format(func_args), 500
+
+        pkg_name = match.group('name')
+        version = match.group('version')
+        logger.debug("{}, {}".format(pkg_name, version))
+    else:
+        # old API
+        pkg_name = request.args.get('id')
+        sem_ver_level = request.args.get('semVerLevel', default=None)
+        version = None
 
     # Some terms are quoted
     pkg_name = pkg_name.strip("'")
 
-    results = db.find_by_pkg_name(session, pkg_name)
+    results = db.find_by_pkg_name(session, pkg_name, version)
     logger.debug(results)
     feed = FeedWriter('FindPackagesById', request.url_root)
     resp = make_response(feed.write_to_output(results))
