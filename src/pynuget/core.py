@@ -139,24 +139,21 @@ def hash_file(file, algorithm=hashlib.md5):
     return m.digest()
 
 
-def hash_and_encode_file(file, pkg_name, version):
+def encode_file(file, hash_):
     """
     Parameters
     ----------
     file : :class:`pathlib.Path` object
-    pkg_name : str
-    version : str
+    hash_ : bytes
+        The value returned by `hash_file()`.
 
     Returns:
     --------
     hash_ : bytes
     filesize : int
     """
-    hash_file(file)
-    logger.debug("Hashing and encoding uploaded file.")
-    a = hash_file(file, hashlib.sha512)
     logger.debug("Encoding in Base64.")
-    hash_ = base64.b64encode(a)
+    hash_ = base64.b64encode(hash_)
 
     # Get the filesize of the uploaded file. Used later.
     filesize = os.path.getsize(file)
