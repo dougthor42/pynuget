@@ -3,6 +3,7 @@
 """
 import re
 from pathlib import Path
+from uuid import uuid4
 
 # Third-Party
 from flask import g
@@ -96,6 +97,9 @@ def push():
         logger.error("Package file was not uploaded.")
         return "error: File not uploaded", 409
     file = request.files['package']
+
+    # Save the file to a temporary location
+    file = core.save_file(file, "_temp", str(uuid4()))
 
     # Open the zip file that was sent and extract out the .nuspec file."
     try:
