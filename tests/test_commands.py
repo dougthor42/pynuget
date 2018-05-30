@@ -8,7 +8,6 @@ from pathlib import Path
 import pytest
 
 from pynuget import commands
-from pynuget import app
 from pynuget import db
 
 from .test_db import session

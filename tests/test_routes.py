@@ -6,8 +6,9 @@ import shutil
 from io import BytesIO
 
 import pytest
+from flask import current_app
 
-from pynuget import app
+from pynuget import create_app
 from pynuget import routes
 from pynuget import commands
 
@@ -19,6 +20,9 @@ DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 def client():
     # override the default variables.
     # TODO: Move this to just a different config file.
+
+    app = create_app()
+
     old_server_path = app.config['SERVER_PATH']
     old_package_dir = app.config['PACKAGE_DIR']
     server_path = app.config['SERVER_PATH'] = os.path.join(DATA_DIR, 'server')
