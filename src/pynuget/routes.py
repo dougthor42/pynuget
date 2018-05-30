@@ -6,17 +6,18 @@ from pathlib import Path
 from uuid import uuid4
 
 # Third-Party
+from flask import current_app
 from flask import g
 from flask import request
 from flask import send_file
 from flask import make_response
+from flask import Blueprint
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.exc import NoResultFound
 
 from werkzeug.local import LocalProxy
 
-from pynuget import app
 from pynuget import db
 from pynuget import core
 from pynuget import logger
@@ -28,11 +29,14 @@ from pynuget.core import ApiException
 FEED_CONTENT_TYPE_HEADER = 'application/atom+xml; type=feed; charset=UTF-8'
 
 
+pages = Blueprint('pages', __name__)
+
+
 def get_db_session():
     session = getattr(g, 'session', None)
     if session is None:
         # TODO: Handle MySQL/PostgreSQL backends.
-        db_name = Path(app.config['SERVER_PATH']) / Path(app.config['DB_NAME'])
+        db_name = Path(current_app.config['SERVER_PATH']) / Path(current_app.config['DB_NAME'])
 
         # TODO: Move this check so that it gets run on server start, not
         # just when a route that uses the session is called.
@@ -49,17 +53,10 @@ def get_db_session():
     return session
 
 
-@app.teardown_appcontext
-def teardown_db_session(exception):
-    session = getattr(g, 'session', None)
-    if session is not None:
-        session.close()
-
-
 session = LocalProxy(get_db_session)
 
 
-@app.route('/$metadata')
+@pages.route('/$metadata')
 def meta():
     """
     The `nuget list` command calls this route.
@@ -85,8 +82,8 @@ def meta():
     return resp
 
 
-@app.route('/', methods=['GET'])
-@app.route('/index', methods=['GET'])
+@pages.route('/', methods=['GET'])
+@pages.route('/index', methods=['GET'])
 def index():
     """
     Used for web interface.
@@ -95,7 +92,7 @@ def index():
     return "index page"
 
 
-@app.route('/api/v2/package/', methods=['PUT'])
+@pages.route('/api/v2/package/', methods=['PUT'])
 def push():
     """
     Used by `nuget push`.
@@ -207,7 +204,7 @@ def push():
     return resp
 
 
-@app.route('/count', methods=['GET'])
+@pages.route('/count', methods=['GET'])
 def count():
     """
     Not sure which nuget command uses this...
@@ -218,8 +215,8 @@ def count():
     return resp
 
 
-@app.route('/delete', methods=['DELETE'])
-@app.route('/api/v2/package/<package>/<version>', methods=['DELETE'])
+@pages.route('/delete', methods=['DELETE'])
+@pages.route('/api/v2/package/<package>/<version>', methods=['DELETE'])
 def delete(package=None, version=None):
     """
     Used by `nuget delete`.
@@ -236,7 +233,7 @@ def delete(package=None, version=None):
     if version is None:
         version = request.args.get('version')
     path = core.get_package_path(pkg_name, version)
-    path = Path(app.config['SERVER_PATH']) / app.config['PACKAGE_DIR'] / path
+    path = Path(current_app.config['SERVER_PATH']) / current_app.config['PACKAGE_DIR'] / path
 
     if path.exists():
         path.unlink()
@@ -252,7 +249,7 @@ def delete(package=None, version=None):
     return '', 204
 
 
-@app.route('/download/<pkg_id>/<version>', methods=['GET'])
+@pages.route('/download/<pkg_id>/<version>', methods=['GET'])
 def download(pkg_id=None, version=None):
     """
     Indirectly used by `nuget install`.
@@ -269,7 +266,7 @@ def download(pkg_id=None, version=None):
     path = core.get_package_path(pkg_name, version)
 
     # Make sure we're trying to download from our package direcory
-    path = Path(app.config['SERVER_PATH']) / app.config['PACKAGE_DIR'] / path
+    path = Path(current_app.config['SERVER_PATH']) / current_app.config['PACKAGE_DIR'] / path
     abs_path = Path.cwd() / path
 
     logger.debug("Path to package: %s" % abs_path)
@@ -288,7 +285,7 @@ def download(pkg_id=None, version=None):
     return result, 200
 
 
-@app.route('/FindPackagesById()', methods=['GET'])
+@pages.route('/FindPackagesById()', methods=['GET'])
 def find_by_id():
     """
     Used by `nuget install`.
@@ -321,7 +318,7 @@ def find_by_id():
     return resp
 
 
-@app.route('/Search()', methods=['GET'])
+@pages.route('/Search()', methods=['GET'])
 def search():
     """
     Used by `nuget list`.
@@ -358,7 +355,7 @@ def search():
     return resp
 
 
-@app.route('/updates', methods=['GET'])
+@pages.route('/updates', methods=['GET'])
 def updates():
     """
     I thought this was `nuget restore` but that looks to be

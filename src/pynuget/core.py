@@ -8,9 +8,9 @@ import re
 from pathlib import Path
 from zipfile import ZipFile
 
+from flask import current_app
 from lxml import etree as et
 
-from pynuget import app
 from pynuget import logger
 
 
@@ -25,7 +25,7 @@ class ApiException(PyNuGetException):
 def require_auth(headers):
     """Ensure that the API key is valid."""
     key = headers.get('X-Nuget-Apikey', None)
-    is_valid = key is not None and key in app.config['API_KEYS']
+    is_valid = key is not None and key in current_app.config['API_KEYS']
     if not is_valid:
         logger.error("Missing or Invalid API key")
     return is_valid
@@ -173,8 +173,8 @@ def save_file(file, pkg_name, version):
     """
     # Save the package file to the local package dir. Thus far it's
     # just been floating around in magic Flask land.
-    server_path = Path(app.config['SERVER_PATH'])
-    package_dir = Path(app.config['PACKAGE_DIR'])
+    server_path = Path(current_app.config['SERVER_PATH'])
+    package_dir = Path(current_app.config['PACKAGE_DIR'])
     local_path = server_path / package_dir
     local_path = local_path / pkg_name / (version + ".nupkg")
 

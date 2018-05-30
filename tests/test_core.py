@@ -11,8 +11,8 @@ import pytest
 from lxml import etree as et
 from werkzeug.datastructures import FileStorage
 
+from pynuget import create_app
 from pynuget import core
-from pynuget import app
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 NAMESPACE = {'nuspec':
@@ -21,12 +21,14 @@ NAMESPACE = {'nuspec':
 
 def test_require_auth():
     # Make sure that our default config hasn't changed.
+    app = create_app()
     assert app.config['API_KEYS'] == {"ChangeThisKey"}
 
-    headers = {'X-Nuget-Apikey': 'ChangeThisKey'}
-    assert core.require_auth(headers)
-    headers = {'X-Nuget-Apikey': 'Invaldid Key'}
-    assert not core.require_auth(headers)
+    with app.app_context():
+        headers = {'X-Nuget-Apikey': 'ChangeThisKey'}
+        assert core.require_auth(headers)
+        headers = {'X-Nuget-Apikey': 'Invaldid Key'}
+        assert not core.require_auth(headers)
 
 
 def test_get_pacakge_path():
@@ -61,7 +63,9 @@ def test_save_file():
     with open(good, 'rb') as openf:
         file = FileStorage(openf)
 
-        path = core.save_file(file, "a", "b")
+        app = create_app()
+        with app.app_context():
+            path = core.save_file(file, "a", "b")
         path.unlink()
 
 
@@ -110,6 +114,7 @@ def test_extract_nuspec():
 
 def test_hash_and_encode_file():
     # Overwrite our server path
+    app = create_app()
     old_server_path = app.config['SERVER_PATH']
     old_package_dir = app.config['PACKAGE_DIR']
     app.config['SERVER_PATH'] = DATA_DIR
