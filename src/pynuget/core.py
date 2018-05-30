@@ -219,10 +219,10 @@ def extract_nuspec(file):
     """
     Parameters
     ----------
-    file : :class:`werkzeug.datastructures.FileStorage` object or path (str)
+    file : :class:`pathlib.Path` object or str
         The file as retrieved by Flask.
     """
-    pkg = ZipFile(file, 'r')
+    pkg = ZipFile(str(file), 'r')
     logger.debug("Parsing uploaded file.")
     nuspec_file = None
     pattern = re.compile(r'^.*\.nuspec$', re.IGNORECASE)
