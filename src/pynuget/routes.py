@@ -68,6 +68,9 @@ def root():
 @app.route('/$metadata')
 @app.route('/nuget/$metadata')
 def meta():
+    """
+    The `nuget list` command calls this route.
+    """
     logger.debug("route: /$metadata")
     resp = make_response(
         """<?xml version="1.0" encoding="utf-8"?>
@@ -93,6 +96,9 @@ def meta():
 @app.route('/index', methods=['GET', 'PUT', 'DELETE'])
 @app.route('/api/v2/package/', methods=['GET', 'PUT', 'DELETE'])
 def index():
+    """
+    Used for web interface.
+    """
     logger.debug("Route: /index")
     if request.method == 'PUT':
         return push()
@@ -105,6 +111,9 @@ def index():
 
 
 def push():
+    """
+    Used by `nuget push`.
+    """
     logger.debug("push()")
     logger.debug("  args: {}".format(request.args))
     logger.debug("  header: {}".format(request.headers))
@@ -214,6 +223,9 @@ def push():
 
 @app.route('/count', methods=['GET'])
 def count():
+    """
+    Not sure which nuget command uses this...
+    """
     logger.debug("Route: /count")
     resp = make_response(str(db.count_packages(session)))
     resp.headers['Content-Type'] = 'text/plain; charset=utf-8'
@@ -223,6 +235,9 @@ def count():
 @app.route('/delete', methods=['DELETE'])
 @app.route('/api/v2/package/<package>/<version>', methods=['DELETE'])
 def delete(package=None, version=None):
+    """
+    Used by `nuget delete`.
+    """
     logger.debug("Route: /delete")
     if not core.require_auth(request.headers):
         return "api_error: Missing or Invalid API key", 401      # TODO
@@ -254,6 +269,9 @@ def delete(package=None, version=None):
 @app.route('/download', methods=['GET'])
 @app.route('/download/<pkg_id>/<version>', methods=['GET'])
 def download(pkg_id=None, version=None):
+    """
+    Indirectly used by `nuget install`.
+    """
     logger.debug("Route: /download")
 
     if pkg_id is None:
@@ -289,6 +307,8 @@ def download(pkg_id=None, version=None):
 @app.route('/FindPackagesById()', methods=['GET'])
 def find_by_id():
     """
+    Used by `nuget install`.
+
     It looks like the NuGet client expects this to send back a list of all
     versions for the package, and then the client handles extraction of
     an individual version.
@@ -321,6 +341,9 @@ def find_by_id():
 @app.route('/nuget/Search()', methods=['GET'])
 @app.route('/Search()', methods=['GET'])
 def search():
+    """
+    Used by `nuget list`.
+    """
     logger.debug("Route: /search")
     logger.debug(request.args)
     # TODO: Cleanup this and db.search_pacakges call sig.
@@ -355,6 +378,10 @@ def search():
 
 @app.route('/updates', methods=['GET'])
 def updates():
+    """
+    I thought this was `nuget restore` but that looks to be
+    `GET http://localhost:5000/Packages(Id='xunit',Version='2.3.1')`
+    """
     logger.debug("Route: /updates")
     ids = request.args.get('packageids').strip("'").split('|')
     versions = request.args.get('versions').strip("'").split('|')
