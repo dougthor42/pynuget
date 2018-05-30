@@ -172,6 +172,22 @@ def test_push_fail_parse_dependencies(client, put_header):
     #assert rv.status_code == 400
 
 
+def test_metadata(client):
+    rv = client.get('/$metadata')
+    assert rv.status_code == 200
+    assert b'<?xml version="1.0" encoding="utf-8"?>' in rv.data
+    assert b'xml:base="http://localhost' in rv.data
+    assert b'<workspace>' in rv.data
+    assert b'<atom:title type="text">Default</atom:title>' in rv.data
+    assert b'<atom:title type="text">Packages</atom:title>' in rv.data
+    assert b'</workspace>' in rv.data
+    assert b'</service>' in rv.data
+    assert 'application/atomsvc+xml;' in rv.headers['Content-Type']
+    assert ' charset=utf-8' in rv.headers['Content-Type']
+    assert rv.headers['Pragma'] == 'no-cache'
+    assert rv.headers['Cache-Control'] == 'no-cache'
+
+
 def test_count(client):
     rv = client.get('/count')
     assert rv.data == b'0'

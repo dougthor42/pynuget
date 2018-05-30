@@ -65,9 +65,28 @@ def root():
     return "Hello World!"
 
 
+@app.route('/$metadata')
 @app.route('/nuget/$metadata')
 def meta():
-    return "metadata file"
+    logger.debug("route: /$metadata")
+    resp = make_response(
+        """<?xml version="1.0" encoding="utf-8"?>
+        <service xml:base="{}" xmlns="http://www.w3.org/2007/app" xmlns:atom="http://www.w3.org/2005/Atom">
+          <workspace>
+            <atom:title type="text">Default</atom:title>
+            <collection href="Packages">
+              <atom:title type="text">Packages</atom:title>
+            </collection>
+          </workspace>
+        </service>""".format(request.url_root)
+    )
+    resp.headers['Content-Type'] = 'application/atomsvc+xml; charset=utf-8'
+    resp.headers['Cache-Control'] = 'no-cache'
+    resp.headers['Pragma'] = 'no-cache'
+    resp.headers['Expires'] = '-1'
+
+    logger.debug("Returning resp: %s" % str(resp))
+    return resp
 
 
 @app.route('/', methods=['GET', 'PUT', 'DELETE'])
