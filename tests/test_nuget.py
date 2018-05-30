@@ -2,60 +2,41 @@
 """
 """
 import os
-import shutil
 
 import pytest
 
-from pynuget import core
-from pynuget import app
-from pynuget import commands
+from .test_routes import client, populated_db
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
 
-@pytest.fixture
-def client():
-    # override the default variables.
-    # TODO: Move this to just a different config file.
-    old_server_path = app.config['SERVER_PATH']
-    old_package_dir = app.config['PACKAGE_DIR']
-    server_path = app.config['SERVER_PATH'] = os.path.join(DATA_DIR, 'server')
-    pkg_dir = app.config['PACKAGE_DIR'] = 'pkgs'
-    old_api_keys = app.config['API_KEYS']
-    api_keys = app.config['API_KEYS'] = ['no_key']
-
-    commands._create_directories(server_path, pkg_dir)
-    commands._create_db(app.config['DB_BACKEND'],
-                        app.config['DB_NAME'],
-                        server_path)
-
-    client = app.test_client()
-    yield client
-
-    # Cleanup
-    os.remove(os.path.join(server_path, app.config['DB_NAME']))
-    shutil.rmtree(str(server_path), ignore_errors=False)
-    app.config['SERVER_PATH'] = old_server_path
-    app.config['PACKAGE_DIR'] = old_package_dir
-    app.config['API_KEYS'] = old_api_keys
-
-
-
 @pytest.mark.integration
-def test_nuget_list():
+def test_nuget_metadata(client):
+    # happens during list
+    # GET http://localhost:5000/$metadata
     pass
 
 
 @pytest.mark.integration
-def test_nuget_add():
+def test_nuget_list(populated_db):
+    # GET http://localhost:5000/Search()?$orderby=Id&searchTerm=''&targetFramework=''&includePrerelease=true&$skip=0&$top=30&semVerLevel=2.0.0
     pass
 
 
 @pytest.mark.integration
-def test_nuget_delete():
+def test_nuget_add(client):
+    # PUT http://localhost:5000/api/v2/package/
     pass
 
 
 @pytest.mark.integration
-def test_nuget_install():
+def test_nuget_delete(populated_db):
+    # DELETE http://localhost:5000/api/v2/package/NuGetTest/0.0.1
+    pass
+
+
+@pytest.mark.integration
+def test_nuget_install(populated_db):
+    # GET http://localhost:5000/Packages(Id='NuGetTest',Version='0.0.2')
+    # GET http://localhost:5000/FindPackagesById()?id='NuGetTest'&semVerLevel=2.0.0
     pass
