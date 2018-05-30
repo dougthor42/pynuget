@@ -187,16 +187,15 @@ def save_file(file, pkg_name, version):
 
     Returns:
     --------
-    hash_ : bytes
-    filesize
+    local_path : :class:`pathlib.Path`
+        The path to the saved file.
     """
     # Save the package file to the local package dir. Thus far it's
     # just been floating around in magic Flask land.
-    local_path = Path(app.config['SERVER_PATH']) / Path(app.config['PACKAGE_DIR'])
-    local_path = os.path.join(str(local_path),
-                              pkg_name,
-                              version + ".nupkg",
-                              )
+    server_path = Path(app.config['SERVER_PATH'])
+    package_dir = Path(app.config['PACKAGE_DIR'])
+    local_path = server_path / package_dir
+    local_path = local_path / pkg_name / (version + ".nupkg")
 
     # Check if the package's directory already exists. Create if needed.
     os.makedirs(os.path.split(local_path)[0],
@@ -206,12 +205,14 @@ def save_file(file, pkg_name, version):
 
     logger.debug("Saving uploaded file to filesystem.")
     try:
-        file.save(local_path)
+        file.save(str(local_path))
     except Exception as err:       # TODO: specify exceptions
         logger.error("Unknown exception: %s" % err)
         raise err
     else:
-        logger.info("Succesfully saved package to '%s'" % local_path)
+        logger.info("Succesfully saved package to '%s'" % str(local_path))
+
+    return local_path
 
 
 def extract_nuspec(file):
