@@ -143,8 +143,7 @@ def hash_and_encode_file(file, pkg_name, version):
     """
     Parameters
     ----------
-    file : :class:`werkzeug.datastructures.FileStorage` object
-        The file as retrieved by Flask.
+    file : :class:`pathlib.Path` object
     pkg_name : str
     version : str
 
@@ -194,6 +193,44 @@ def hash_and_encode_file(file, pkg_name, version):
             logger.info("Succesfully saved package to '%s'" % local_path)
 
     return hash_.decode('utf-8'), filesize
+
+
+def save_file(file, pkg_name, version):
+    """
+    Parameters
+    ----------
+    file : :class:`werkzeug.datastructures.FileStorage` object
+        The file as retrieved by Flask.
+    pkg_name : str
+    version : str
+
+    Returns:
+    --------
+    hash_ : bytes
+    filesize
+    """
+    # Save the package file to the local package dir. Thus far it's
+    # just been floating around in magic Flask land.
+    local_path = Path(app.config['SERVER_PATH']) / Path(app.config['PACKAGE_DIR'])
+    local_path = os.path.join(str(local_path),
+                              pkg_name,
+                              version + ".nupkg",
+                              )
+
+    # Check if the package's directory already exists. Create if needed.
+    os.makedirs(os.path.split(local_path)[0],
+                mode=0o0755,
+                exist_ok=True,      # do not throw an error path exists.
+                )
+
+    logger.debug("Saving uploaded file to filesystem.")
+    try:
+        file.save(local_path)
+    except Exception as err:       # TODO: specify exceptions
+        logger.error("Unknown exception: %s" % err)
+        raise err
+    else:
+        logger.info("Succesfully saved package to '%s'" % local_path)
 
 
 def extract_nuspec(file):
