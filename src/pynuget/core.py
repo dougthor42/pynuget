@@ -5,11 +5,8 @@ import base64
 import hashlib
 import os
 import re
-import shutil
-import tempfile
-from zipfile import ZipFile
 from pathlib import Path
-from uuid import uuid4
+from zipfile import ZipFile
 
 from lxml import etree as et
 
