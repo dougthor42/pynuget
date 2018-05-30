@@ -60,7 +60,6 @@ session = LocalProxy(get_db_session)
 
 
 @app.route('/$metadata')
-@app.route('/nuget/$metadata')
 def meta():
     """
     The `nuget list` command calls this route.
