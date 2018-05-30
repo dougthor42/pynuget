@@ -137,12 +137,8 @@ def push():
     try:
         # rename our file.
         # Check if the package's directory already exists. Create if needed.
-        import os
         new = file.parent.parent / pkg_name / (version + ".nupkg")
-        os.makedirs(os.path.split(str(new))[0],
-                    mode=0o0755,
-                    exist_ok=True,      # do not throw an error path exists.
-                    )
+        core.create_parent_dirs(new)
         logger.debug("Renaming %s to %s" % (str(file), new))
         file.rename(new)
         hash_, filesize = core.hash_and_encode_file(str(new))

@@ -198,10 +198,7 @@ def save_file(file, pkg_name, version):
     local_path = local_path / pkg_name / (version + ".nupkg")
 
     # Check if the package's directory already exists. Create if needed.
-    os.makedirs(os.path.split(local_path)[0],
-                mode=0o0755,
-                exist_ok=True,      # do not throw an error path exists.
-                )
+    create_parent_dirs(local_path)
 
     logger.debug("Saving uploaded file to filesystem.")
     try:
@@ -213,6 +210,20 @@ def save_file(file, pkg_name, version):
         logger.info("Succesfully saved package to '%s'" % str(local_path))
 
     return local_path
+
+
+def create_parent_dirs(path):
+    """
+    Create the parent directories if it doesn't already exist.
+
+    Parameters
+    ----------
+    path : :class:`pathlib.Path`
+    """
+    os.makedirs(str(path.parent),
+                mode=0o0755,
+                exist_ok=True,      # do not throw an error path exists.
+                )
 
 
 def extract_nuspec(file):
