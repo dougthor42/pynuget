@@ -135,7 +135,17 @@ def push():
 
     # Hash the uploaded file and encode the hash in Base64. For some reason.
     try:
-        hash_, filesize = core.hash_and_encode_file(file, pkg_name, version)
+        # rename our file.
+        # Check if the package's directory already exists. Create if needed.
+        import os
+        new = file.parent.parent / pkg_name / (version + ".nupkg")
+        os.makedirs(os.path.split(str(new))[0],
+                    mode=0o0755,
+                    exist_ok=True,      # do not throw an error path exists.
+                    )
+        logger.debug("Renaming %s to %s" % (str(file), new))
+        file.rename(new)
+        hash_, filesize = core.hash_and_encode_file(str(new))
     except Exception as err:
         logger.error("Exception: %s" % err)
         return "api_error: Unable to save file", 500
