@@ -252,7 +252,6 @@ def delete(package=None, version=None):
     return '', 204
 
 
-@app.route('/download', methods=['GET'])
 @app.route('/download/<pkg_id>/<version>', methods=['GET'])
 def download(pkg_id=None, version=None):
     """
