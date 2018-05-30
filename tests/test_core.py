@@ -71,6 +71,15 @@ def test_hash_file():
     assert in_hex.startswith("3e479fa121a7b19f9f5eed")
 
 
+def test_save_file():
+    good = os.path.join(DATA_DIR, "good.nupkg")
+    with open(good, 'rb') as openf:
+        file = FileStorage(openf)
+
+        path = core.save_file(file, "a", "b")
+        path.unlink()
+
+
 def test_encode_file():
     good = os.path.join(DATA_DIR, "good.nupkg")
 
