@@ -112,6 +112,33 @@ def determine_dependencies(metadata_element, namespace):
     return dependencies
 
 
+def hash_file(file, algorithm=hashlib.md5):
+    """
+    Parameters
+    ----------
+    file : :class:`pathlib.Path` object
+    algorithm : Hash algorithm constructor
+        One of the hash algorithms present in the `hashlib` module.
+
+    Returns:
+    --------
+    hash_ : bytes
+
+    Note that the returned `hash_` value is in binary. To make it a human
+    readable string, use `binascii.hexlify(hash_).decode('utf-8')`.
+    """
+    file = str(file)
+    logger.debug("Hashing file %s" % file)
+    m = algorithm()
+    with open(file, 'rb') as openf:
+        m.update(openf.read())
+    hash_ = m.hexdigest()
+
+    logger.debug("%s hash: %s, %s" % (algorithm.__name__, hash_, file))
+
+    return m.digest()
+
+
 def hash_and_encode_file(file, pkg_name, version):
     """
     Parameters

@@ -3,6 +3,7 @@
 """
 import os
 import shutil
+from binascii import hexlify
 from pathlib import Path
 from unittest.mock import MagicMock
 
@@ -54,6 +55,20 @@ def test_et_to_str():
     assert core.et_to_str(node) is None
     node = MagicMock(text="Hello")
     assert core.et_to_str(node) == "Hello"
+
+
+def test_hash_file():
+    file = Path(DATA_DIR) / "NuGetTest.0.0.1.nupkg"
+    hash_ = core.hash_file(file)
+    assert isinstance(hash_, bytes)
+    in_hex = hexlify(hash_).decode('utf-8')
+    assert in_hex == 'c51fc4294f82ddccfe7026f62bbb3089'
+
+    import hashlib
+    hash_ = core.hash_file(file, hashlib.sha512)
+    assert isinstance(hash_, bytes)
+    in_hex = hexlify(hash_).decode('utf-8')
+    assert in_hex.startswith("3e479fa121a7b19f9f5eed")
 
 
 def test_parse_nuspec():
