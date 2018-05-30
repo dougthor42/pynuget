@@ -35,10 +35,10 @@ ADO_METADATA_URL = ADO_BASE_URL + "/metadata"
 
 class FeedWriter(object):
 
-    def __init__(self, feed_name):
+    def __init__(self, feed_name, base_url='http://localhost:5000/'):
         logger.debug("Initializing FeedWriter")
         self.feed_name = feed_name
-        self.base_url = 'http://localhost:5000/'         # TODO: not hard-code
+        self.base_url = base_url
 
     def write(self, results):
         self.begin_feed()

@@ -308,7 +308,7 @@ def find_by_id():
 
     results = db.find_by_pkg_name(session, pkg_name)
     logger.debug(results)
-    feed = FeedWriter('FindPackagesById')
+    feed = FeedWriter('FindPackagesById', request.url_root)
     resp = make_response(feed.write_to_output(results))
     resp.headers['Content-Type']
 
@@ -344,7 +344,7 @@ def search():
                                  search_query=search_query,
                                  )
 
-    feed = FeedWriter('Search')
+    feed = FeedWriter('Search', request.url_root)
     resp = make_response(feed.write_to_output(results))
     resp.headers['Content-Type'] = FEED_CONTENT_TYPE_HEADER
 
@@ -363,7 +363,7 @@ def updates():
 
     results = db.package_updates(session, pkg_to_vers, include_prerelease)
 
-    feed = FeedWriter('GetUpdates')
+    feed = FeedWriter('GetUpdates', request.url_root)
     resp = make_response(feed.write_to_output(results))
     resp.headers['Content-Type'] = FEED_CONTENT_TYPE_HEADER
     return resp
