@@ -112,7 +112,71 @@ def determine_dependencies(metadata_element, namespace):
     return dependencies
 
 
-def hash_and_encode_file(file, pkg_name, version):
+def hash_and_encode_file(file):
+    """
+    Parameters
+    ----------
+    file : :class:`pathlib.Path` object
+
+    Returns:
+    --------
+    hash_ : bytes
+    filesize : int
+    """
+    return encode_file(file, hash_file(file, hashlib.sha512))
+
+
+def hash_file(file, algorithm=hashlib.md5):
+    """
+    Parameters
+    ----------
+    file : :class:`pathlib.Path` object
+    algorithm : Hash algorithm constructor
+        One of the hash algorithms present in the `hashlib` module.
+
+    Returns:
+    --------
+    hash_ : bytes
+
+    Note that the returned `hash_` value is in binary. To make it a human
+    readable string, use `binascii.hexlify(hash_).decode('utf-8')`.
+    """
+    file = str(file)
+    logger.debug("Hashing file %s" % file)
+    m = algorithm()
+    with open(file, 'rb') as openf:
+        m.update(openf.read())
+    hash_ = m.hexdigest()
+
+    logger.debug("%s hash: %s, %s" % (algorithm.__name__, hash_, file))
+
+    return m.digest()
+
+
+def encode_file(file, hash_):
+    """
+    Parameters
+    ----------
+    file : :class:`pathlib.Path` object
+    hash_ : bytes
+        The value returned by `hash_file()`.
+
+    Returns:
+    --------
+    hash_ : bytes
+    filesize : int
+    """
+    logger.debug("Encoding in Base64.")
+    hash_ = base64.b64encode(hash_)
+
+    # Get the filesize of the uploaded file. Used later.
+    filesize = os.path.getsize(file)
+    logger.debug("File size: %d bytes" % filesize)
+
+    return hash_.decode('utf-8'), filesize
+
+
+def save_file(file, pkg_name, version):
     """
     Parameters
     ----------
@@ -123,60 +187,53 @@ def hash_and_encode_file(file, pkg_name, version):
 
     Returns:
     --------
-    hash_ : bytes
-    filesize : int
+    local_path : :class:`pathlib.Path`
+        The path to the saved file.
     """
-    logger.debug("Hashing and encoding uploaded file.")
-    with tempfile.TemporaryDirectory() as tmpdir:
-        name = str(uuid4()) + ".tmp"
-        temp_file = os.path.join(tmpdir, name)
-        logger.debug("Saving uploaded file to temporary location.")
-        file.save(temp_file)
-        m = hashlib.sha512()
-        logger.debug("Hashing file.")
-        with open(temp_file, 'rb') as openf:
-            m.update(openf.read())
-        logger.debug("Encoding in Base64.")
-        hash_ = base64.b64encode(m.digest())
+    # Save the package file to the local package dir. Thus far it's
+    # just been floating around in magic Flask land.
+    server_path = Path(app.config['SERVER_PATH'])
+    package_dir = Path(app.config['PACKAGE_DIR'])
+    local_path = server_path / package_dir
+    local_path = local_path / pkg_name / (version + ".nupkg")
 
-        # Get the filesize of the uploaded file. Used later.
-        filesize = os.path.getsize(temp_file)
-        logger.debug("File size: %d bytes" % filesize)
+    # Check if the package's directory already exists. Create if needed.
+    create_parent_dirs(local_path)
 
-        # Save the package file to the local package dir. Thus far it's
-        # just been floating around in magic Flask land.
-        local_path = Path(app.config['SERVER_PATH']) / Path(app.config['PACKAGE_DIR'])
-        local_path = os.path.join(str(local_path),
-                                  pkg_name,
-                                  version + ".nupkg",
-                                  )
+    logger.debug("Saving uploaded file to filesystem.")
+    try:
+        file.save(str(local_path))
+    except Exception as err:       # TODO: specify exceptions
+        logger.error("Unknown exception: %s" % err)
+        raise err
+    else:
+        logger.info("Succesfully saved package to '%s'" % str(local_path))
 
-        # Check if the pacakge's directory already exists. Create if needed.
-        os.makedirs(os.path.split(local_path)[0],
-                    mode=0o0755,
-                    exist_ok=True,      # do not throw an error path exists.
-                    )
+    return local_path
 
-        logger.debug("Saving uploaded file to filesystem.")
-        try:
-            shutil.copy(temp_file, local_path)
-        except Exception as err:       # TODO: specify exceptions
-            logger.error("Unknown exception: %s" % err)
-            raise err
-        else:
-            logger.info("Succesfully saved package to '%s'" % local_path)
 
-    return hash_.decode('utf-8'), filesize
+def create_parent_dirs(path):
+    """
+    Create the parent directories if it doesn't already exist.
+
+    Parameters
+    ----------
+    path : :class:`pathlib.Path`
+    """
+    os.makedirs(str(path.parent),
+                mode=0o0755,
+                exist_ok=True,      # do not throw an error path exists.
+                )
 
 
 def extract_nuspec(file):
     """
     Parameters
     ----------
-    file : :class:`werkzeug.datastructures.FileStorage` object or path (str)
+    file : :class:`pathlib.Path` object or str
         The file as retrieved by Flask.
     """
-    pkg = ZipFile(file, 'r')
+    pkg = ZipFile(str(file), 'r')
     logger.debug("Parsing uploaded file.")
     nuspec_file = None
     pattern = re.compile(r'^.*\.nuspec$', re.IGNORECASE)

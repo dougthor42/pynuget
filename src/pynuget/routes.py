@@ -3,6 +3,7 @@
 """
 import re
 from pathlib import Path
+from uuid import uuid4
 
 # Third-Party
 from flask import g
@@ -97,6 +98,9 @@ def push():
         return "error: File not uploaded", 409
     file = request.files['package']
 
+    # Save the file to a temporary location
+    file = core.save_file(file, "_temp", str(uuid4()))
+
     # Open the zip file that was sent and extract out the .nuspec file."
     try:
         nuspec = core.extract_nuspec(file)
@@ -131,7 +135,13 @@ def push():
 
     # Hash the uploaded file and encode the hash in Base64. For some reason.
     try:
-        hash_, filesize = core.hash_and_encode_file(file, pkg_name, version)
+        # rename our file.
+        # Check if the package's directory already exists. Create if needed.
+        new = file.parent.parent / pkg_name / (version + ".nupkg")
+        core.create_parent_dirs(new)
+        logger.debug("Renaming %s to %s" % (str(file), new))
+        file.rename(new)
+        hash_, filesize = core.hash_and_encode_file(str(new))
     except Exception as err:
         logger.error("Exception: %s" % err)
         return "api_error: Unable to save file", 500
