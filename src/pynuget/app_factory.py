@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 
 from flask import Flask
+from flask import g
 
 from pynuget._logging import setup_logging
 from pynuget.routes import pages
@@ -41,5 +42,11 @@ def create_app():
              db_backend=app.config['DB_BACKEND'],
              apache_config=app.config['APACHE_CONFIG'],
              )
+
+    @app.teardown_appcontext
+    def teardown_db_session(exception):
+        session = getattr(g, 'session', None)
+        if session is not None:
+            session.close()
 
     return app

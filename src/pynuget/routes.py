@@ -53,13 +53,6 @@ def get_db_session():
     return session
 
 
-@app.teardown_appcontext
-def teardown_db_session(exception):
-    session = getattr(g, 'session', None)
-    if session is not None:
-        session.close()
-
-
 session = LocalProxy(get_db_session)
 
 
