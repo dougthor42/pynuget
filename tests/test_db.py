@@ -29,10 +29,6 @@ def session():
     return session
 
 
-def test_create_schema(session):
-    pass
-
-
 def test_count_packages(session):
     session.add(db.Package(name="pkg_2", latest_version="0.0.1"))
     session.commit()

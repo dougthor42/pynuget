@@ -22,11 +22,6 @@ class ApiException(PyNuGetException):
     pass
 
 
-# XXX: Not needed?
-def api_error():
-    raise NotImplementedError
-
-
 def require_auth(headers):
     """Ensure that the API key is valid."""
     key = headers.get('X-Nuget-Apikey', None)
@@ -34,12 +29,6 @@ def require_auth(headers):
     if not is_valid:
         logger.error("Missing or Invalid API key")
     return is_valid
-
-
-# XXX: Not needed?
-def request_method():
-    """Get the HTTP method used for the current request."""
-    raise NotImplementedError
 
 
 def get_package_path(package_id, version):
@@ -60,11 +49,6 @@ def get_package_path(package_id, version):
     """
     result = Path(package_id) / (version  + '.nupkg')
     return result
-
-
-# XXX: Not needed?
-def url_scheme():
-    raise NotImplementedError
 
 
 def et_to_str(node):
