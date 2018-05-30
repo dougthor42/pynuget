@@ -89,8 +89,8 @@ def check_push(expected_code, client, header, file=None):
 
 
 def test_root_get(client):
-    rv = client.get('/web')
-    assert b'Hello World!' in rv.data
+    rv = client.get('/')
+    assert rv.status_code == 200
 
 
 def test_index_get(client):

@@ -59,12 +59,6 @@ def teardown_db_session(exception):
 session = LocalProxy(get_db_session)
 
 
-@app.route('/web')
-def root():
-    logger.debug("Route: /web")
-    return "Hello World!"
-
-
 @app.route('/$metadata')
 @app.route('/nuget/$metadata')
 def meta():
