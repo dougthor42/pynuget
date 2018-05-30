@@ -321,8 +321,6 @@ def find_by_id():
     return resp
 
 
-@app.route('/search', methods=['GET'])
-@app.route('/nuget/Search()', methods=['GET'])
 @app.route('/Search()', methods=['GET'])
 def search():
     """
