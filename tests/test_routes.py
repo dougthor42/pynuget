@@ -283,6 +283,18 @@ def test_find_by_id(populated_db):
     assert b"<d:Id>NuGetTest</d:Id>" in rv.data
 
 
+def test_packages(populated_db):
+    client = populated_db
+
+    rv = client.get(
+        "/Packages(Id='NuGetTest',Version='0.0.1')",
+        follow_redirects=True,
+    )
+
+    assert b"Douglas Thor" in rv.data
+    assert b"<d:Id>NuGetTest</d:Id>" in rv.data
+
+
 def test_search(populated_db):
     client = populated_db
 
