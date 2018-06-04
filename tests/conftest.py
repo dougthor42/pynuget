@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 """
+import datetime as dt
 import os
 import shutil
 from pathlib import Path
@@ -11,6 +12,7 @@ import sqlalchemy as sa
 from pynuget import create_app
 from pynuget import commands
 from pynuget import db
+from pynuget import feedwriter as fw
 
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
@@ -116,3 +118,86 @@ def package_dir(package_data):
             os.makedirs(str(path), exist_ok=True)
     yield pkg_dir
     shutil.rmtree(str(pkg_dir), ignore_errors=False)
+
+
+@pytest.fixture
+def feedwriter():
+    return fw.FeedWriter("NoName")
+
+
+@pytest.fixture
+def version_row():
+    row = db.Version(
+        version_id=1,
+        package_id=1,
+        version="0.0.1",
+        copyright_="No copyright",
+        created=dt.datetime(1970, 1, 1, 0, 0, 0, 0),
+        dependencies='[{"id": 1, "version": "0.2.3"}]',
+        description="Some description",
+        icon_url="no url",
+        is_prerelease=False,
+        package_hash="abc123",
+        package_hash_algorithm="Michael Jackson",
+        package_size=1024,
+        project_url="https://github.com/dougthor42/pynuget/",
+        release_notes="No release notes. Sorry!",
+        require_license_acceptance=False,
+        tags="no tags",
+        title="DummyPackage",
+        version_download_count=9,
+        license_url="https://github.com/dougthor42/pynuget/blob/master/LICENSE",
+    )
+
+    pkg = db.Package(package_id=1,
+                     title="DummyPackage",
+                     download_count=12,
+                     latest_version="0.0.1")
+
+    row.package = pkg
+
+    return row
+
+
+@pytest.fixture
+def version_row_xml():
+    """The values in here are intimately linked to those in version_row."""
+    # I think it's supposed to look like this...
+    # Note implicit string concatenation.
+    expected = (
+        '<root><properties><MinClientVersion />'
+        '<Dependencies>1:0.2.3:</Dependencies>'
+        '<VersionDownloadCount m:type="int">9</VersionDownloadCount>'
+        '<ReleaseNotes>No release notes. Sorry!</ReleaseNotes>'
+        '<version>0.0.1</version>'
+        '<LicenseUrl>"'
+        'https://github.com/dougthor42/pynuget/blob/master/LICENSE"'
+        '</LicenseUrl>'
+        '<Tags>no tags</Tags><Language m:null="true" />'
+        '<ProjectUrl>https://github.com/dougthor42/pynuget/</ProjectUrl>'
+        '<IconUrl>no url</IconUrl>'
+        '<PackageHashAlgorithm>Michael Jackson</PackageHashAlgorithm>'
+        '<PackageHash>abc123</PackageHash>'
+        '<Title>DummyPackage</Title>'
+        '<PackageSize m:type="int">1024</PackageSize>'
+        '<DownloadCount m:type="int">12</DownloadCount>'
+        '<NormalizedVersion>0.0.1</NormalizedVersion>'
+        '<Created m:type="dt.datetime">1970-01-01T00:00:00Z</Created>'
+        '<Description>Some description</Description>'
+        '<LicenseNames /><Summary m:null="true" />'
+        '<LastEdited m:null="true" m:type="dt.datetime" />'
+        '<IsPrerelease m:type="bool">False</IsPrerelease>'
+        '<RequireLicenseAcceptance m:type="bool">False'
+        '</RequireLicenseAcceptance>'
+        '<Copyright>No copyright</Copyright>'
+        '<ReportAbuseUrl />'
+        '<IsAbsoluteLatestVersion m:type="bool">True'
+        '</IsAbsoluteLatestVersion>'
+        '<IsLatestVersion m:type="bool">True</IsLatestVersion>'
+        '<Published m:type="dt.datetime">1970-01-01T00:00:00Z</Published>'
+        '<GalleryDetailsUrl>TBDdetails/1/0.0.1</GalleryDetailsUrl'
+        '><LicenseReportUrl />'
+        '</properties>'
+        '</root>'
+    )
+    return expected
