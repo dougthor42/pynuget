@@ -6,8 +6,6 @@ import subprocess
 
 import pytest
 
-from .test_routes import client, populated_db, put_header
-
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 NUGET_EXE = "/home/dthor/temp/nuget.exe"
 SOURCE = "http://localhost:5000"
