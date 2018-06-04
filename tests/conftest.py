@@ -9,6 +9,7 @@ from pathlib import Path
 import pytest
 import sqlalchemy as sa
 
+from . import helpers
 from pynuget import create_app
 from pynuget import commands
 from pynuget import db
@@ -73,6 +74,14 @@ def put_header():
         'Accept-Encoding': 'gzip, deflate',
     }
     return header
+
+
+@pytest.fixture
+def populated_db(client, put_header):
+    """Build up a dummy database of NuGet packages."""
+    # TODO: make this just DB calls instead of full API
+    helpers.check_push(201, client, put_header, 'good.nupkg')
+    yield client
 
 
 @pytest.fixture

@@ -6,40 +6,12 @@ from io import BytesIO
 
 import pytest
 
+from . import helpers
+from .helpers import check_push
 from pynuget import routes
 
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
-
-
-@pytest.fixture
-def populated_db(client, put_header):
-    """Build up a dummy database of NuGet packages."""
-    # TODO: make this just DB calls instead of full API
-    check_push(201, client, put_header, 'good.nupkg')
-    yield client
-
-
-def check_push(expected_code, client, header, file=None):
-    data = None
-    if file:
-        nupkg_file = os.path.join(DATA_DIR, file)
-        openf = open(nupkg_file, 'rb')
-        data = {'package': (openf, 'filename.nupkg')}
-
-    rv = client.put(
-        '/api/v2/package/',
-        headers=header,
-        follow_redirects=True,
-        data=data,
-    )
-
-    try:
-        openf.close()
-    except Exception:
-        pass
-
-    assert rv.status_code == expected_code
 
 
 def test_root_get(client):
