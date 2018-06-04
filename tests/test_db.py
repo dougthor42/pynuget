@@ -8,27 +8,6 @@ import sqlalchemy as sa
 from pynuget import db
 
 
-@pytest.fixture
-def session():
-    engine = sa.create_engine('sqlite:///:memory:')
-
-    db.Base.metadata.create_all(engine)
-
-    session = sa.orm.Session(bind=engine)
-
-    # Add some dummy data
-    pkg = db.Package(name="dummy", latest_version="0.0.3")
-    session.add(pkg)
-    session.commit()
-
-    session.add(db.Version(package_id=pkg.package_id, version="0.0.1"))
-    session.add(db.Version(package_id=pkg.package_id, version="0.0.2"))
-    session.add(db.Version(package_id=pkg.package_id, version="0.0.3"))
-    session.commit()
-
-    return session
-
-
 def test_count_packages(session):
     session.add(db.Package(name="pkg_2", latest_version="0.0.1"))
     session.commit()

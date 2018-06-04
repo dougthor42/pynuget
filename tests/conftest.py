@@ -5,9 +5,11 @@ import os
 import shutil
 
 import pytest
+import sqlalchemy as sa
 
 from pynuget import create_app
 from pynuget import commands
+from pynuget import db
 
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
@@ -68,3 +70,27 @@ def put_header():
         'Accept-Encoding': 'gzip, deflate',
     }
     return header
+
+
+@pytest.fixture
+def session():
+    """
+    Create a database session.
+    """
+    engine = sa.create_engine('sqlite:///:memory:')
+
+    db.Base.metadata.create_all(engine)
+
+    session = sa.orm.Session(bind=engine)
+
+    # Add some dummy data
+    pkg = db.Package(name="dummy", latest_version="0.0.3")
+    session.add(pkg)
+    session.commit()
+
+    session.add(db.Version(package_id=pkg.package_id, version="0.0.1"))
+    session.add(db.Version(package_id=pkg.package_id, version="0.0.2"))
+    session.add(db.Version(package_id=pkg.package_id, version="0.0.3"))
+    session.commit()
+
+    return session

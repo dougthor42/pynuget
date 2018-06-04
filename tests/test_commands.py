@@ -10,9 +10,6 @@ import pytest
 from pynuget import commands
 from pynuget import db
 
-from .test_db import session
-
-
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
 
