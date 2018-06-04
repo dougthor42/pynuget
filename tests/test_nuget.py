@@ -2,13 +2,15 @@
 """
 """
 import os
+import subprocess
 
 import pytest
 
 from .test_routes import client, populated_db, put_header
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
-
+NUGET_EXE = "/home/dthor/temp/nuget.exe"
+SOURCE = "http://localhost:5000"
 
 @pytest.mark.integration
 def test_nuget_metadata(client):
@@ -18,9 +20,20 @@ def test_nuget_metadata(client):
 
 
 @pytest.mark.integration
+@pytest.mark.temp
 def test_nuget_list(populated_db):
     # GET http://localhost:5000/Search()?$orderby=Id&searchTerm=''&targetFramework=''&includePrerelease=true&$skip=0&$top=30&semVerLevel=2.0.0
-    pass
+
+    cmd = [
+        'mono', NUGET_EXE,
+        'list',
+        '-Source', SOURCE,
+        '-Verbosity', 'detailed',
+        '-AllVersions',
+        '-Prerelease',
+    ]
+
+    subprocess.run(cmd)
 
 
 @pytest.mark.integration
