@@ -167,13 +167,17 @@ def _copy_file_with_replace_prompt(src, dst, replace=None):
     # Save the old file by renaming it with a timestamp.
     # TODO: I don't like this logic very much. There's got to be a better way.
     if dst.exists():
+        logger.debug("Path {} already exists".format(dst))
         if replace:
+            logger.debug("Replacing (and saving previous version)")
             dst.rename(Path(str(dst) + "." + _now_str()))
             shutil.copy(str(src.resolve()), str(dst))
             return True
         else:
+            logger.debug("Not replacing")
             return False
     else:
+        logger.debug("Copying new file to {}".format(dst))
         shutil.copy(str(src.resolve()), str(dst))
         return True
 
