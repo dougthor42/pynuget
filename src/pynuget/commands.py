@@ -6,6 +6,7 @@ import re
 import shutil
 import subprocess
 import sys
+from datetime import datetime as dt
 from pathlib import Path
 
 from sqlalchemy import create_engine
@@ -17,7 +18,8 @@ from pynuget import _logging
 logger = _logging.setup_logging(True, False, "./pynuget-cli.log")
 
 
-def init(server_path, package_dir, db_name, db_backend, apache_config):
+def init(server_path, package_dir, db_name, db_backend, apache_config,
+         replace_wsgi=False, replace_apache=False):
     """
     Initialize the PyNuGet server.
 
@@ -54,10 +56,10 @@ def init(server_path, package_dir, db_name, db_backend, apache_config):
     _create_directories(server_path, package_dir)
     _create_db(db_backend, db_name, server_path)
 
-    # TODO
-#    _copy_wsgi()
+    _copy_wsgi(server_path, replace_wsgi)
 
-#    _copy_apache_config(apache_config)
+    # TODO
+    _copy_apache_config(apache_config, replace_apache)
 
     _save_config(**args)
 
@@ -121,6 +123,59 @@ def rebuild():
 
     _add_packages_to_db(file_data)
     _remove_packages_from_db(file_data, db_data)
+
+
+def _replace_prompt(path):
+    """Return True if the user wants to replace the file."""
+    while True:
+        result = input("{} already exists. Replace? [yN] ".format(path))
+        result = result.lower()
+        if result in ('y', 'yes'):
+            return True
+        elif result in ('n', 'no', ''):
+            return False
+        else:
+            print("Invalid answer. Please answer 'yes' or 'no'.")
+
+
+def _now_str():
+    """Return the current local time as a str for appending to a filename."""
+    return dt.now().strftime("%y%m%d-%H%M%S")
+
+
+def _copy_file_with_replace_prompt(src, dst, replace=None):
+    """
+    Copy a file, prompting to replace if it exists. Always save old file.
+
+    Parameters
+    ----------
+    src : :class:`pathlib.Path`
+        The source file to copy.
+    dst : :class:`pathlib.Path`
+        The location to copy to.
+    replace : bool or None
+
+    Returns
+    -------
+    modified : bool
+        If True, the file was modified (created or replaced). If False, the
+        existing file was not modified.
+    """
+    if replace is None:
+        replace = _replace_prompt(dst)
+
+    # Save the old file by renaming it with a timestamp.
+    # TODO: I don't like this logic very much. There's got to be a better way.
+    if dst.exists():
+        if replace:
+            dst.rename(Path(str(dst) + "." + _now_str()))
+            shutil.copy(str(src.resolve()), str(dst))
+            return True
+        else:
+            return False
+    else:
+        shutil.copy(str(src.resolve()), str(dst))
+        return True
 
 
 def _db_data_to_dict(db_data):
@@ -268,23 +323,50 @@ def _create_db(db_backend, db_name, server_path):
         raise ValueError(msg)
 
 
-def _copy_wsgi():
-    """Copy the WSGI file to the server directory."""
+def _copy_wsgi(server_path, replace_existing=None):
+    """
+    Copy the WSGI file to the server directory.
+
+    Parameters
+    ----------
+    server_path : str
+    replace_existing : bool or None
+        If None, prompt the user to replace. If True, rename the old file
+        and make a new one. If False, do nothing.
+
+    Returns
+    -------
+    None
+    """
     logger.info("Copying WSGI file.")
-    pass
+    original = Path(sys.prefix) / 'data' / 'wsgi.py'
+    wsgi_path = Path(server_path) / 'wsgi.py'
+
+    _copy_file_with_replace_prompt(original, wsgi_path, replace_existing)
 
 
-def _copy_apache_config(apache_config):
-    """Copy the example apache config to the Apache sites."""
+def _copy_apache_config(apache_config, replace_existing=None):
+    """
+    Copy the example apache config to the Apache sites.
+
+    Parameters
+    ----------
+    apache_config : str
+        Name of the apache config file. Must not be an absolute path.
+    replace : bool or None
+        If None, prompt the user to replace the config file. If the config
+        file is overwritten (True or user responds True, the old file will
+        still be saved). If False, the default config is not copied.
+    """
     logger.info("Copying example Apache Config.")
-    apache_path = Path('/etc/apache2/site-available/')
+    apache_path = Path('/etc/apache2/sites-available/')
     apache_config = Path(apache_config)
     if apache_config.is_absolute():
         raise OSError("'apache_config' must not be an absolue path")
-    apache_config = apache_path / apache_config
+    apache_conf = apache_path / apache_config
+    example_conf = Path(sys.prefix) / 'data' / 'apache-example.conf'
 
-    if not apache_config.exists():
-        shutil.copy('apache-example.conf', apache_config.resolve())
+    _copy_file_with_replace_prompt(example_conf, apache_conf, replace_existing)
 
 
 def _enable_apache_conf(apache_config):
