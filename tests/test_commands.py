@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 """
+import filecmp
 import os
 from pathlib import Path
 
@@ -148,3 +149,51 @@ def test__enable_apache_config():
     path.unlink()
     path.parent.rmdir()
     path.parent.parent.rmdir()
+
+
+def test__save_config():
+    # open up the default config file from the package.
+    # TODO: better place for the config file used for testing.
+    pkg_dir = Path(__file__).parent / ".." / "src" / "pynuget"
+    file = pkg_dir / "default_config.py"
+    assert file.exists()
+
+    # For now, this fuction only creates a file in one place.
+    created_file = Path("./server/config.py")
+
+    # _save_config doens't attempt to create any dirs, so do that now.
+    commands._create_directories(
+        server_path=str(created_file.parent),
+        package_dir='pkg'
+    )
+
+    # with no kwargs, we should error out ('server_path' is required)
+    with pytest.raises(KeyError):
+        commands._save_config(file)
+
+    # With minimal kwargs, the resulting file should match our default
+    commands._save_config(file, server_path="./server")
+    assert filecmp.cmp(str(file), str(created_file))
+
+    # A full list of args should still work.
+#    server_path, package_dir, db_name, db_backend, apache_config,
+#         replace_wsgi=False, replace_apache=False
+    commands._save_config(file,
+                          server_path="./server",
+                          package_dir="apples",
+                          db_name="hello.sqlite",
+                          db_backend="mysql",
+                          apache_config="dumb.conf",
+                          )
+    assert not filecmp.cmp(str(file), str(created_file))
+
+    # Args that are not present in the default config should be ignored.
+    commands._save_config(file,
+                          server_path='./server',
+                          replace_wsgi=False,
+                          repalce_apache=False,
+                          )
+    assert filecmp.cmp(str(file), str(created_file))
+
+    # Cleanup
+    created_file.unlink()
