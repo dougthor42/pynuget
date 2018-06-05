@@ -51,7 +51,7 @@ def init(server_path, package_dir, db_name, db_backend, apache_config,
     +  Enable Apache site.
     +  Create the DB file or schema if it doesn't exist.
     """
-    args = locals()
+    args = dict(locals())
     _check_permissions()
     _create_directories(server_path, package_dir)
     _create_db(db_backend, db_name, server_path)
