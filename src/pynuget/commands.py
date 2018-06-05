@@ -58,8 +58,8 @@ def init(server_path, package_dir, db_name, db_backend, apache_config,
 
     _copy_wsgi(server_path, replace_wsgi)
 
-    # TODO
-    _copy_apache_config(apache_config, replace_apache)
+    conf = _copy_apache_config(apache_config, replace_apache)
+    _enable_apache_conf(conf.resolve())
 
     _save_config(**args)
 
@@ -357,6 +357,11 @@ def _copy_apache_config(apache_config, replace_existing=None):
         If None, prompt the user to replace the config file. If the config
         file is overwritten (True or user responds True, the old file will
         still be saved). If False, the default config is not copied.
+
+    Returns
+    -------
+    apache_conf : :class:`pathlib.Path`
+        Full path to the apache config file.
     """
     logger.info("Copying example Apache Config.")
     apache_path = Path('/etc/apache2/sites-available/')
@@ -368,15 +373,36 @@ def _copy_apache_config(apache_config, replace_existing=None):
 
     _copy_file_with_replace_prompt(example_conf, apache_conf, replace_existing)
 
+    return apache_conf
 
-def _enable_apache_conf(apache_config):
-    """Enable the apache site."""
-    logger.info("Enabling Apache site.")
+
+def _enable_apache_conf(conf):
+    """
+    Enable the apache site.
+
+    Enabling a site simply consists of symlinking to the sites-available
+    directory.
+
+    Parameters
+    ----------
+    conf : :class:`pathlib.Path`
+        The full path to the apache config file.
+
+    Returns
+    -------
+    link : :class:`pathlib.Path`
+        The path to the symlink.
+    """
+    logger.info("Enabling Apache site: {}".format(conf))
+
+    link = conf.parent.parent / 'sites-enabled' / conf.name
+
     try:
-        subprocess.run(['a2ensite', apache_config], shell=True, check=True)
-    except subprocess.CalledProcessError as err:
-        logger.error("Unable to enable the Apache site '%s'" % apache_config)
-        logger.error(err)
+        link.symlink_to(conf)
+    except FileExistsError:
+        logger.info("Site is already enabled.")
+
+    return link
 
 
 def _save_config(**kwargs):

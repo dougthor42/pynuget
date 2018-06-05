@@ -129,3 +129,22 @@ def test__replace_prompt(monkeypatch):
 
     monkeypatch.setattr('builtins.input', counted_input)
     assert commands._replace_prompt("aaa") is True
+
+
+def test__enable_apache_config():
+    path = Path("./apache2/sites-available/something.conf")
+    enabled = Path("./apache2/sites-enabled")
+    os.makedirs(str(path.parent), mode=0o2775, exist_ok=True)
+    os.makedirs(str(enabled), mode=0o2775, exist_ok=True)
+    path.touch()
+    result = commands._enable_apache_conf(path)
+
+    assert isinstance(result, Path)
+    assert result.is_symlink()
+
+    # Cleanup
+    result.unlink()
+    enabled.rmdir()
+    path.unlink()
+    path.parent.rmdir()
+    path.parent.parent.rmdir()
