@@ -63,6 +63,8 @@ def init(server_path, package_dir, db_name, db_backend, apache_config,
 
     _save_config(**args)
 
+    _reload_apache()
+
 
 def clear(server_path, force=False):
     """
@@ -407,6 +409,19 @@ def _enable_apache_conf(conf):
         logger.info("Site is already enabled.")
 
     return link
+
+
+def _reload_apache():
+    """Reload the apache configuration."""
+    logger.info("Reloading Apache configuration")
+    try:
+        args = ['service', 'apache2', 'restart']
+        subprocess.run(args, check=True)
+    except subprocess.CalledProcessError as err:
+        msg = ("Unlable to reload the apache configuration. Please attempt to"
+               " reload it manually.")
+        logger.error(err)
+        logger.error(msg)
 
 
 def _save_config(**kwargs):
