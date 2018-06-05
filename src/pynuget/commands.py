@@ -61,7 +61,8 @@ def init(server_path, package_dir, db_name, db_backend, apache_config,
     conf = _copy_apache_config(apache_config, replace_apache)
     _enable_apache_conf(conf.resolve())
 
-    _save_config(**args)
+    default_config_file = Path(__file__).parent / "default_config.py"
+    _save_config(default_config_file, **args)
 
     _reload_apache()
 
@@ -424,12 +425,11 @@ def _reload_apache():
         logger.error(msg)
 
 
-def _save_config(**kwargs):
+def _save_config(default_config_file, **kwargs):
     """Save the values to the configuration file."""
     logger.info("Saving configuration.")
 
     # Open the default config file.
-    default_config_file = Path(__file__).parent / "default_config.py"
     with open(str(default_config_file), 'r') as openf:
         raw = openf.read()
 
@@ -439,8 +439,14 @@ def _save_config(**kwargs):
             pat = r'''^(?P<variable>{} = )['"](?P<value>.+)['"]$'''
             pat = re.compile(pat.format(global_variable), re.MULTILINE)
 
-            old_value = pat.search(raw).group('value')
+            old_value = pat.search(raw)
+            if old_value is None:
+                logger.debug("ignoring {}".format(global_variable))
+                continue
+
+            old_value = old_value.group('value')
             if old_value == new_value:
+                logger.debug("Parameter '{}' unchanged.".format(variable))
                 continue
 
             raw = pat.sub('\g<variable>"{}"'.format(new_value), raw)
