@@ -20,6 +20,19 @@ DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
 
 @pytest.fixture
+def dummy_file():
+    """Create a dummy pathlib.Path file. Try to delete it when done."""
+    file = Path("tempfile.txt")
+    file.touch()
+    yield file
+
+    try:
+        Path(file).unlink()
+    except FileNotFoundError:
+        pass
+
+
+@pytest.fixture
 def client():
     """
     Create a client app for testing.
