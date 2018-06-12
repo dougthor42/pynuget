@@ -54,6 +54,7 @@ def init(server_path, package_dir, db_name, db_backend, apache_config,
     args = dict(locals())
     _check_permissions()
     _create_directories(server_path, package_dir)
+    _create_log_dir("/var/log/pynuget")
     _create_db(db_backend, db_name, server_path)
 
     _copy_wsgi(server_path, replace_wsgi)
@@ -296,6 +297,23 @@ def _create_directories(server_path, package_dir):
     logger.debug("Creating '%s'" % package_dir)
     os.makedirs(str(package_dir), mode=0o2775, exist_ok=True)
 #    shutil.chown(str(package_dir), 'www-data', 'www-data')
+
+
+def _create_log_dir(log_dir):
+    """Create the log directory."""
+    logger.info("Creating log directory %s" % log_dir)
+    log_path = Path(log_dir)
+
+    if not log_path.is_absolute():
+        log_path = Path.cwd() / log_dir
+        logger.warn("'log_dir' is not absolute, setting to %s" % log_path)
+
+    logger.debug("Creating '%s'" % log_path)
+    os.makedirs(str(log_path),
+                mode=0x2775,
+                exist_ok=True)
+
+    shutil.chown(str(log_dir), 'www-data', 'www-data')
 
 
 def _create_db(db_backend, db_name, server_path):
