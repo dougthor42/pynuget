@@ -16,7 +16,7 @@ def create_app():
     Application Factory.
     """
 
-    instance_path = Path("/var/www/pynuget/instance")
+    instance_path = Path("/var/www/pynuget")
     config_file = instance_path / "config.py"
 
     app = Flask(__name__)
