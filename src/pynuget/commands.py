@@ -309,11 +309,14 @@ def _create_log_dir(log_dir):
         logger.warn("'log_dir' is not absolute, setting to %s" % log_path)
 
     logger.debug("Creating '%s'" % log_path)
-    os.makedirs(str(log_path),
-                mode=0x2775,
-                exist_ok=True)
 
-    shutil.chown(str(log_dir), 'www-data', 'www-data')
+    try:
+        os.makedirs(str(log_path),
+                    mode=0x2775,
+                    exist_ok=True)
+        shutil.chown(str(log_dir), 'www-data', 'www-data')
+    except PermissionError:
+        logger.warn("Unable to make dir or change owner of %s" % log_dir)
 
 
 def _create_db(db_backend, db_name, server_path):
