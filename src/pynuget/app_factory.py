@@ -7,6 +7,7 @@ from pathlib import Path
 from flask import Flask
 from flask import g
 
+from pynuget import logger
 from pynuget._logging import setup_logging
 from pynuget.routes import pages
 
@@ -25,6 +26,7 @@ def create_app():
     app.config.from_object('pynuget.default_config')
 
     if config_file.exists():
+        logger.debug("Found config file: %s. Loading..." % str(config_file))
         app.config.from_pyfile(str(config_file))
 
     # Update logging to also log to a file.
