@@ -11,6 +11,8 @@ from pynuget import logger
 from pynuget._logging import setup_logging
 from pynuget.routes import pages
 
+ENV_VAR = "PYNUGET_CONFIG_TYPE"
+
 
 def create_app():
     """
@@ -20,10 +22,15 @@ def create_app():
     instance_path = Path("/var/www/pynuget")
     config_file = instance_path / "config.py"
 
-    testing = os.getenv("PYNUGET_CONFIG_TYPE", None) == 'TESTING'
+    testing = os.getenv(ENV_VAR, None) == 'TESTING'
 
     app = Flask(__name__)
     app.config.from_object('pynuget.default_config')
+
+    # Override some default vars if we're running using the flask dev server.
+    if os.getenv(ENV_VAR, None) == "LOCAL_DEV":
+        app.config['LOG_PATH'] = os.getenv('PYNUGET_LOG_PATH')
+        app.config['SERVER_PATH'] = os.getenv('PYNUGET_SERVER_PATH')
 
     if config_file.exists():
         logger.debug("Found config file: %s. Loading..." % str(config_file))
