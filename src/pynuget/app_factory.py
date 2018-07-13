@@ -19,6 +19,8 @@ def create_app():
     instance_path = Path("/var/www/pynuget")
     config_file = instance_path / "config.py"
 
+    testing = os.getenv("PYNUGET_CONFIG_TYPE", None) == 'TESTING'
+
     app = Flask(__name__)
     app.config.from_object('pynuget.default_config')
 
@@ -27,8 +29,9 @@ def create_app():
 
     # Update logging to also log to a file.
     # This *should* modify the logger that was created in __init__.py...
-    setup_logging(to_console=False, to_file=True,
-                  log_path=app.config['LOG_PATH'])
+    if not testing:
+        setup_logging(to_console=False, to_file=True,
+                      log_path=app.config['LOG_PATH'])
 
     # Register blueprints
     app.register_blueprint(pages)
