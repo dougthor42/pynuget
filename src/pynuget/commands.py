@@ -105,7 +105,7 @@ def clear(server_path, force=False):
 
     # And receate the directories and database based on the config file.
     logger.info("Recreating database and package dir.")
-    _create_directories(server_path, config.PACKAGE_DIR)
+    _create_directories(server_path, config.PACKAGE_DIR, "/var/log/pynuget")
     _create_db(config.DB_BACKEND, config.DB_NAME, server_path)
 
 

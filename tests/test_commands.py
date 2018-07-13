@@ -164,7 +164,8 @@ def test__save_config():
     # _save_config doens't attempt to create any dirs, so do that now.
     commands._create_directories(
         server_path=str(created_file.parent),
-        package_dir='pkg'
+        package_dir='pkg',
+        log_dir="/var/log/pynuget"
     )
 
     # with no kwargs, we should error out ('server_path' is required)
