@@ -56,7 +56,8 @@ def init(server_path, package_dir, db_name, db_backend, apache_config,
     _create_directories(server_path, package_dir, "/var/log/pynuget")
     _create_db(db_backend, db_name, server_path)
 
-    _copy_wsgi(server_path, replace_wsgi)
+    wsgi_file = _copy_wsgi(server_path, replace_wsgi)
+    _update_wsgi(wsgi_file)
 
     conf = _copy_apache_config(apache_config, replace_apache)
     _enable_apache_conf(conf.resolve())
@@ -399,6 +400,41 @@ def _copy_wsgi(server_path, replace_existing=None):
     wsgi_path = Path(server_path) / 'wsgi.py'
 
     _copy_file_with_replace_prompt(original, wsgi_path, replace_existing)
+
+    return wsgi_path
+
+
+def _update_wsgi(wsgi_path):
+    """
+    Update the WSGI file with the correct venv directory.
+
+    Parameters
+    ----------
+    wsgi_path : Path object
+    """
+    logger.debug("Updating WSGI file: %s" % wsgi_path)
+    # Find our site-packages folder. Don't do anything if we're not in a venv.
+    venv = os.getenv('VIRTUAL_ENV', None)
+    if venv is None:
+        logger.info("Not in a virtual env. Nothing to do.")
+        return
+
+    venv = Path(venv)
+    site_pkgs = list(venv.glob('lib/python*/site-packages'))[0]
+    logger.debug("Found site-packages directory: %s" % site_pkgs)
+
+    args = ["sed",
+            "-i", "-E",
+            r's@^(site\.addsitedir).+$@\1\("{}"\)@g'.format(site_pkgs),
+            str(wsgi_path),
+            ]
+    logger.debug("Command: %s" % " ".join(args))
+    try:
+        subprocess.run(args)
+    except subprocess.CalledProcessError:
+        msg = ("Unlable update the WSGI file with the virtual environment's"
+               " site-packages directory! Please do so manually")
+        logger.error(msg)
 
 
 def _copy_apache_config(apache_config, replace_existing=None):
