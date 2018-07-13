@@ -36,16 +36,6 @@ def create_app():
     # Register blueprints
     app.register_blueprint(pages)
 
-    # Now let's make sure that all our files are set up properly
-    if os.getenv("PYNUGET_CONFIG_TYPE", None) == 'TESTING':
-        from pynuget.commands import init                              # noqa
-        init(server_path=app.config['SERVER_PATH'],
-             package_dir=app.config['PACKAGE_DIR'],
-             db_name=app.config['DB_NAME'],
-             db_backend=app.config['DB_BACKEND'],
-             apache_config=app.config['APACHE_CONFIG'],
-             )
-
     @app.teardown_appcontext
     def teardown_db_session(exception):
         session = getattr(g, 'session', None)
