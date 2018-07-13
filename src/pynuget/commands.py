@@ -53,8 +53,7 @@ def init(server_path, package_dir, db_name, db_backend, apache_config,
     """
     args = dict(locals())
     _check_permissions()
-    _create_directories(server_path, package_dir)
-    _create_log_dir("/var/log/pynuget")
+    _create_directories(server_path, package_dir, "/var/log/pynuget")
     _create_db(db_backend, db_name, server_path)
 
     _copy_wsgi(server_path, replace_wsgi)
@@ -127,6 +126,30 @@ def rebuild():
 
     _add_packages_to_db(file_data)
     _remove_packages_from_db(file_data, db_data)
+
+
+def _create_dir(path):
+    """
+    Create (and chown) a given directory.
+
+    Parameters
+    ----------
+    path : pathlib.Path
+
+    Returns
+    -------
+    None
+    """
+    path = str(path)
+    logger.debug("Creating '%s'" % path)
+    try:
+        # Note: os.makedirs will not change permissions of existing dirs
+        os.makedirs(path,
+                    mode=0x2775,        # u=rwx,g=srwx,o=rx
+                    exist_ok=True)
+        shutil.chown(path, 'www-data', 'www-data')
+    except PermissionError:
+        logger.warn("Unable to make dir or change owner of %s" % path)
 
 
 def _replace_prompt(path):
@@ -274,11 +297,12 @@ def _check_permissions():
         logger.warn("This script probably needs `sudo`. Trying anyway.")
 
 
-def _create_directories(server_path, package_dir):
+def _create_directories(server_path, package_dir, log_dir):
     """Create the server directories if they don't exist."""
     logger.info("Creating directories (if they don't exist).")
     server_path = Path(server_path)
     package_dir = Path(package_dir)
+    log_path = Path(log_dir)
 
     if not server_path.is_absolute():
         server_path = Path.cwd() / server_path
@@ -288,35 +312,13 @@ def _create_directories(server_path, package_dir):
         package_dir = server_path / package_dir
         logger.warn("'package_dir' is not absolue, setting to %s" % package_dir)
 
-    # os.makedirs will not change permissions of existing directories
-    logger.debug("Creating '%s'" % server_path)
-    os.makedirs(str(server_path),
-                mode=0o2775,        # u=rwx,g=srwx,o=rx
-                exist_ok=True)
-
-    logger.debug("Creating '%s'" % package_dir)
-    os.makedirs(str(package_dir), mode=0o2775, exist_ok=True)
-#    shutil.chown(str(package_dir), 'www-data', 'www-data')
-
-
-def _create_log_dir(log_dir):
-    """Create the log directory."""
-    logger.info("Creating log directory %s" % log_dir)
-    log_path = Path(log_dir)
-
     if not log_path.is_absolute():
         log_path = Path.cwd() / log_dir
         logger.warn("'log_dir' is not absolute, setting to %s" % log_path)
 
-    logger.debug("Creating '%s'" % log_path)
-
-    try:
-        os.makedirs(str(log_path),
-                    mode=0x2775,
-                    exist_ok=True)
-        shutil.chown(str(log_dir), 'www-data', 'www-data')
-    except PermissionError:
-        logger.warn("Unable to make dir or change owner of %s" % log_dir)
+    _create_dir(server_path)
+    _create_dir(package_dir)
+    _create_dir(log_path)
 
 
 def _create_db(db_backend, db_name, server_path):
