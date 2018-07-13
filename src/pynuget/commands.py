@@ -53,8 +53,7 @@ def init(server_path, package_dir, db_name, db_backend, apache_config,
     """
     args = dict(locals())
     _check_permissions()
-    _create_directories(server_path, package_dir)
-    _create_log_dir("/var/log/pynuget")
+    _create_directories(server_path, package_dir, "/var/log/pynuget")
     _create_db(db_backend, db_name, server_path)
 
     _copy_wsgi(server_path, replace_wsgi)
@@ -298,11 +297,12 @@ def _check_permissions():
         logger.warn("This script probably needs `sudo`. Trying anyway.")
 
 
-def _create_directories(server_path, package_dir):
+def _create_directories(server_path, package_dir, log_dir):
     """Create the server directories if they don't exist."""
     logger.info("Creating directories (if they don't exist).")
     server_path = Path(server_path)
     package_dir = Path(package_dir)
+    log_path = Path(log_dir)
 
     if not server_path.is_absolute():
         server_path = Path.cwd() / server_path
@@ -312,19 +312,12 @@ def _create_directories(server_path, package_dir):
         package_dir = server_path / package_dir
         logger.warn("'package_dir' is not absolue, setting to %s" % package_dir)
 
-    _create_dir(server_path)
-    _create_dir(package_dir)
-
-
-def _create_log_dir(log_dir):
-    """Create the log directory."""
-    logger.info("Creating log directory %s" % log_dir)
-    log_path = Path(log_dir)
-
     if not log_path.is_absolute():
         log_path = Path.cwd() / log_dir
         logger.warn("'log_dir' is not absolute, setting to %s" % log_path)
 
+    _create_dir(server_path)
+    _create_dir(package_dir)
     _create_dir(log_path)
 
 

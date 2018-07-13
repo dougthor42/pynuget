@@ -17,8 +17,7 @@ log_dir = default_config.LOG_DIR
 
 
 commands._check_permissions()
-commands._create_directories(server_path, package_dir)
-commands._create_log_dir(log_dir)
+commands._create_directories(server_path, package_dir, log_dir)
 commands._create_db(db_backend, db_name, server_path)
 
 app = create_app()
