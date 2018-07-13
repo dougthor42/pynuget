@@ -64,6 +64,8 @@ def init(server_path, package_dir, db_name, db_backend, apache_config,
     default_config_file = Path(__file__).parent / "default_config.py"
     _save_config(default_config_file, **args)
 
+    _set_permissions([server_path, "/var/log/pynuget"])
+
     _reload_apache()
 
 
@@ -296,6 +298,29 @@ def _check_permissions():
     """Raise PermissionError if we're not root/sudo."""
     if os.getuid() != 0:
         logger.warn("This script probably needs `sudo`. Trying anyway.")
+
+
+def _set_permissions(paths):
+    """
+    Set permissions because apparently nothing else likes to..."
+
+    Parameters
+    ----------
+    paths : iterable of str or iterable of pathlib.Path objects
+    """
+    logger.debug("Setting owner and permissions for %s" % paths)
+    for path in paths:
+        try:
+            args = ['chown', '-R', 'www-data:www-data', str(path)]
+            subprocess.run(args, check=True)
+        except subprocess.CalledProcessError as err:
+            logger.exception("Unlable to chown %s" % path)
+
+        try:
+            args = ['chmod', '-R', '2775', str(path)]
+            subprocess.run(args, check=True)
+        except subprocess.CalledProcessError as err:
+            logger.exception("Unlable to chmod %s" % path)
 
 
 def _create_directories(server_path, package_dir, log_dir):
