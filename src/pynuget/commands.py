@@ -147,9 +147,13 @@ def _create_dir(path):
         os.makedirs(path,
                     mode=0x2775,        # u=rwx,g=srwx,o=rx
                     exist_ok=True)
-        shutil.chown(path, 'www-data', 'www-data')
     except PermissionError:
-        logger.warn("Unable to make dir or change owner of %s" % path)
+        logger.warn("Unable to make dir %s" % path)
+    else:
+        try:
+            shutil.chown(path, 'www-data', 'www-data')
+        except PermissionError:
+            logger.warn("Unable to change owner of %s" % path)
 
 
 def _replace_prompt(path):
