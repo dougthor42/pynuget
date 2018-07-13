@@ -129,6 +129,30 @@ def rebuild():
     _remove_packages_from_db(file_data, db_data)
 
 
+def _create_dir(path):
+    """
+    Create (and chown) a given directory.
+
+    Parameters
+    ----------
+    path : pathlib.Path
+
+    Returns
+    -------
+    None
+    """
+    path = str(path)
+    logger.debug("Creating '%s'" % path)
+    try:
+        # Note: os.makedirs will not change permissions of existing dirs
+        os.makedirs(path,
+                    mode=0x2775,        # u=rwx,g=srwx,o=rx
+                    exist_ok=True)
+        shutil.chown(path, 'www-data', 'www-data')
+    except PermissionError:
+        logger.warn("Unable to make dir or change owner of %s" % path)
+
+
 def _replace_prompt(path):
     """Return True if the user wants to replace the file."""
     while True:
