@@ -27,7 +27,7 @@ def create_app():
 
     # Update logging to also log to a file.
     # This *should* modify the logger that was created in __init__.py...
-    setup_logging(to_console=True, to_file=False,
+    setup_logging(to_console=False, to_file=True,
                   log_path=app.config['LOG_PATH'])
 
     # Register blueprints
