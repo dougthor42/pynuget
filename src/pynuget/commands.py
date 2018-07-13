@@ -6,6 +6,7 @@ import re
 import shutil
 import subprocess
 import sys
+from datetime import datetime as dt
 from pathlib import Path
 
 from sqlalchemy import create_engine
@@ -17,7 +18,8 @@ from pynuget import _logging
 logger = _logging.setup_logging(True, False, "./pynuget-cli.log")
 
 
-def init(server_path, package_dir, db_name, db_backend, apache_config):
+def init(server_path, package_dir, db_name, db_backend, apache_config,
+         replace_wsgi=False, replace_apache=False):
     """
     Initialize the PyNuGet server.
 
@@ -49,17 +51,21 @@ def init(server_path, package_dir, db_name, db_backend, apache_config):
     +  Enable Apache site.
     +  Create the DB file or schema if it doesn't exist.
     """
-    args = locals()
+    args = dict(locals())
     _check_permissions()
     _create_directories(server_path, package_dir)
+    _create_log_dir("/var/log/pynuget")
     _create_db(db_backend, db_name, server_path)
 
-    # TODO
-#    _copy_wsgi()
+    _copy_wsgi(server_path, replace_wsgi)
 
-#    _copy_apache_config(apache_config)
+    conf = _copy_apache_config(apache_config, replace_apache)
+    _enable_apache_conf(conf.resolve())
 
-    _save_config(**args)
+    default_config_file = Path(__file__).parent / "default_config.py"
+    _save_config(default_config_file, **args)
+
+    _reload_apache()
 
 
 def clear(server_path, force=False):
@@ -121,6 +127,63 @@ def rebuild():
 
     _add_packages_to_db(file_data)
     _remove_packages_from_db(file_data, db_data)
+
+
+def _replace_prompt(path):
+    """Return True if the user wants to replace the file."""
+    while True:
+        result = input("{} already exists. Replace? [yN] ".format(path))
+        result = result.lower()
+        if result in ('y', 'yes'):
+            return True
+        elif result in ('n', 'no', ''):
+            return False
+        else:
+            print("Invalid answer. Please answer 'yes' or 'no'.")
+
+
+def _now_str():
+    """Return the current local time as a str for appending to a filename."""
+    return dt.now().strftime("%y%m%d-%H%M%S")
+
+
+def _copy_file_with_replace_prompt(src, dst, replace=None):
+    """
+    Copy a file, prompting to replace if it exists. Always save old file.
+
+    Parameters
+    ----------
+    src : :class:`pathlib.Path`
+        The source file to copy.
+    dst : :class:`pathlib.Path`
+        The location to copy to.
+    replace : bool or None
+
+    Returns
+    -------
+    modified : bool
+        If True, the file was modified (created or replaced). If False, the
+        existing file was not modified.
+    """
+    if replace is None:
+        replace = _replace_prompt(dst)
+
+    # Save the old file by renaming it with a timestamp.
+    # TODO: I don't like this logic very much. There's got to be a better way.
+    if dst.exists():
+        logger.debug("Path {} already exists".format(dst))
+        if replace:
+            logger.debug("Replacing (and saving previous version)")
+            dst.rename(Path(str(dst) + "." + _now_str()))
+            shutil.copy(str(src.resolve()), str(dst))
+            return True
+        else:
+            logger.debug("Not replacing")
+            return False
+    else:
+        logger.debug("Copying new file to {}".format(dst))
+        shutil.copy(str(src.resolve()), str(dst))
+        return True
 
 
 def _db_data_to_dict(db_data):
@@ -236,6 +299,26 @@ def _create_directories(server_path, package_dir):
 #    shutil.chown(str(package_dir), 'www-data', 'www-data')
 
 
+def _create_log_dir(log_dir):
+    """Create the log directory."""
+    logger.info("Creating log directory %s" % log_dir)
+    log_path = Path(log_dir)
+
+    if not log_path.is_absolute():
+        log_path = Path.cwd() / log_dir
+        logger.warn("'log_dir' is not absolute, setting to %s" % log_path)
+
+    logger.debug("Creating '%s'" % log_path)
+
+    try:
+        os.makedirs(str(log_path),
+                    mode=0x2775,
+                    exist_ok=True)
+        shutil.chown(str(log_dir), 'www-data', 'www-data')
+    except PermissionError:
+        logger.warn("Unable to make dir or change owner of %s" % log_dir)
+
+
 def _create_db(db_backend, db_name, server_path):
     """Create the database (file or schema) if it doesn't exist."""
     logger.info("Creating database.")
@@ -268,41 +351,106 @@ def _create_db(db_backend, db_name, server_path):
         raise ValueError(msg)
 
 
-def _copy_wsgi():
-    """Copy the WSGI file to the server directory."""
+def _copy_wsgi(server_path, replace_existing=None):
+    """
+    Copy the WSGI file to the server directory.
+
+    Parameters
+    ----------
+    server_path : str
+    replace_existing : bool or None
+        If None, prompt the user to replace. If True, rename the old file
+        and make a new one. If False, do nothing.
+
+    Returns
+    -------
+    None
+    """
     logger.info("Copying WSGI file.")
-    pass
+    original = Path(sys.prefix) / 'data' / 'wsgi.py'
+    wsgi_path = Path(server_path) / 'wsgi.py'
+
+    _copy_file_with_replace_prompt(original, wsgi_path, replace_existing)
 
 
-def _copy_apache_config(apache_config):
-    """Copy the example apache config to the Apache sites."""
+def _copy_apache_config(apache_config, replace_existing=None):
+    """
+    Copy the example apache config to the Apache sites.
+
+    Parameters
+    ----------
+    apache_config : str
+        Name of the apache config file. Must not be an absolute path.
+    replace : bool or None
+        If None, prompt the user to replace the config file. If the config
+        file is overwritten (True or user responds True, the old file will
+        still be saved). If False, the default config is not copied.
+
+    Returns
+    -------
+    apache_conf : :class:`pathlib.Path`
+        Full path to the apache config file.
+    """
     logger.info("Copying example Apache Config.")
-    apache_path = Path('/etc/apache2/site-available/')
+    apache_path = Path('/etc/apache2/sites-available/')
     apache_config = Path(apache_config)
     if apache_config.is_absolute():
         raise OSError("'apache_config' must not be an absolue path")
-    apache_config = apache_path / apache_config
+    apache_conf = apache_path / apache_config
+    example_conf = Path(sys.prefix) / 'data' / 'apache-example.conf'
 
-    if not apache_config.exists():
-        shutil.copy('apache-example.conf', apache_config.resolve())
+    _copy_file_with_replace_prompt(example_conf, apache_conf, replace_existing)
+
+    return apache_conf
 
 
-def _enable_apache_conf(apache_config):
-    """Enable the apache site."""
-    logger.info("Enabling Apache site.")
+def _enable_apache_conf(conf):
+    """
+    Enable the apache site.
+
+    Enabling a site simply consists of symlinking to the sites-available
+    directory.
+
+    Parameters
+    ----------
+    conf : :class:`pathlib.Path`
+        The full path to the apache config file.
+
+    Returns
+    -------
+    link : :class:`pathlib.Path`
+        The path to the symlink.
+    """
+    logger.info("Enabling Apache site: {}".format(conf))
+
+    link = conf.parent.parent / 'sites-enabled' / conf.name
+
     try:
-        subprocess.run(['a2ensite', apache_config], shell=True, check=True)
+        link.symlink_to(conf)
+    except FileExistsError:
+        logger.info("Site is already enabled.")
+
+    return link
+
+
+def _reload_apache():
+    """Reload the apache configuration."""
+    logger.info("Reloading Apache configuration")
+    try:
+        args = ['service', 'apache2', 'restart']
+        subprocess.run(args, check=True)
     except subprocess.CalledProcessError as err:
-        logger.error("Unable to enable the Apache site '%s'" % apache_config)
+        msg = ("Unlable to reload the apache configuration. Please attempt to"
+               " reload it manually.")
         logger.error(err)
+        logger.error(msg)
 
 
-def _save_config(**kwargs):
+def _save_config(default_config_file, **kwargs):
     """Save the values to the configuration file."""
     logger.info("Saving configuration.")
 
     # Open the default config file.
-    default_config_file = Path(__file__).parent / "default_config.py"
     with open(str(default_config_file), 'r') as openf:
         raw = openf.read()
 
@@ -312,8 +460,14 @@ def _save_config(**kwargs):
             pat = r'''^(?P<variable>{} = )['"](?P<value>.+)['"]$'''
             pat = re.compile(pat.format(global_variable), re.MULTILINE)
 
-            old_value = pat.search(raw).group('value')
+            old_value = pat.search(raw)
+            if old_value is None:
+                logger.debug("ignoring {}".format(global_variable))
+                continue
+
+            old_value = old_value.group('value')
             if old_value == new_value:
+                logger.debug("Parameter '{}' unchanged.".format(variable))
                 continue
 
             raw = pat.sub('\g<variable>"{}"'.format(new_value), raw)

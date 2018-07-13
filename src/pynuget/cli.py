@@ -128,11 +128,13 @@ def main():
 
 
 def run_init(args):
-    commands.init(server_path=SERVER_PATH,
-                  package_dir=args.package_dir,
-                  db_name=args.db_name,
-                  db_backend=args.db_backend,
-                  apache_config=args.apache_config)
+    commands.init(
+        server_path=SERVER_PATH,
+        package_dir=args.package_dir,
+        db_name=args.db_name,
+        db_backend=args.db_backend,
+        apache_config=args.apache_config,
+    )
 
 
 def run_clear(args):
