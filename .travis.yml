@@ -10,6 +10,9 @@ python:
 notifications:
   email: false
 
+env:
+  - PYNUGET_CONFIG_TYPE=TESTING
+
 addons:
   apt:
     souces:
