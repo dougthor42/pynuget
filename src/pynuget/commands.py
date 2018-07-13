@@ -140,18 +140,15 @@ def _create_dir(path):
     -------
     None
     """
-    path = str(path)
     logger.debug("Creating '%s'" % path)
     try:
-        # Note: os.makedirs will not change permissions of existing dirs
-        os.makedirs(path,
-                    mode=0x2775,        # u=rwx,g=srwx,o=rx
-                    exist_ok=True)
+        # u=rwx,g=srwx,o=rx
+        path.mkdir(parents=True, mode=0x2775, exist_ok=True)
     except PermissionError:
         logger.warn("Unable to make dir %s" % path)
     else:
         try:
-            shutil.chown(path, 'www-data', 'www-data')
+            shutil.chown(str(path), 'www-data', 'www-data')
         except PermissionError:
             logger.warn("Unable to change owner of %s" % path)
 
