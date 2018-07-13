@@ -293,10 +293,11 @@ def _create_directories(server_path, package_dir):
     os.makedirs(str(server_path),
                 mode=0o2775,        # u=rwx,g=srwx,o=rx
                 exist_ok=True)
+    shutil.chown(str(server_path), 'www-data', 'www-data')
 
     logger.debug("Creating '%s'" % package_dir)
     os.makedirs(str(package_dir), mode=0o2775, exist_ok=True)
-#    shutil.chown(str(package_dir), 'www-data', 'www-data')
+    shutil.chown(str(package_dir), 'www-data', 'www-data')
 
 
 def _create_log_dir(log_dir):
