@@ -135,8 +135,8 @@ def test__replace_prompt(monkeypatch):
 def test__enable_apache_config():
     path = Path("./apache2/sites-available/something.conf")
     enabled = Path("./apache2/sites-enabled")
-    os.makedirs(str(path.parent), mode=0o2775, exist_ok=True)
-    os.makedirs(str(enabled), mode=0o2775, exist_ok=True)
+    os.makedirs(str(path.parent), exist_ok=True)
+    os.makedirs(str(enabled), exist_ok=True)
     path.touch()
     result = commands._enable_apache_conf(path)
 

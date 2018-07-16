@@ -146,9 +146,11 @@ def _create_dir(path):
     logger.debug("Creating '%s'" % path)
     try:
         # u=rwx,g=srwx,o=rx
-        path.mkdir(parents=True, mode=0x2775, exist_ok=True)
+        path.mkdir(parents=True, exist_ok=True)
     except PermissionError:
         logger.warn("Unable to make dir %s" % path)
+        logger.warn(path.parent.stat())
+        logger.warn("Parent Mode: %s" % (path.parent.stat().st_mode & 0o0777))
     else:
         try:
             shutil.chown(str(path), 'www-data', 'www-data')
