@@ -180,8 +180,8 @@ def test__save_config():
     assert filecmp.cmp(str(file), str(created_file))
 
     # A full list of args should still work.
-#    server_path, package_dir, db_name, db_backend, apache_config,
-#         replace_wsgi=False, replace_apache=False
+    #    server_path, package_dir, db_name, db_backend, apache_config,
+    #         replace_wsgi=False, replace_apache=False
     commands._save_config(file,
                           save_to=created_file,
                           server_path="./server",
