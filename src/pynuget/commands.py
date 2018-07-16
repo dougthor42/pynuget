@@ -510,7 +510,7 @@ def _reload_apache():
         logger.error(msg)
 
 
-def _save_config(default_config_file, **kwargs):
+def _save_config(default_config_file, save_to=None, **kwargs):
     """Save the values to the configuration file."""
     logger.info("Saving configuration.")
 
@@ -539,7 +539,10 @@ def _save_config(default_config_file, **kwargs):
             msg = "Replaced %s: '%s' with '%s'"
             logger.debug(msg % (variable, old_value, new_value))
 
-    config_path = Path(kwargs['server_path']) / Path('config.py')
+    config_path = save_to
+    if save_to is None:
+        config_path = Path(kwargs['server_path']) / Path('config.py')
+
     with open(str(config_path), 'w') as openf:
         openf.write(raw)
 
