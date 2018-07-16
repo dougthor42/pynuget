@@ -53,8 +53,9 @@ def client():
     pkg_dir = app.config['PACKAGE_DIR'] = 'pkgs'
     old_api_keys = app.config['API_KEYS']
     api_keys = app.config['API_KEYS'] = ['no_key']
+    log_dir = './log'
 
-    commands._create_directories(server_path, pkg_dir, "/var/log/pynuget")
+    commands._create_directories(server_path, pkg_dir, log_dir)
     commands._create_db(app.config['DB_BACKEND'],
                         app.config['DB_NAME'],
                         server_path)
