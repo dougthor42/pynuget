@@ -64,6 +64,7 @@ def test_save_file():
         file = FileStorage(openf)
 
         app = create_app()
+        app.config['SERVER_PATH'] = './server'
         with app.app_context():
             path = core.save_file(file, "a", "b")
         path.unlink()
