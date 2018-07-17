@@ -2,7 +2,7 @@
 pynuget
 =======
 
-.. image:: https://img.shields.io/travis/USER/REPO.svg
+.. image:: https://img.shields.io/travis/dougthor42/pynuget.svg
    :alt: Travis
    :target: https://travis-ci.org/dougthor42/pynuget
 
