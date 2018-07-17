@@ -37,5 +37,14 @@ deploy:
   server: https://test.pypi.org/legacy/
   user: dougthor42
   password:
-    secure: jSAhszLiUPl3DI0/mNRHc0K0SJJxOPIrNV6WydMDa1Cojumx3mMyI+8hyCdEWDOtseD2HV+xeUDh6TDkUg+5gQd+8hBpF9xDdbgxH6vwMwyJO4s0F4P5S02EiEROnPgpnAtixAqfvLUljjhudEXpH2+6lMENPDsFUnOuAozkQ7OPYyskmvkgvpIyT51HunhkEzbGBCLvXOM8MLR9DYVvSsJy7lXbaSdB49Gsmg6Mttk2i2fyoTQ6y8Ngblt6i6hCvuphjby+5f6HthFG8tkpucO5H43ZWfoZHj45C79aPfbLi7KtAhVS0fIk3mFUvrXcw9cqgrgDABPUhl7o1mx1gZA0NNOarL8wWO+WPAq1e871q9wlFJCRxxiXMk4EEugRa1QuR1cit4T/3+78dVaFz8/vuLmthsg4eWpPRnRD7E4PI/7crTxD6bZMn4nUmWZgZs+eCYI7mtNJjlvePysKRdAF5rPt6QDslIeK1KmIvKUB0XBK2l2Gc/L7BhJ9ouF3YR9DmQoEv3HkYRwnnXH4xZFXr5Zs67tq/PgKvr7w4lZEITNs8oYRRedcjfnZJjm1A8wdw5oWZHCBb/Kdm4nL0cCufkil5sMsRbTdgPdCiXi6i4bjotuihoxHWs5MIej8bHn8IVPiFcKwPUeDV5jLaT/yE3bGx4VKxtKAzquV4RU=
+    secure: 'jSAhszLiUPl3DI0/mNRHc0K0SJJxOPIrNV6WydMDa1Cojumx3mMyI+8hyCdEWD
+      OtseD2HV+xeUDh6TDkUg+5gQd+8hBpF9xDdbgxH6vwMwyJO4s0F4P5S02EiEROnPgpnAt
+      ixAqfvLUljjhudEXpH2+6lMENPDsFUnOuAozkQ7OPYyskmvkgvpIyT51HunhkEzbGBCLv
+      XOM8MLR9DYVvSsJy7lXbaSdB49Gsmg6Mttk2i2fyoTQ6y8Ngblt6i6hCvuphjby+5f6Ht
+      hFG8tkpucO5H43ZWfoZHj45C79aPfbLi7KtAhVS0fIk3mFUvrXcw9cqgrgDABPUhl7o1m
+      x1gZA0NNOarL8wWO+WPAq1e871q9wlFJCRxxiXMk4EEugRa1QuR1cit4T/3+78dVaFz8/
+      vuLmthsg4eWpPRnRD7E4PI/7crTxD6bZMn4nUmWZgZs+eCYI7mtNJjlvePysKRdAF5rPt
+      6QDslIeK1KmIvKUB0XBK2l2Gc/L7BhJ9ouF3YR9DmQoEv3HkYRwnnXH4xZFXr5Zs67tq/
+      PgKvr7w4lZEITNs8oYRRedcjfnZJjm1A8wdw5oWZHCBb/Kdm4nL0cCufkil5sMsRbTdgP
+      dCiXi6i4bjotuihoxHWs5MIej8bHn8IVPiFcKwPUeDV5jLaT/yE3bGx4VKxtKAzquV4RU='
   distributions: sdist bdist_wheel
