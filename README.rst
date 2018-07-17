@@ -44,6 +44,9 @@ you figure it out, please submit a PR for this documentation. :smile:
 3. Install the Package
 ^^^^^^^^^^^^^^^^^^^^^^
 
+If I've done things correctly, all the requirements should be automatically
+installed.
+
 .. code-block:: shell
 
     $ pip install pynuget
