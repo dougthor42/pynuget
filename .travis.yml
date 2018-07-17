@@ -34,17 +34,17 @@ deploy:
     branch: master
     condition: "$TRAVIS_PYTHON_VERSION = 3.6"
   provider: pypi
-  server: https://test.pypi.org/legacy/
   user: dougthor42
   password:
-    secure: 'jSAhszLiUPl3DI0/mNRHc0K0SJJxOPIrNV6WydMDa1Cojumx3mMyI+8hyCdEWD
-      OtseD2HV+xeUDh6TDkUg+5gQd+8hBpF9xDdbgxH6vwMwyJO4s0F4P5S02EiEROnPgpnAt
-      ixAqfvLUljjhudEXpH2+6lMENPDsFUnOuAozkQ7OPYyskmvkgvpIyT51HunhkEzbGBCLv
-      XOM8MLR9DYVvSsJy7lXbaSdB49Gsmg6Mttk2i2fyoTQ6y8Ngblt6i6hCvuphjby+5f6Ht
-      hFG8tkpucO5H43ZWfoZHj45C79aPfbLi7KtAhVS0fIk3mFUvrXcw9cqgrgDABPUhl7o1m
-      x1gZA0NNOarL8wWO+WPAq1e871q9wlFJCRxxiXMk4EEugRa1QuR1cit4T/3+78dVaFz8/
-      vuLmthsg4eWpPRnRD7E4PI/7crTxD6bZMn4nUmWZgZs+eCYI7mtNJjlvePysKRdAF5rPt
-      6QDslIeK1KmIvKUB0XBK2l2Gc/L7BhJ9ouF3YR9DmQoEv3HkYRwnnXH4xZFXr5Zs67tq/
-      PgKvr7w4lZEITNs8oYRRedcjfnZJjm1A8wdw5oWZHCBb/Kdm4nL0cCufkil5sMsRbTdgP
-      dCiXi6i4bjotuihoxHWs5MIej8bHn8IVPiFcKwPUeDV5jLaT/yE3bGx4VKxtKAzquV4RU='
+    secure: 'AyBpaKtQJDv/oyDbkXHEbIpTzWRdScPos2Fgg2N4eX3UM0L/ADcv61gTFGTB
+      QUYQMcNZaqKJEOMk5JFrnvD6+ca7O00/x/wVR3WfilGGeoVHM9u/A7UNDIHt1ltNm99
+      k6bRgk+maDXEBxeLiyhjZZduRFFjZGVXAhg+IDWJm81tYc7HW7AQAbPxiRsBPDAKTy9
+      oRHPUPI4oTQhuFgW9iZ6RMzXz+g+d80VkWQ3QbV9HmvNvyoAtGa11z3pU6MHfXvTCzh
+      NQ2olg+MRHOhu+stNWEzfXwnBYPidgc54NDqf4r9SG1vRgtVCVBx28UBGxJwLEKAAKt
+      DIerDfVqX//PCwzC7ChKTT5VB6+upm/9XYsQCHvfsr1am0OYKqlkj70CuiLD48CQYg9
+      YPxRN/9gGeQ9YFprge6iTsWN20DHiK52NZbRnP2tfrjYhuBQP0tpk7unXFTaQLFM+17
+      MBx/88SO+sxsItlXqEFjh2xJnM26+mN9yIHABPpSPxJaDzok5CSYdV/DFSlKaKql8m8
+      IFm5s4a7cprt9TB7cujYOkmSKpRpZEU+LAjBLTeafbwT/6fFcsDViAJiQVel2e06Dst
+      bwblHxKqmdmiufpOJgRnWXwNP1qV+EqtzKdMMBasoWEIiw866AzdcJZ4wk9k4krfxxP
+      umkBfiX0wMFVwjLrWx0c='
   distributions: sdist bdist_wheel
