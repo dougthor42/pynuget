@@ -20,11 +20,12 @@ Installation
 1. Install the Prerequisites
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+If you're savvy, you could use nginx instead. I am not savvy.
+
 .. code-block:: shell
 
     $ sudo apt install apache2
     $ sudo apt install libapache2-mod-wsgi-py3
-
 
 
 2. Create a Virtual Environment
