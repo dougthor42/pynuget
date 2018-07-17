@@ -6,8 +6,11 @@ pynuget
    :alt: Travis
    :target: https://travis-ci.org/dougthor42/pynuget
 
-A port of https://github.com/Daniel15/simple-nuget-server/ because I
+
+A port of Daniel15's `simple-nuget-server`_ because I
 don't know PHP or Nginx. Runs on Flask and Apache. Python 3.5+
+
+.. _simple-nuget-server: https://github.com/Daniel15/simple-nuget-server/
 
 
 Installation
