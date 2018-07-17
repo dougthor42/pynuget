@@ -59,7 +59,7 @@ with open("README.rst", 'r') as openf:
 setup(
     # General
     name="pynuget",
-    version="0.0.1",
+    version="0.1.0",
 
     # Descriptions
     description="A Python-based NuGet Server",
