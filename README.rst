@@ -31,6 +31,10 @@ If you're savvy, you could use nginx instead. I am not savvy.
 2. Create a Virtual Environment
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+This is highly recommended. I also haven't bothered to figure out how to do
+a non-venv install so... If you want to do that you're on your own! When
+you figure it out, please submit a PR for this documentation. :smile:
+
 .. code-block:: shell
 
     $ python3 -m venv /usr/local/venv-pynuget/        # or anywhere
