@@ -74,9 +74,6 @@ setup(
     # Files
     package_dir={'': 'src'},
     packages=find_packages(where='src'),
-#    package_data={
-#        'pynuget.include': ['../../wsgi.py', '../../apache-example.conf'],
-#    },
 
     # these get copied to sys.prefix/data, which will be the venv's folder.
     data_files=[
