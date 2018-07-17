@@ -98,3 +98,14 @@ full customization of the server.
 4. If your server has a Window manager, you can open up a web browser and
    navigate to ``http://localhost`` and you should see the PyNuGet landing
    page.
+
+
+6. Change your Secrets!
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Make sure to change your secret keys to random values. One way to do so is
+outlined in the `flask tutorial`_. You'll need to change 2 values in
+``/var/www/pynuget/config.py``::
+
+    SECRET_KEY
+    API_KEYS
