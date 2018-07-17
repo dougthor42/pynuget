@@ -56,7 +56,8 @@ def init(server_path, package_dir, db_name, db_backend, apache_config,
     _create_directories(server_path, package_dir, "/var/log/pynuget")
     _create_db(db_backend, db_name, server_path)
 
-    _copy_wsgi(server_path, replace_wsgi)
+    wsgi_file = _copy_wsgi(server_path, replace_wsgi)
+    _update_wsgi(wsgi_file)
 
     conf = _copy_apache_config(apache_config, replace_apache)
     _enable_apache_conf(conf.resolve())
@@ -145,9 +146,11 @@ def _create_dir(path):
     logger.debug("Creating '%s'" % path)
     try:
         # u=rwx,g=srwx,o=rx
-        path.mkdir(parents=True, mode=0x2775, exist_ok=True)
+        path.mkdir(parents=True, exist_ok=True)
     except PermissionError:
         logger.warn("Unable to make dir %s" % path)
+        logger.warn(path.parent.stat())
+        logger.warn("Parent Mode: %s" % (path.parent.stat().st_mode & 0o0777))
     else:
         try:
             shutil.chown(str(path), 'www-data', 'www-data')
@@ -400,6 +403,41 @@ def _copy_wsgi(server_path, replace_existing=None):
 
     _copy_file_with_replace_prompt(original, wsgi_path, replace_existing)
 
+    return wsgi_path
+
+
+def _update_wsgi(wsgi_path):
+    """
+    Update the WSGI file with the correct venv directory.
+
+    Parameters
+    ----------
+    wsgi_path : Path object
+    """
+    logger.debug("Updating WSGI file: %s" % wsgi_path)
+    # Find our site-packages folder. Don't do anything if we're not in a venv.
+    venv = os.getenv('VIRTUAL_ENV', None)
+    if venv is None:
+        logger.info("Not in a virtual env. Nothing to do.")
+        return
+
+    venv = Path(venv)
+    site_pkgs = list(venv.glob('lib/python*/site-packages'))[0]
+    logger.debug("Found site-packages directory: %s" % site_pkgs)
+
+    args = ["sed",
+            "-i", "-E",
+            r's@^(site\.addsitedir).+$@\1\("{}"\)@g'.format(site_pkgs),
+            str(wsgi_path),
+            ]
+    logger.debug("Command: %s" % " ".join(args))
+    try:
+        subprocess.run(args)
+    except subprocess.CalledProcessError:
+        msg = ("Unlable update the WSGI file with the virtual environment's"
+               " site-packages directory! Please do so manually")
+        logger.error(msg)
+
 
 def _copy_apache_config(apache_config, replace_existing=None):
     """
@@ -474,7 +512,7 @@ def _reload_apache():
         logger.error(msg)
 
 
-def _save_config(default_config_file, **kwargs):
+def _save_config(default_config_file, save_to=None, **kwargs):
     """Save the values to the configuration file."""
     logger.info("Saving configuration.")
 
@@ -503,7 +541,10 @@ def _save_config(default_config_file, **kwargs):
             msg = "Replaced %s: '%s' with '%s'"
             logger.debug(msg % (variable, old_value, new_value))
 
-    config_path = Path(kwargs['server_path']) / Path('config.py')
+    config_path = save_to
+    if save_to is None:
+        config_path = Path(kwargs['server_path']) / Path('config.py')
+
     with open(str(config_path), 'w') as openf:
         openf.write(raw)
 

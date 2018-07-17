@@ -135,8 +135,8 @@ def test__replace_prompt(monkeypatch):
 def test__enable_apache_config():
     path = Path("./apache2/sites-available/something.conf")
     enabled = Path("./apache2/sites-enabled")
-    os.makedirs(str(path.parent), mode=0o2775, exist_ok=True)
-    os.makedirs(str(enabled), mode=0o2775, exist_ok=True)
+    os.makedirs(str(path.parent), exist_ok=True)
+    os.makedirs(str(enabled), exist_ok=True)
     path.touch()
     result = commands._enable_apache_conf(path)
 
@@ -165,21 +165,25 @@ def test__save_config():
     commands._create_directories(
         server_path=str(created_file.parent),
         package_dir='pkg',
-        log_dir="/var/log/pynuget"
+        log_dir="./log"
     )
 
     # with no kwargs, we should error out ('server_path' is required)
     with pytest.raises(KeyError):
         commands._save_config(file)
 
-    # With minimal kwargs, the resulting file should match our default
-    commands._save_config(file, server_path="./server")
+    # With minimal args that match the default, nothing should be changed.
+    commands._save_config(file,
+                          save_to=created_file,
+                          server_path="/var/www/pynuget",
+                          )
     assert filecmp.cmp(str(file), str(created_file))
 
     # A full list of args should still work.
-#    server_path, package_dir, db_name, db_backend, apache_config,
-#         replace_wsgi=False, replace_apache=False
+    #    server_path, package_dir, db_name, db_backend, apache_config,
+    #         replace_wsgi=False, replace_apache=False
     commands._save_config(file,
+                          save_to=created_file,
                           server_path="./server",
                           package_dir="apples",
                           db_name="hello.sqlite",
@@ -190,7 +194,8 @@ def test__save_config():
 
     # Args that are not present in the default config should be ignored.
     commands._save_config(file,
-                          server_path='./server',
+                          save_to=created_file,
+                          server_path="/var/www/pynuget",
                           replace_wsgi=False,
                           repalce_apache=False,
                           )

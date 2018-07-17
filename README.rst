@@ -47,8 +47,13 @@ Installation
 
 .. code-block:: shell
 
-    $ sudo /usr/local/venv-pynuget/bin/pynuget init
+    $ sudo -E /usr/local/venv-pynuget/bin/pynuget init
 
+.. important::
+
+    Note the ``-E`` flag on ``sudo``! This preserves environment variables.
+    We're specifically interested in the ``VIRTUAL_ENV`` variable, as that's
+    needed to update the WSGI file.
 
 .. note::
 
