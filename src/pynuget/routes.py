@@ -374,7 +374,9 @@ def search():
     resp = make_response(feed.write_to_output(results))
     resp.headers['Content-Type'] = FEED_CONTENT_TYPE_HEADER
 
-    logger.debug(resp.data.decode('utf-8').replace('><',' >\n<'))
+    # Keep this line for future debugging. Will fill up the logs *very*
+    # quickly if there are a lot of packages on the server.
+    # logger.debug(resp.data.decode('utf-8').replace('><',' >\n<'))
 
     return resp
 
