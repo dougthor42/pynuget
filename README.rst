@@ -52,9 +52,13 @@ installed.
     $ pip install pynuget
 
 
-
 4. Run the Initial Setup Script
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To (hopefully) make things easier, I've included a CLI command that
+initializes the server with some reasonable defaults. This is pretty
+undocumented at this time, but my hope is that it will eventually support
+full customization of the server.
 
 .. code-block:: shell
 
