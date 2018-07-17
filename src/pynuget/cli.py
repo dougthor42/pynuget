@@ -115,6 +115,30 @@ def main():
     )
     parser_rebuild.set_defaults(func=run_rebuild)
 
+    # Push
+    parser_push = subparser.add_parser(
+        "push",
+        help=("Push a package to the server."),
+        parents=[parent_parser],
+    )
+    parser_push.set_defaults(func=run_push)
+    parser_push.add_argument(
+        "-s", "--source",
+        help=("The url of the server to push to."),
+        required=True,
+    )
+    parser_push.add_argument(
+        "-k", "--api-key",
+        dest='key',
+        help=("The NuGet API key of the server."),
+        default='',
+        required=False,
+    )
+    parser_push.add_argument(
+        "file",
+        help=("The file to upload."),
+    )
+
     # Parse the args
     args = parser.parse_args()
 
@@ -143,3 +167,7 @@ def run_clear(args):
 
 def run_rebuild(args):
     commands.rebuild()
+
+
+def run_push(args):
+    commands.push(args.file, args.source, args.key)
