@@ -14,6 +14,14 @@ from pynuget import db
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
 
+@pytest.mark.skip("I think this needs an actual server running, not just the"
+                  " test client.")
+def test_push(client):
+    file = Path(DATA_DIR) / "NuGetTest.0.0.1.nupkg"
+    key = "no_key"
+    commands.push(str(file), source='http://localhost:5000', key=key)
+
+
 def test__get_packages_from_files(package_data, package_dir):
     data = commands._get_packages_from_files(package_dir)
     for key, value in data.items():

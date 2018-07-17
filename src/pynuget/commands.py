@@ -9,6 +9,7 @@ import sys
 from datetime import datetime as dt
 from pathlib import Path
 
+import requests
 from sqlalchemy import create_engine
 
 from pynuget import db
@@ -129,6 +130,49 @@ def rebuild():
 
     _add_packages_to_db(file_data)
     _remove_packages_from_db(file_data, db_data)
+
+
+def push(file, source, key):
+    """
+    Push a package to a nuget server.
+
+    Mimics the basic functionality of::
+
+        nuget.exe push -ApiKey $key -Source $source $file
+
+    This is needed because the standard NuGet.exe is not sending
+    Content-Length in the header during HTTP PUT. I also can't figure out how
+    to get Apache to ignore Content-Length (as it's a SHOULD not a MUST in
+    the spec), and the Content-Length apache direcive isn't available until
+    Apache 2.5...
+
+    Parameters
+    ----------
+    file : str
+        The path to the file to upload
+    source : str
+        The URL for the (py)NuGet server to push to.
+    key : str
+        The ApiKey value.
+    """
+    logger.debug("push('%s', '%s', '<redacted>')" % (file, source))
+
+    if not Path(file).exists():
+        logger.error("File '%s' does not exist. Aborting." % file)
+        return
+
+    header = {
+        'X-Nuget-ApiKey': key,
+        'User-Agent': 'PyNuGet',
+    }
+
+    if source[-1] == "/":
+        source = source[:-1]
+    source += '/api/v2/package/'
+
+    files = {'package': open(file, 'rb')}
+    resp = requests.put(source, headers=header, files=files)
+    logger.debug("{} {}".format(resp, resp.text))
 
 
 def _create_dir(path):
