@@ -216,6 +216,7 @@ def count():
 
 
 @pages.route('/delete', methods=['DELETE'])
+@pages.route('/<package>/<version>', methods=['DELETE'])
 @pages.route('/api/v2/package/<package>/<version>', methods=['DELETE'])
 def delete(package=None, version=None):
     """
