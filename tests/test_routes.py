@@ -16,11 +16,13 @@ DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
 def test_root_get(client):
     rv = client.get('/')
+    assert b"This is a NuGet compatible package index" in rv.data
     assert rv.status_code == 200
 
 
 def test_index_get(client):
     rv = client.get('/index')
+    assert b"This is a NuGet compatible package index" in rv.data
     assert rv.status_code == 200
 
 
