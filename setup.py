@@ -74,6 +74,7 @@ setup(
     # Files
     package_dir={'': 'src'},
     packages=find_packages(where='src'),
+    include_package_data=True,
 
     # these get copied to sys.prefix/data, which will be the venv's folder.
     data_files=[
