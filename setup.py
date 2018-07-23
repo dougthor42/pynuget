@@ -9,6 +9,9 @@ from glob import glob
 from os.path import basename
 from os.path import splitext
 
+from pathlib import Path
+import re
+
 
 # #########################################################################
 # These classes will only work if the user runs:
@@ -34,6 +37,27 @@ class InstallCommand(install):
         # Post-install: perhaps init the dirs and database?
 
 # #########################################################################
+
+
+def find_version(*file_paths):
+    """
+    Find the package version for the given path.
+
+    Taken from https://github.com/pypa/pip/blob/master/setup.py and modified
+    to suit my needs/tastes.
+    """
+    version_file = Path(__file__).parent.joinpath(*file_paths)
+    with open(str(version_file), 'r') as openf:
+        data = openf.read()
+    version_match = re.search(
+        r"^__version__ = ['\"]([^'\"]*)['\"]",
+        data,
+        re.M,
+    )
+    if version_match:
+        return version_match.group(1)
+
+    raise RuntimeError("Unable to find version string.")
 
 
 classifiers = [
@@ -71,7 +95,7 @@ with open("README.rst", 'r') as openf:
 setup(
     # General
     name="pynuget",
-    version="0.1.0",
+    version=find_version('src', 'pynuget', '__init__.py'),
 
     # Descriptions
     description="A Python-based NuGet Server",
