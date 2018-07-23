@@ -8,6 +8,7 @@ from uuid import uuid4
 # Third-Party
 from flask import current_app
 from flask import g
+from flask import render_template
 from flask import request
 from flask import send_file
 from flask import make_response
@@ -89,7 +90,8 @@ def index():
     Used for web interface.
     """
     logger.debug("Route: /index")
-    return "index page"
+    version = "<TODO>"
+    return render_template("web/index.html", server_version=version)
 
 
 @pages.route('/api/v2/package/', methods=['PUT'])

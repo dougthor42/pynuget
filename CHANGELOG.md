@@ -1,6 +1,11 @@
 # Changelog for PyNuGet
 
 
+## Unreleased
++ Added a very simple web UI which allows users to see all packages and
+  versions available.
+
+
 ## 0.1.0 (2018-07-17): Initial Release
 + First release of working prototype. Contains `push`, `list`, and
   `delete` functionality.

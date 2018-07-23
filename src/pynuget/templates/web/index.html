@@ -1,0 +1,28 @@
+{% extends "web/_layout.html" %}
+{% block body %}
+
+<p>This is a NuGet compatible package index.</p>
+
+<p>To use this server, with NuGet, run the following command:</p>
+<blockquote>
+<pre>
+nuget.exe list -Source $source
+nuget.exe delete -ApiKey $key -Source $source $pkg $vers
+nuget.exe push -ApiKey $key -Source $source $file
+</pre>
+</blockquote>
+
+<p>This server is running version {{ server_version }} of
+<a href="https://github.com/dougthor42/pynuget">PyNuGet</a>.</p>
+
+<p>The complete list of packages can be
+found <a href="nuget_packages/">here</a>.</p>
+
+{% if files %}
+  <ul>
+    {% for file in files %}
+    <li><a href="{{ file }}">{{ file }}</a></li>
+    {% endfor %}
+  </ul>
+{% endif %}
+{% endblock %}

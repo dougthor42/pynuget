@@ -14,13 +14,10 @@ from pynuget import routes
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
 
-def test_root_get(client):
-    rv = client.get('/')
-    assert rv.status_code == 200
-
-
-def test_index_get(client):
-    rv = client.get('/index')
+@pytest.mark.parametrize("url", ['/', '/index'])
+def test_root_get(client, url):
+    rv = client.get(url)
+    assert b"This is a NuGet compatible package index" in rv.data
     assert rv.status_code == 200
 
 
