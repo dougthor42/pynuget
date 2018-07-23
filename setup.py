@@ -97,6 +97,7 @@ setup(
     py_modules=[splitext(basename(path))[0] for path in glob('src/*.py')],
 
     classifiers=classifiers,
+    keywords='nuget packaging c# csharp',
 
     # Versions and Requirements
     python_requires=">=3.5",
