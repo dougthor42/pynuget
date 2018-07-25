@@ -2,6 +2,7 @@
 
 
 ## Unreleased
++ Added line numbers to logging (#33).
 
 
 ## 0.2.1 (2018-07-25)
