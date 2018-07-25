@@ -99,6 +99,13 @@ def test_parse_nuspec():
     assert version == '0.0.1'
 
 
+def test_extact_namespace():
+    good = et.parse(os.path.join(DATA_DIR, "good.nuspec"))
+    ns = core.extract_namespace(good)
+    assert isinstance(ns, str)
+    assert ns == "http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd"
+
+
 def test_extract_nuspec():
     no_nuspec = os.path.join(DATA_DIR, "no_nuspec.nupkg")
     with pytest.raises(core.ApiException):
