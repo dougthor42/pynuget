@@ -2,6 +2,7 @@
 
 
 ## Unreleased
++ Don't use a static value for the nuspec namespace.
 
 
 ## 0.2.0 (2018-07-23):

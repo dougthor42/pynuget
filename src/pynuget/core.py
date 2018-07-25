@@ -241,6 +241,24 @@ def extract_nuspec(file):
     return nuspec
 
 
+def extract_namespace(nuspec):
+    """
+    Extract the namespce from the NuSpec file.
+
+    Parameters
+    ----------
+    nuspec : :class:`lxml.etree.Element` object
+        The parsed nuspec data.
+
+    Returns
+    -------
+    namespace : str
+    """
+    namespace = nuspec.xpath('namespace-uri(.)')
+    logger.debug("Found namespace: %s" % namespace)
+    return namespace
+
+
 def parse_nuspec(nuspec, ns=None):
     """
     Parameters
