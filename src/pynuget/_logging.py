@@ -18,6 +18,7 @@ LOG_LEVEL_GUI = LOG_LEVEL_BASE
 LOG_FMT = ("%(asctime)s.%(msecs)03dZ"
            " [%(levelname)-8.8s]"
            " [%(module)-8.8s]"       # Note implicit string concatenation.
+           " [%(lineno)4d]"
            " [%(funcName)-16.16s]"
            "  %(message)s"
            )
