@@ -122,8 +122,7 @@ def push():
         return "api_error: Zero or multiple nuspec files found", 400
 
     # The NuSpec XML file uses namespaces.
-    # TODO: What if the namespace changes?
-    ns = {'nuspec': 'http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd'}
+    ns = {'nuspec': core.extract_namespace(nuspec)}
 
     # Make sure both the ID and the version are provided in the .nuspec file.
     try:
