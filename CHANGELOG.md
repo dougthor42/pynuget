@@ -4,7 +4,11 @@
 ## Unreleased
 
 
-## 0.2.4 (2018-07-26)
+## 0.2.5 (2018-07-26)
++ Removed the wrong logging message in the previous release. >_<
+
+
+## 0.2.4 (2018-07-26) [YANKED]
 + Removed too-verbose logging in find_by_id.
 
 
