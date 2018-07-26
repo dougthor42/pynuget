@@ -354,7 +354,7 @@ def group_dependencies(data):
         except KeyError:
             groups[framework] = [item]
 
-    grp_names = groups.key()
+    grp_names = groups.keys()
     logger.debug("Found {} dependency groups: {}".format(len(grp_names),
                                                          grp_names))
     return groups
