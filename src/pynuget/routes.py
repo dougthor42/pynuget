@@ -374,6 +374,7 @@ def search():
 
     feed = FeedWriter('Search', request.url_root)
     resp = make_response(feed.write_to_output(results))
+    logger.debug("Finished FeedWriter.write_to_output")
     resp.headers['Content-Type'] = FEED_CONTENT_TYPE_HEADER
 
     # Keep this line for future debugging. Will fill up the logs *very*
