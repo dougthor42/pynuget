@@ -2,6 +2,7 @@
 
 
 ## Unreleased
++ Optionally run coverage when running in localhost development.
 
 
 ## 0.2.1 (2018-07-25)
