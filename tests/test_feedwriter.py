@@ -88,6 +88,23 @@ def test_render_dependencies(feedwriter):
     assert result == "1:0.2.3:|2:1.2.3:|3:2.5.0:dnx451"
 
 
+def test_group_frameworks():
+    raw = """
+        [
+            {"version": "4.0.0", "framework": null, "id": "NLog"},
+            {"version": "4.0.0", "framework": "A", "id": "pkg2"},
+            {"version": "4.0.0", "framework": "A", "id": "pkg1"},
+            {"version": "4.0.0", "framework": "B", "id": "pkg3"},
+            {"version": "1.2.0", "id": "pkg4"}
+        ]
+        """
+    import json
+    data = json.loads(raw)
+
+    assert fw.group_frameworks([data[4]]) is None
+    assert fw.group_frameworks(data) == [None, "A", "B"]
+
+
 def test_format_target_framework(feedwriter):
     assert feedwriter.format_target_framework('DNX4.5.1') == 'dnx451'
 

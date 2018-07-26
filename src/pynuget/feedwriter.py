@@ -273,3 +273,37 @@ class FeedWriter(object):
 
         if value is None:
             child.set('null', 'true')
+
+
+def group_frameworks(data):
+    """
+    Collect the frameworks from dependency data into a set list.
+
+    Parameters
+    ----------
+    data :
+        Parsed JSON
+
+    Returns
+    -------
+    frameworks : list
+        Sorted list of framework names.
+    """
+    # if none of the dependencies define a framework, we can use a flat list.
+    if not any('framework' in item.keys() for item in data):
+        return None
+
+    # TODO: Are frameworks case sensitive?
+    frameworks = {item.get('framework', None) for item in data}
+
+    # sometimes a framework will be 'null': we can just drop that from the set
+    frameworks -= {'null'}
+
+    # Since sets are unorderd, convert to a list. `None` isn't sortable, so
+    # if it's in the set, pop it out, then sort, then prepend.
+    if None in frameworks:
+        frameworks = [None] + sorted(list(frameworks - {None}))
+    else:
+        frameworks = sorted(list(frameworks))
+
+    return frameworks
