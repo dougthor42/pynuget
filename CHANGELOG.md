@@ -9,6 +9,7 @@
 + Fixed an issue where deleting the last remaining version of a package
   would not delete the row in the Package table, thus causing subsequet pushes
   of the same version to fail. (#38)
++ Added exit codes for all CLI commands. (#37)
 
 
 ## 0.2.1 (2018-07-25)

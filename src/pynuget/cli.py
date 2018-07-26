@@ -152,13 +152,15 @@ def main():
 
 
 def run_init(args):
-    commands.init(
+    success = commands.init(
         server_path=SERVER_PATH,
         package_dir=args.package_dir,
         db_name=args.db_name,
         db_backend=args.db_backend,
         apache_config=args.apache_config,
     )
+    if not success:
+        sys.exit(1)
 
 
 def run_clear(args):
@@ -166,8 +168,12 @@ def run_clear(args):
 
 
 def run_rebuild(args):
-    commands.rebuild()
+    success = commands.rebuild()
+    if not success:
+        sys.exit(1)
 
 
 def run_push(args):
-    commands.push(args.file, args.source, args.key)
+    success = commands.push(args.file, args.source, args.key)
+    if not success:
+        sys.exit(1)

@@ -70,6 +70,8 @@ def init(server_path, package_dir, db_name, db_backend, apache_config,
 
     _reload_apache()
 
+    return True
+
 
 def clear(server_path, force=False):
     """
@@ -112,6 +114,8 @@ def clear(server_path, force=False):
     _create_directories(server_path, config.PACKAGE_DIR, "/var/log/pynuget")
     _create_db(config.DB_BACKEND, config.DB_NAME, server_path)
 
+    return False
+
 
 def rebuild():
     """Rebuild the package database."""
@@ -130,6 +134,8 @@ def rebuild():
 
     _add_packages_to_db(file_data)
     _remove_packages_from_db(file_data, db_data)
+
+    return False
 
 
 def push(file, source, key):
@@ -173,6 +179,9 @@ def push(file, source, key):
     files = {'package': open(file, 'rb')}
     resp = requests.put(source, headers=header, files=files)
     logger.debug("{} {}".format(resp, resp.text))
+
+    # 201 = Item Created. Means we were successful.
+    return resp.status_code == 201
 
 
 def _create_dir(path):
