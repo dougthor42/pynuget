@@ -150,22 +150,46 @@ def test_insert_version(session):
 
 
 def test_delete_version(session):
+    # Add additional dummy data.
+    pkg = db.Package(name="Foo", latest_version="0.9.6")
+    session.add(pkg)
+    session.commit()
+
+    session.add(db.Version(package_id=pkg.package_id, version="0.9.6"))
+    session.add(db.Version(package_id=pkg.package_id, version="0.9.7"))
+    session.commit()
+
+    # The package we're interested in.
+    pkg_id = 'dummy'
+
     # get our initial counts
-    version_count = session.query(sa.func.count(db.Version.version_id))
+    version_count = (session.query(sa.func.count(db.Version.version_id))
+                     .join(db.Package)
+                     .filter(db.Package.name == pkg_id))
     package_count = session.query(sa.func.count(db.Package.package_id))
     initial_version_count = version_count.scalar()
     initial_package_count = package_count.scalar()
 
-    # Delete a version
-    pkg_id = 'dummy'
     db.delete_version(session, pkg_id, '0.0.2')
 
+    # The number of versions for our package should have decreased by 1.
     assert initial_version_count - 1 == version_count.scalar()
+
+    # We should still have 2 packages
+    assert initial_package_count == 2
     assert initial_package_count == package_count.scalar()
+
+    # The deleted version should not show up at all. (Note this particular
+    # test only works because our dummy data only has 1 instance of "0.0.2")
     assert '0.0.2' not in session.query(db.Version.version).all()
 
-    # twice more, the 2nd of which should delete the package
+    # Deleting the highest version should change the `latest_version` value
+    qry = session.query(db.Package).filter(db.Package.name == 'dummy')
     db.delete_version(session, pkg_id, '0.0.3')
+    assert qry.one().latest_version == '0.0.1'
+
+    # Deleting the last version of a package should remove the row from the
+    # Packages table.
     db.delete_version(session, pkg_id, '0.0.1')
     assert version_count.scalar() == 0
-    assert package_count.scalar() == 0
+    assert package_count.scalar() == 1
