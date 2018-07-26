@@ -3,6 +3,7 @@
 
 ## Unreleased
 + Added line numbers to logging (#33).
++ Optionally run coverage when running in localhost development.
 
 
 ## 0.2.1 (2018-07-25)
