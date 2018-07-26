@@ -334,7 +334,6 @@ def delete_version(session, package_name, version):
     logger.debug(package)
 
     session.delete(sql.one())
-    session.commit()
 
     # update the Package.latest_version value, or delete the Package
     versions = (session.query(Version)
