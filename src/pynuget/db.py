@@ -73,7 +73,7 @@ class Version(Base):
     package = relationship("Package", backref="versions")
 
     def __repr__(self):
-        return "<Version({}, {})>".format(self.package.name, self.version)
+        return "<Version({}, {}, {})>".format(self.version_id, self.package.name, self.version)
 
     @hybrid_property
     def thing(self):
