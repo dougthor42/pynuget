@@ -88,6 +88,51 @@ def test_render_dependencies(feedwriter):
     assert result == "1:0.2.3:|2:1.2.3:|3:2.5.0:dnx451"
 
 
+def test_render_dependencies_xml(feedwriter):
+    raw = """
+        [
+            {"version": "4.0.0", "framework": null, "id": "NLog"},
+            {"version": "4.0.0", "framework": "A", "id": "pkg2"},
+            {"version": "4.0.0", "framework": "A", "id": "pkg1"},
+            {"version": "4.0.0", "framework": "B", "id": "pkg3"},
+            {"version": "1.2.0", "id": "pkg4"}
+        ]
+        """
+
+    result = feedwriter.render_dependencies_xml(raw)
+    print(et.tostring(result))
+    assert isinstance(result, et._Element)
+
+
+def test_group_dependencies():
+    raw = """
+        [
+            {"version": "4.0.0", "framework": null, "id": "NLog"},
+            {"version": "4.0.0", "framework": "A", "id": "pkg2"},
+            {"version": "4.0.0", "framework": "A", "id": "pkg1"},
+            {"version": "4.0.0", "framework": "B", "id": "pkg3"},
+            {"version": "1.2.0", "id": "pkg4"}
+        ]
+        """
+    import json
+    data = json.loads(raw)
+
+    # if no frameworks are listed, they should all be grouped under "None"
+    assert fw.group_dependencies([data[4]]) == {None: [data[4]]}
+
+    actual = fw.group_dependencies(data)
+    expected = {
+        None: [{"version": "4.0.0", "framework": None, "id": "NLog"},
+               {"version": "1.2.0", "id": "pkg4"}],
+        "A": [{"version": "4.0.0", "framework": "A", "id": "pkg2"},
+              {"version": "4.0.0", "framework": "A", "id": "pkg1"}],
+        "B": [{"version": "4.0.0", "framework": "B", "id": "pkg3"}],
+    }
+
+    assert isinstance(actual, dict)
+    assert actual == expected
+
+
 def test_format_target_framework(feedwriter):
     assert feedwriter.format_target_framework('DNX4.5.1') == 'dnx451'
 
