@@ -275,9 +275,9 @@ class FeedWriter(object):
             child.set('null', 'true')
 
 
-def group_frameworks(data):
+def group_dependencies(data):
     """
-    Collect the frameworks from dependency data into a set list.
+    Groups each dependency into a dict of items with the same framework.
 
     Parameters
     ----------
@@ -286,24 +286,23 @@ def group_frameworks(data):
 
     Returns
     -------
-    frameworks : list
-        Sorted list of framework names.
+    groups : dict
     """
-    # if none of the dependencies define a framework, we can use a flat list.
-    if not any('framework' in item.keys() for item in data):
-        return None
+    logger.debug("Starting group_dependencies(...)")
+    groups = {}
+    for item in data:
+        framework = item.get('framework', None)
 
-    # TODO: Are frameworks case sensitive?
-    frameworks = {item.get('framework', None) for item in data}
+        # special case: 'null' framework
+        if framework == 'null':
+            framework = None
 
-    # sometimes a framework will be 'null': we can just drop that from the set
-    frameworks -= {'null'}
+        try:
+            groups[framework].append(item)
+        except KeyError:
+            groups[framework] = [item]
 
-    # Since sets are unorderd, convert to a list. `None` isn't sortable, so
-    # if it's in the set, pop it out, then sort, then prepend.
-    if None in frameworks:
-        frameworks = [None] + sorted(list(frameworks - {None}))
-    else:
-        frameworks = sorted(list(frameworks))
-
-    return frameworks
+    grp_names = groups.key()
+    logger.debug("Found {} dependency groups: {}".format(len(grp_names),
+                                                         grp_names))
+    return groups

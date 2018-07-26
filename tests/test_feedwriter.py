@@ -88,7 +88,7 @@ def test_render_dependencies(feedwriter):
     assert result == "1:0.2.3:|2:1.2.3:|3:2.5.0:dnx451"
 
 
-def test_group_frameworks():
+def test_group_dependencies():
     raw = """
         [
             {"version": "4.0.0", "framework": null, "id": "NLog"},
@@ -101,8 +101,20 @@ def test_group_frameworks():
     import json
     data = json.loads(raw)
 
-    assert fw.group_frameworks([data[4]]) is None
-    assert fw.group_frameworks(data) == [None, "A", "B"]
+    # if no frameworks are listed, they should all be grouped under "None"
+    assert fw.group_dependencies([data[4]]) == {None: [data[4]]}
+
+    actual = fw.group_dependencies(data)
+    expected = {
+        None: [{"version": "4.0.0", "framework": None, "id": "NLog"},
+               {"version": "1.2.0", "id": "pkg4"}],
+        "A": [{"version": "4.0.0", "framework": "A", "id": "pkg2"},
+              {"version": "4.0.0", "framework": "A", "id": "pkg1"}],
+        "B": [{"version": "4.0.0", "framework": "B", "id": "pkg3"}],
+    }
+
+    assert isinstance(actual, dict)
+    assert actual == expected
 
 
 def test_format_target_framework(feedwriter):
