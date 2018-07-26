@@ -70,7 +70,7 @@ def main():
         "--package-dir",
         help=("The directory that the packages will be saved in and served"
               " from. If this value is not an absolute path, `server_path`"
-              " will be used as the root. Defaults to 'packages' in"
+              " will be used as the root. Defaults to 'nuget_packages' in"
               " `server_path`"),
         default="nuget_packages",
     )

@@ -32,7 +32,7 @@ def init(server_path, package_dir, db_name, db_backend, apache_config,
     package_dir : str
         The directory that the packages will be saved in and served from. If
         this value is not an absolute path, `server_path` will be used as
-        the root. Defaults to 'packages' in `server_path`
+        the root. Defaults to 'nuget_packages' in `server_path`
     db_name : str
         The name of the database to use. If db_backend == 'sqlite', then
         this is the relative or absolute path to the SQLite file to use. If
