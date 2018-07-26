@@ -170,6 +170,7 @@ def package_updates(session, packages_dict, include_prerelease=False):
                         in packages_dict.items()]
 
     query = (session.query(Version)
+             .join(Package)
              .filter(Version.version == Package.latest_version)
              .filter(Version.package_id.in_(packages_dict.keys()))
              .filter(~Version.thing.in_(package_versions))
@@ -244,6 +245,7 @@ def validate_id_and_version(session, package_name, version):
     """
     logger.debug("db.validate_id_and_version(...)")
     query = (session.query(Version)
+             .join(Package)
              .filter(Package.name == package_name)
              .filter(Version.version == version)
              )
@@ -264,6 +266,7 @@ def increment_download_count(session, package_name, version):
     msg = "db.increment_download_count(%s, %s)"
     logger.debug(msg % (package_name, version))
     obj = (session.query(Version)
+           .join(Package)
            .filter(Package.name == package_name)
            .filter(Version.version == version)
            ).one()
