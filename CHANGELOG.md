@@ -4,6 +4,10 @@
 ## Unreleased
 
 
+## 0.2.3 (2018-07-26)
++ Fixed multiple instances of missing joins on queries... oops.
+
+
 ## 0.2.2 (2018-07-26)
 + Added line numbers to logging (#33).
 + Optionally run coverage when running in localhost development.
