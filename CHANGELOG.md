@@ -4,6 +4,8 @@
 ## Unreleased
 + Added line numbers to logging (#33).
 + Optionally run coverage when running in localhost development.
++ Fixed an issue where files with dependencies would break the "List" nuget
+  command (#39)
 
 
 ## 0.2.1 (2018-07-25)
