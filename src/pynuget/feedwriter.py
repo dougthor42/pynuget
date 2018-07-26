@@ -162,7 +162,7 @@ class FeedWriter(object):
             'NormalizedVersion': row.version,
             'Copyright': row.copyright_,
             'Created': self.render_meta_date(row.created),
-            'Dependencies': self.render_dependencies(row.dependencies),
+            'Dependencies': self.render_dependencies_xml(row.dependencies),
             'Description': row.description,  # TODO: htmlspecialchars
             'DownloadCount': {'value': str(row.package.download_count), 'type': 'Edm.Int32'},
             'GalleryDetailsUrl': gallery_details_url,
@@ -191,6 +191,10 @@ class FeedWriter(object):
         }
 
         for name, data in sorted(meta.items()):
+            if isinstance(data, et._Element):
+                properties.append(data)
+                continue
+
             if isinstance(data, dict):
                 value = data['value']
                 type_ = data['type']
@@ -235,6 +239,54 @@ class FeedWriter(object):
             output.append(formatted_dependency)
 
         return "|".join(output)
+
+    def render_dependencies_xml(self, raw):
+        """
+        Convert a raw json in the format:
+            [
+                {"version": "4.0.0", "framework": null, "id": "NLog"},
+                {"version": "4.0.0", "framework": "A", "id": "pkg2"},
+                {"version": "4.0.0", "framework": "A", "id": "pkg1"},
+                {"version": "4.0.0", "framework": "B", "id": "pkg3"},
+            ]
+
+        to the following XML:
+            <group>
+              <dependency id="NLog" version="4.0.0" />
+            </group>
+            <group targetFramework="A">
+              <dependency id="pkg2" version="4.0.0" />
+              <dependency id="pkg1" version="4.0.0" />
+            </group>
+            <group targetFramework="B">
+              <dependency id="pkg3" version="4.0.0" />
+            </group>
+        """
+        logger.debug("FeedWriter.render_dependencies(%s)" % raw)
+        if not raw:
+            return ''
+
+        try:
+            data = json.loads(raw)
+        except json.decoder.JSONDecodeError:
+            return ''
+
+        data = group_dependencies(data)
+
+        # then render the xml.
+        root_node = et.Element(NS_D + 'Dependencies', nsmap=NSMAP)
+        for group, deps in data.items():
+            node = et.Element(NS_D + 'Group', nsmap=NSMAP)
+            if group is not None:
+                node.set('targetFramework', group)
+            for dep in deps:
+                dep_node = et.Element(NS_D + 'Dependency', nsmap=NSMAP)
+                dep_node.set('id', dep['id'])
+                dep_node.set('version', dep['version'])
+                node.append(dep_node)
+            root_node.append(node)
+
+        return root_node
 
     def format_target_framework(self, framework):
         """Format a raw target framework from a NuSpec into the format

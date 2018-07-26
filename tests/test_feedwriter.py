@@ -88,6 +88,22 @@ def test_render_dependencies(feedwriter):
     assert result == "1:0.2.3:|2:1.2.3:|3:2.5.0:dnx451"
 
 
+def test_render_dependencies_xml(feedwriter):
+    raw = """
+        [
+            {"version": "4.0.0", "framework": null, "id": "NLog"},
+            {"version": "4.0.0", "framework": "A", "id": "pkg2"},
+            {"version": "4.0.0", "framework": "A", "id": "pkg1"},
+            {"version": "4.0.0", "framework": "B", "id": "pkg3"},
+            {"version": "1.2.0", "id": "pkg4"}
+        ]
+        """
+
+    result = feedwriter.render_dependencies_xml(raw)
+    print(et.tostring(result))
+    assert isinstance(result, et._Element)
+
+
 def test_group_dependencies():
     raw = """
         [
