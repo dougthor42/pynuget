@@ -338,6 +338,7 @@ def delete_version(session, package_name, version):
 
     # update the Package.latest_version value, or delete the Package
     versions = (session.query(Version)
+                .join(Package)
                 .filter(Package.name == package_name)
                 ).all()
     if len(versions) > 0:
