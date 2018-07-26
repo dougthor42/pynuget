@@ -4,6 +4,10 @@
 ## Unreleased
 
 
+## 0.2.4 (2018-07-26)
++ Removed too-verbose logging in find_by_id.
+
+
 ## 0.2.3 (2018-07-26)
 + Fixed multiple instances of missing joins on queries... oops.
 
