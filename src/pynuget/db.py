@@ -73,7 +73,7 @@ class Version(Base):
     package = relationship("Package", backref="versions")
 
     def __repr__(self):
-        return "<Version({}, {})>".format(self.package.name, self.version)
+        return "<Version({}, {}, {})>".format(self.version_id, self.package.name, self.version)
 
     @hybrid_property
     def thing(self):
@@ -330,18 +330,19 @@ def delete_version(session, package_name, version):
            .filter(Package.name == package_name)
            .filter(Version.version == version)
            )
-    package = sql.one().package
-    logger.debug(package)
+    version = sql.one()
+    pkg = version.package
 
-    session.delete(sql.one())
-    session.commit()
+    session.delete(version)
 
     # update the Package.latest_version value, or delete the Package
     versions = (session.query(Version)
+                .join(Package)
                 .filter(Package.name == package_name)
                 ).all()
     if len(versions) > 0:
-        package.latest_version = max(v.version for v in versions)
+        pkg.latest_version = max(v.version for v in versions)
     else:
-        session.delete(package)
+        logger.info("No more versions exist. Deleting package %s" % pkg)
+        session.delete(pkg)
     session.commit()

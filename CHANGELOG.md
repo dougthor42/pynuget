@@ -6,6 +6,9 @@
 + Optionally run coverage when running in localhost development.
 + Fixed an issue where files with dependencies would break the "List" nuget
   command (#39)
++ Fixed an issue where deleting the last remaining version of a package
+  would not delete the row in the Package table, thus causing subsequet pushes
+  of the same version to fail. (#38)
 
 
 ## 0.2.1 (2018-07-25)
