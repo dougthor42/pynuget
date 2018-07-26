@@ -343,5 +343,6 @@ def delete_version(session, package_name, version):
     if len(versions) > 0:
         pkg.latest_version = max(v.version for v in versions)
     else:
+        logger.info("No more versions exist. Deleting package %s" % pkg)
         session.delete(pkg)
     session.commit()
