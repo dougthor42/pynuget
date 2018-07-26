@@ -330,10 +330,10 @@ def delete_version(session, package_name, version):
            .filter(Package.name == package_name)
            .filter(Version.version == version)
            )
-    pkg = sql.one().package
-    logger.debug(pkg)
+    version = sql.one()
+    pkg = version.package
 
-    session.delete(sql.one())
+    session.delete(version)
 
     # update the Package.latest_version value, or delete the Package
     versions = (session.query(Version)
