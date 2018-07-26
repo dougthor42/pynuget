@@ -273,6 +273,7 @@ def increment_download_count(session, package_name, version):
     obj.version_download_count += 1
     obj.package.download_count += 1
     session.commit()
+    logger.debug("Finished increment_download_count")
 
 
 def insert_or_update_package(session, package_name, title, latest_version):
