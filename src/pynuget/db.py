@@ -330,8 +330,8 @@ def delete_version(session, package_name, version):
            .filter(Package.name == package_name)
            .filter(Version.version == version)
            )
-    package = sql.one().package
-    logger.debug(package)
+    pkg = sql.one().package
+    logger.debug(pkg)
 
     session.delete(sql.one())
 
@@ -341,7 +341,7 @@ def delete_version(session, package_name, version):
                 .filter(Package.name == package_name)
                 ).all()
     if len(versions) > 0:
-        package.latest_version = max(v.version for v in versions)
+        pkg.latest_version = max(v.version for v in versions)
     else:
-        session.delete(package)
+        session.delete(pkg)
     session.commit()
