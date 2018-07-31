@@ -109,3 +109,6 @@ outlined in the `flask tutorial`_. You'll need to change 2 values in
 
     SECRET_KEY
     API_KEYS
+
+
+.. _`flask tutorial`: http://flask.pocoo.org/docs/1.0/tutorial/deploy/#configure-the-secret-key
