@@ -36,9 +36,13 @@ EXPOSE 80
 CMD ["apache2ctl", "-D", "FOREGROUND", "-e", "info"]
 
 
-# And now actually add the project-specific stuff.
-COPY pynuget.conf /etc/apache2/sites-available/pynuget.conf
-COPY pynuget.wsgi /var/www/wsgi/pynuget.wsgi
+####################################################
+# And now actually add the project-specific stuff. #
+####################################################
+
+# Default Apache and WSGI configs
+COPY apache-example.conf /etc/apache2/sites-available/pynuget.conf
+COPY wsgi.py /var/www/wsgi/pynuget.wsgi
 
 # Install python requirements
 COPY requirements.txt /
