@@ -78,7 +78,7 @@ classifiers = [
 
 requires = [
     "sqlalchemy>=1.2.7",
-    "flask>=0.12.2",
+    "flask>=1.0.2",
     "lxml>=4.2.1",
     "requests>=2.20.1",
 ]
