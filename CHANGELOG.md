@@ -2,6 +2,7 @@
 
 
 ## Unreleased
++ Updated `requests` to v2.20.1. Fixes CVE-2018-18074.
 
 
 ## 0.2.5 (2018-07-26)

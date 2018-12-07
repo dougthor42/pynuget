@@ -80,7 +80,7 @@ requires = [
     "sqlalchemy>=1.2.7",
     "flask>=0.12.2",
     "lxml>=4.2.1",
-    "requests>=2.19.1",
+    "requests>=2.20.1",
 ]
 
 entry_points = {
