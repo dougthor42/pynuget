@@ -2,6 +2,7 @@
 
 
 ## Unreleased
++ Updated `flask` to v1.0.2. Fixes CVE-2018-1000656. (#51)
 + Updated `requests` to v2.20.1. Fixes CVE-2018-18074.
 
 
