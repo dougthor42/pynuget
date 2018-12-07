@@ -55,6 +55,8 @@ RUN a2ensite pynuget \
     && a2enmod headers \
     && a2dissite 000-default.conf \
     && mkdir /var/log/pynuget \
-    && chown -R www-data:www-data /var/log/pynuget
+    && chown -R www-data:www-data /var/log/pynuget \
+    && mkdir /var/www/pynuget/nuget_packages \
+    && chown -R www-data:www-data /var/www/pynuget
 
 # vim: tabstop=4 shiftwidth=4 expandtab filetype=dockerfile
