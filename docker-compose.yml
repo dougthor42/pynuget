@@ -1,0 +1,15 @@
+version: "3.2"
+services:
+  pynuget:
+    image: dougthor42/pynuget:latest
+    container_name: pynuget
+    restart: always
+    ports:
+      - "127.0.0.1:5081:80"
+    volumes:
+      - type: bind
+        source: /var/log/pynuget
+        target: /var/log/pynuget
+      - type: bind
+        source: /var/www/pynuget
+        target: /var/www/pynuget
