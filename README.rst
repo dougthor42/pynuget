@@ -16,6 +16,11 @@ don't know PHP or Nginx. Runs on Flask and Apache. Python 3.5+
 Installation
 ------------
 
+There are 2 options for installation:
+
+1. Docker.
+2. Not Docker.
+
 
 1. Install the Prerequisites
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
