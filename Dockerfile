@@ -43,6 +43,7 @@ CMD ["apache2ctl", "-D", "FOREGROUND", "-e", "info"]
 # Default Apache and WSGI configs
 COPY apache-example.conf /etc/apache2/sites-available/pynuget.conf
 COPY wsgi.py /var/www/pynuget/pynuget.wsgi
+COPY instance/config.py /var/www/pynuget/config.py
 
 # Install python requirements
 COPY requirements.txt /
@@ -57,6 +58,7 @@ RUN a2ensite pynuget \
     && mkdir /var/log/pynuget \
     && chown -R www-data:www-data /var/log/pynuget \
     && mkdir /var/www/pynuget/nuget_packages \
-    && chown -R www-data:www-data /var/www/pynuget
+    && chown -R www-data:www-data /var/www/pynuget \
+    && pynuget init
 
 # vim: tabstop=4 shiftwidth=4 expandtab filetype=dockerfile
