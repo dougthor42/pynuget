@@ -42,7 +42,7 @@ CMD ["apache2ctl", "-D", "FOREGROUND", "-e", "info"]
 
 # Default Apache and WSGI configs
 COPY apache-example.conf /etc/apache2/sites-available/pynuget.conf
-COPY wsgi.py /var/www/wsgi/pynuget.wsgi
+COPY wsgi.py /var/www/pynuget/pynuget.wsgi
 
 # Install python requirements
 COPY requirements.txt /
