@@ -1,3 +1,4 @@
+# Create a python-debian-apache image.
 FROM python:3.7.1-slim-stretch
 
 LABEL maintainer="doug.thor@gmail.com"
@@ -33,5 +34,23 @@ EXPOSE 80
 
 # Run apache in the foreground
 CMD ["apache2ctl", "-D", "FOREGROUND", "-e", "info"]
+
+
+# And now actually add the project-specific stuff.
+COPY pynuget.conf /etc/apache2/sites-available/pynuget.conf
+COPY pynuget.wsgi /var/www/wsgi/pynuget.wsgi
+
+# Install python requirements
+COPY requirements.txt /
+RUN pip install -r requirements.txt \
+    && rm requirements.txt
+
+RUN pip install pynuget
+
+RUN a2ensite pynuget \
+    && a2enmod headers \
+    && a2dissite 000-default.conf \
+    && mkdir /var/log/pynuget \
+    && chown -R www-data:www-data /var/log/pynuget
 
 # vim: tabstop=4 shiftwidth=4 expandtab filetype=dockerfile
