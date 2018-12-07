@@ -14,7 +14,7 @@ RUN apt-get update \
         wget \
     # Install mod_wsgi from source for our specific python verison
     && wget \
-        -O mod_wsgi-$WSGI_VERISON.tar.gz \
+        -O mod_wsgi-$WSGI_VERSION.tar.gz \
         "https://github.com/GrahamDumpleton/mod_wsgi/archive/$WSGI_VERSION.tar.gz" \
     && tar -xzf mod_wsgi-$WSGI_VERSION.tar.gz \
     && cd mod_wsgi-$WSGI_VERSION \
