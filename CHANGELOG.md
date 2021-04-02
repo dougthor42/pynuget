@@ -6,6 +6,7 @@
 + Updated `requests` to v2.20.1. Fixes CVE-2018-18074.
 + Updated `lxml` to v4.6.3. Fixes CVE-2018-19787, CVE-2020-27783, and
   CVE-2021-28957. (#55)
++ Dropped support for Python 3.5, add support for Python 3.8 and 3.9. (#55)
 
 
 ## 0.2.5 (2018-07-26)
