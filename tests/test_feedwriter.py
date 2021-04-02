@@ -158,9 +158,9 @@ def test_add_meta(feedwriter):
     expected_1 = (
         b'<root>'
         b'<d:SomeName'
+        b' xmlns="http://www.w3.org/2005/Atom"'
         b' xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices"'
         b' xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata"'
-        b' xmlns="http://www.w3.org/2005/Atom"'
         b' type="Edm.Int32">SomeValue</d:SomeName>'
         b'</root>'
     )
@@ -175,9 +175,9 @@ def test_add_meta(feedwriter):
     expected_2 = (
         b'<root>'
         b'<d:SomeName'
+        b' xmlns="http://www.w3.org/2005/Atom"'
         b' xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices"'
         b' xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata"'
-        b' xmlns="http://www.w3.org/2005/Atom"'
         b' type="Edm.Int32"'
         b' null="true"/>'
         b'</root>'
